@@ -1,10 +1,7 @@
 import { Stage } from "konva/lib/Stage";
-import { RefObject, useRef, useState } from "react";
-import { Image, Layer, Line, Rect } from "react-konva";
-import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
-import { scaleInfoType } from "../utils";
-import { Html } from "react-konva-utils";
-import { useTheme } from "@mui/material";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { Layer, Line, Rect } from "react-konva";
+import { activeToolOptions, scaleInfoType } from "../utils";
 
 type propsType = {
   stageRef: RefObject<Stage>;
@@ -13,6 +10,7 @@ type propsType = {
   changeScaleInfo: React.Dispatch<React.SetStateAction<scaleInfoType[][]>>;
   changeShowScaleModal: React.Dispatch<React.SetStateAction<boolean>>;
   enteredScale: any;
+  activeTool: activeToolOptions;
 };
 
 const Scale = ({
@@ -22,21 +20,40 @@ const Scale = ({
   changeScaleInfo,
   changeShowScaleModal,
   enteredScale,
+  activeTool,
 }: propsType): JSX.Element => {
-  const theme = useTheme();
+  const needCleanup = useRef<boolean>(false);
   const [scale, setScale] = useState<number[]>([]);
-
   const scalling = useRef<boolean>(false);
-  const layers = stageRef.current?.getStage().getLayers()!;
-  stageRef.current?.getStage().draggable(false);
-  layers.forEach((layer) => {
-    if (layer.attrs.name !== "imageLayer" && layer.attrs.name !== "scaleLayer")
-      layer.hide();
-  });
+
+  useEffect(() => {
+    const layers = stageRef.current?.getStage().getLayers()!;
+    if (activeTool === activeToolOptions.scale) {
+      needCleanup.current = true;
+      layers.forEach((layer) => {
+        if (
+          layer.attrs.name !== "imageLayer" &&
+          layer.attrs.name !== "scaleLayer"
+        )
+          layer.hide();
+      });
+    }
+    return () => {
+      if (needCleanup.current) {
+        layers.forEach((layer) => {
+          if (
+            layer.attrs.name !== "imageLayer" &&
+            layer.attrs.name !== "scaleLayer"
+          )
+            layer.show();
+        });
+      }
+    };
+  }, [activeTool]);
 
   const handleMouseDownImageLayer = (event: any) => {
+    if (activeTool !== activeToolOptions.scale) return;
     if (scalling.current === false) {
-      console.log("down");
       scalling.current = true;
       event.target.getStage().container().style.cursor = "crosshair";
       const { x, y } = event.target.getStage().getPointerPosition();
@@ -65,16 +82,16 @@ const Scale = ({
         y: Math.abs(scale[1] - (y - (stageRef.current?.attrs.y | 0))),
         scaleFactor: scaleFactor,
       };
-
       changeShowScaleModal(true);
     }
   };
 
   const handleMouseMoveImageLayer = (event: any) => {
+    if (activeTool !== activeToolOptions.scale) return;
     if (scale.length > 0 && scalling.current) {
       console.log("move");
       const { x, y } = event.target.getStage().getPointerPosition();
-      setScale((prev: any) => {
+      setScale((prev) => {
         const temp = [...prev];
         return [
           temp[0],

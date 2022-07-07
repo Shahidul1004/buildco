@@ -1,19 +1,5 @@
-import {
-  Box,
-  Button,
-  Input,
-  Menu,
-  MenuItem,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import React, {
-  ElementType,
-  MouseEvent,
-  MouseEventHandler,
-  useRef,
-  useState,
-} from "react";
+import { Box, Menu, MenuItem, Typography, useTheme } from "@mui/material";
+import React, { MouseEventHandler, useRef, useState } from "react";
 
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -45,9 +31,9 @@ const SelectFile = ({
   const openOption = Boolean(anchorElOption);
   const activePdf = useRef<string>("");
   const [modalType, setModalType] = useState<string>("");
-  if(selectedPdf === -1 && pdfOrder.length > 0) changeSelectedPdf(pdfOrder[0])
+  if (selectedPdf === -1 && pdfOrder.length > 0) changeSelectedPdf(pdfOrder[0]);
   else if (selectedPdf !== -1 && pdfOrder.indexOf(selectedPdf) === -1) {
-    changeSelectedPdf(pdfOrder[0] || -1);
+    changeSelectedPdf((prev) => pdfOrder[0] || -1);
   }
 
   const handleChangeList = (order: number) => {
@@ -156,8 +142,10 @@ const SelectFile = ({
           >
             <Typography
               onClick={() => {
-                handleChangeList(order);
                 handleCloseList();
+                setTimeout(() => {
+                  handleChangeList(order);
+                }, 10);
               }}
               noWrap
               sx={{

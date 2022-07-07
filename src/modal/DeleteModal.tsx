@@ -15,11 +15,13 @@ const DeleteModal = ({
 }: propTypes): JSX.Element => {
   const handleDelete = () => {
     onClose();
-    changePdfOrder((prev) => {
-      const temp = [...prev];
-      temp.splice(pdfIndex, 1);
-      return temp;
-    });
+    setTimeout(() => {
+      changePdfOrder((prev) => {
+        const temp = [...prev];
+        temp.splice(pdfIndex, 1);
+        return temp;
+      });
+    }, 10);
   };
 
   return (

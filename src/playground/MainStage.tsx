@@ -1,11 +1,17 @@
 import Konva from "konva";
-import { KonvaEventObject } from "konva/lib/Node";
-import { useEffect, useRef, useState } from "react";
-import { Image, Layer, Line, Rect, Stage, Transformer } from "react-konva";
+import { useRef, useState } from "react";
+import { Image, Layer, Stage } from "react-konva";
 import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
-import { activeToolOptions, scaleInfoType } from "../utils";
+import {
+  activeToolOptions,
+  polygonType,
+  rectType,
+  scaleInfoType,
+} from "../utils";
+import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
 import Scale from "./Scale";
+import Select from "./Select";
 
 type propsType = {
   selectedPdf: number;
@@ -16,6 +22,10 @@ type propsType = {
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
   scaleInfo: scaleInfoType[][];
   changeScaleInfo: React.Dispatch<React.SetStateAction<scaleInfoType[][]>>;
+  rect: rectType[];
+  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
+  polygon: polygonType[];
+  changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
 };
 
 const MainStage = ({
@@ -27,9 +37,12 @@ const MainStage = ({
   changeActiveTool,
   scaleInfo,
   changeScaleInfo,
+  rect,
+  changeRect,
+  polygon,
+  changePolygon,
 }: propsType): JSX.Element => {
   const stageRef = useRef<Konva.Stage>(null);
-  const imageLayerRef = useRef<Konva.Layer>(null);
 
   const enteredScale = useRef<any>();
   const [showScaleModal, setShowScaleModal] = useState<boolean>(false);
@@ -38,14 +51,9 @@ const MainStage = ({
     zoomLevel >= 50
       ? 0.5 * (1 + (zoomLevel - 50) / 50.0)
       : 0.5 * (1 + (0.5 * (zoomLevel - 50)) / 50.0);
-  console.log("scaleFactor", scaleFactor);
 
   if (activeTool === activeToolOptions.pan) {
     stageRef.current?.getStage().draggable(true);
-    stageRef.current
-      ?.getStage()
-      .getLayers()
-      .map((layer) => layer.show());
   } else {
     stageRef.current?.getStage().draggable(false);
   }
@@ -53,16 +61,16 @@ const MainStage = ({
   return (
     <>
       <Stage
-        width={blob.width}
-        height={blob.height}
+        width={Math.max(blob.width, window.innerWidth)}
+        height={Math.max(blob.height, window.innerHeight)}
         scaleX={scaleFactor}
         scaleY={scaleFactor}
         ref={stageRef}
       >
-        <Layer name="imageLayer" ref={imageLayerRef}>
+        <Layer name="imageLayer">
           <Image id="image" image={blob} />
         </Layer>
-        {activeTool === activeToolOptions.scale && (
+        {[activeToolOptions.scale].includes(activeTool) && (
           <Scale
             scaleFactor={scaleFactor}
             stageRef={stageRef}
@@ -70,10 +78,14 @@ const MainStage = ({
             changeScaleInfo={changeScaleInfo}
             changeShowScaleModal={setShowScaleModal}
             enteredScale={enteredScale}
+            activeTool={activeTool}
           />
         )}
-
-        {activeTool !== activeToolOptions.scale && (
+        {[
+          activeToolOptions.pan,
+          activeToolOptions.rectangle,
+          activeToolOptions.polygon,
+        ].includes(activeTool) && (
           <Rectangle
             selectedPdf={selectedPdf}
             selectedPage={selectedPage}
@@ -81,6 +93,39 @@ const MainStage = ({
             stageRef={stageRef}
             scaleFactor={scaleFactor}
             activeTool={activeTool}
+            rect={rect}
+            changeRect={changeRect}
+          />
+        )}
+        {[
+          activeToolOptions.pan,
+          activeToolOptions.rectangle,
+          activeToolOptions.polygon,
+        ].includes(activeTool) && (
+          <Polygon
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            scaleInfo={scaleInfo}
+            stageRef={stageRef}
+            scaleFactor={scaleFactor}
+            activeTool={activeTool}
+            polygon={polygon}
+            changePolygon={changePolygon}
+          />
+        )}
+
+        {[activeToolOptions.select].includes(activeTool) && (
+          <Select
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            activeTool={activeTool}
+            stageRef={stageRef}
+            scaleFactor={scaleFactor}
+            scaleInfo={scaleInfo}
+            rect={rect}
+            changeRect={changeRect}
+            polygon={polygon}
+            changePolygon={changePolygon}
           />
         )}
       </Stage>
@@ -99,81 +144,3 @@ const MainStage = ({
 };
 
 export default MainStage;
-
-// var stageWidth = window.innerWidth;
-// var stageHeight = 300;
-// var viewportPadding = 10;
-// var stage = new Konva.Stage({
-
-// 		x: 0,
-// 		y: 0,
-//     container: 'container',
-//     width: stageWidth,
-//     height: stageHeight
-// });
-// var zoom = 0.5;
-// stage.scaleX(zoom);
-// stage.scaleY(zoom);
-// stage.draw();
-
-// var layer = new Konva.Layer();
-// var background = new Konva.Rect({
-// 		x: 0,
-// 		y: 0,
-// 		fill: 'red',
-//     width: stageWidth,
-//     height: stageHeight,
-// });
-
-// var img = new Image();
-
-// img.onload = function() {
-// 		var imageWidth = stageWidth - (viewportPadding * 2);
-//   	var ratio = imageWidth / this.naturalWidth;
-//   	var imageHeight = this.naturalHeight * ratio;
-//     var floorImage = new Konva.Image({
-//     		x: viewportPadding,
-//         y: viewportPadding,
-//         image: img,
-//         width: imageWidth,
-//         height: imageHeight,
-//     });
-//     layer.add(floorImage);
-
-//     background.height(imageHeight + (viewportPadding * 2));
-//     stage.draw();
-// };
-
-// img.src = 'https://dspncdn.com/a1/media/originals/fa/06/eb/fa06ebac2b188e309cff600400d34e41.jpg';
-
-// layer.add(background);
-// stage.add(layer);
-// stage.draw();
-
-// stage.on('wheel', function(e) {
-//   var deltaX = e.evt.deltaX;
-//   var deltaY = e.evt.deltaY;
-//   var scrollStep = Math.abs(deltaY * 1);
-
-//     if (deltaY < 0) {
-//       var yPos = layer.y() + scrollStep;
-
-//       if (yPos > 0) {
-//       	yPos = 0;
-//       }
-
-//       layer.y(yPos);
-//       layer.batchDraw();
-
-//     } else if (deltaY > 0) {
-//       var yPos = layer.y() - scrollStep;
-//     	var remainingDistance = background.height() - stage.height() / stage.scaleY();
-
-//       if (yPos < -remainingDistance) {
-//         yPos = -remainingDistance;
-//       }
-
-//       layer.y(yPos);
-//       layer.batchDraw();
-//     }
-// });

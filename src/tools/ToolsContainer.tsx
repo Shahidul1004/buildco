@@ -5,13 +5,14 @@ import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
 
 import Scale from "./Scale";
+import Select from "./Select";
 import ZoomIn from "./ZoomIn";
 import ZoomOut from "./ZoomOut";
 
 type propsType = {
   selectedPdf: number;
   selectedPage: number;
-  zoomLevel: number;
+  currentZoomLevel: number;
   changeZoomLevel: React.Dispatch<React.SetStateAction<number[][]>>;
   activeTool: activeToolOptions;
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
@@ -20,13 +21,14 @@ type propsType = {
 const ToolsContainer = ({
   selectedPdf,
   selectedPage,
-  zoomLevel,
+  currentZoomLevel,
   changeZoomLevel,
   activeTool,
   changeActiveTool,
 }: propsType): JSX.Element => {
   return (
     <Container>
+      <Select activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Scale activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Pan activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Rectangle activeTool={activeTool} changeActiveTool={changeActiveTool} />
@@ -34,13 +36,13 @@ const ToolsContainer = ({
       <ZoomIn
         selectedPdf={selectedPdf}
         selectedPage={selectedPage}
-        zoomLevel={zoomLevel}
+        currentZoomLevel={currentZoomLevel}
         changeZoomLevel={changeZoomLevel}
       />
       <ZoomOut
         selectedPdf={selectedPdf}
         selectedPage={selectedPage}
-        zoomLevel={zoomLevel}
+        currentZoomLevel={currentZoomLevel}
         changeZoomLevel={changeZoomLevel}
       />
     </Container>

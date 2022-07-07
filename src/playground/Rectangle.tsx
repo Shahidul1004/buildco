@@ -1,8 +1,9 @@
+import _ from "lodash";
 import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { Layer, Rect, Text } from "react-konva";
-import { activeToolOptions, scaleInfoType } from "../utils";
+import { activeToolOptions, rectType, scaleInfoType } from "../utils";
 
 type propsType = {
   selectedPdf: number;
@@ -11,15 +12,8 @@ type propsType = {
   stageRef: RefObject<Stage>;
   scaleFactor: number;
   scaleInfo: scaleInfoType[][];
-};
-
-type rectType = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  key: number;
-  scaleFactor: number;
+  rect: rectType[];
+  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
 };
 
 const getRectArea = (scaleObj: scaleInfoType, rect: rectType): string => {
@@ -44,14 +38,30 @@ const Rectangle = ({
   activeTool,
   stageRef,
   scaleFactor,
+  rect,
+  changeRect,
 }: propsType): JSX.Element => {
-  const [rect, setRect] = useState<rectType[]>([]);
+  const needCleanup = useRef<boolean>(false);
   const [newRect, setNewRect] = useState<rectType[]>([]);
+  const layerRef = useRef<Konva.Layer>(null);
   const tooltipRef = useRef<Konva.Text>(null);
+
+  useEffect(() => {
+    const text = tooltipRef.current!;
+    if (activeTool === activeToolOptions.rectangle) {
+      needCleanup.current = true;
+      layerRef.current?.moveToTop();
+    }
+    return () => {
+      if (needCleanup.current) {
+        setNewRect([]);
+        text.hide();
+      }
+    };
+  }, [activeTool]);
 
   const handleMouseDownRectLayer = (event: any) => {
     if (activeTool !== activeToolOptions.rectangle) return;
-    console.log("down");
     if (newRect.length === 0) {
       const text = tooltipRef.current!;
       const { x, y } = event.target.getStage().getPointerPosition();
@@ -67,6 +77,7 @@ const Rectangle = ({
         height: 0,
         key: rect.length + 1,
         scaleFactor: scaleFactor,
+        rotation: 0,
       };
       text.text(
         getRectArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
@@ -81,13 +92,12 @@ const Rectangle = ({
   };
 
   const handleMouseMoveRectLayer = (event: any) => {
-    console.log("move", newRect);
+    if (activeTool !== activeToolOptions.rectangle) return;
     if (newRect.length === 1) {
       const text = tooltipRef.current!;
       const sx = newRect[0].x;
       const sy = newRect[0].y;
       const key = newRect[0].key;
-      const scaleFactor = newRect[0].scaleFactor;
       const { x, y } = event.target.getStage().getPointerPosition();
       const newRectObj: rectType = {
         x: sx,
@@ -96,6 +106,7 @@ const Rectangle = ({
         height: y - (stageRef.current?.attrs.y | 0) - sy,
         key: key,
         scaleFactor: scaleFactor,
+        rotation: 0,
       };
 
       text.text(
@@ -109,13 +120,12 @@ const Rectangle = ({
     }
   };
   const handleMouseUpRectLayer = (event: any) => {
-    console.log("up", newRect);
+    if (activeTool !== activeToolOptions.rectangle) return;
     if (newRect.length === 1) {
       const text = tooltipRef.current!;
       const sx = newRect[0].x;
       const sy = newRect[0].y;
       const key = newRect[0].key;
-      const scaleFactor = newRect[0].scaleFactor;
       const { x, y } = event.target.getStage().getPointerPosition();
 
       const annotationToAdd = {
@@ -125,9 +135,17 @@ const Rectangle = ({
         height: y - (stageRef.current?.attrs.y | 0) - sy,
         key: key,
         scaleFactor: scaleFactor,
+        rotation: 0,
       };
-      setRect((prev) => [...prev, annotationToAdd]);
-      // rect.push(annotationToAdd);
+
+      changeRect((prev) => {
+        const prevCopy = _.cloneDeep(prev);
+        prevCopy[selectedPdf][selectedPage] = [
+          ...prevCopy[selectedPdf][selectedPage],
+          annotationToAdd,
+        ];
+        return prevCopy;
+      });
       setNewRect([]);
       text.hide();
     }
@@ -138,6 +156,7 @@ const Rectangle = ({
   return (
     <Layer
       name="rectLayer"
+      ref={layerRef}
       onMouseDown={handleMouseDownRectLayer}
       onMouseMove={handleMouseMoveRectLayer}
       onMouseUp={handleMouseUpRectLayer}
@@ -165,6 +184,7 @@ const Rectangle = ({
           y={rect.y / rect.scaleFactor}
           width={rect.width / rect.scaleFactor}
           height={rect.height / rect.scaleFactor}
+          rotation={rect.rotation}
           fill="green"
           stroke="black"
           opacity={0.5}

@@ -19,6 +19,7 @@
     "pdfjs-dist": "^2.14.305",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-intersection-observer": "^9.3.5",
     "react-konva": "^18.2.1",
     "react-konva-utils": "^0.3.0",
     "react-scripts": "5.0.1",
@@ -51,6 +52,8 @@
     ]
   },
   "devDependencies": {
-    "@types/pdfjs-dist": "^2.10.378"
+    "@types/lodash": "^4.14.182",
+    "@types/pdfjs-dist": "^2.10.378",
+    "lodash": "^4.17.21"
   }
 }

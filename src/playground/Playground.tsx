@@ -2,7 +2,12 @@ import { Box, BoxProps, styled } from "@mui/material";
 import * as pdfjsLib from "pdfjs-dist";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../Context";
-import { activeToolOptions, scaleInfoType } from "../utils";
+import {
+  activeToolOptions,
+  polygonType,
+  rectType,
+  scaleInfoType,
+} from "../utils";
 import MainStage from "./MainStage";
 
 type propsType = {
@@ -14,6 +19,10 @@ type propsType = {
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
   scaleInfo: scaleInfoType[][];
   changeScaleInfo: React.Dispatch<React.SetStateAction<scaleInfoType[][]>>;
+  rect: rectType[];
+  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
+  polygon: polygonType[];
+  changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
 };
 
 const Playground = ({
@@ -25,6 +34,10 @@ const Playground = ({
   changeActiveTool,
   scaleInfo,
   changeScaleInfo,
+  rect,
+  changeRect,
+  polygon,
+  changePolygon,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,14 +85,18 @@ const Playground = ({
       <PlaygroundContainer navHeight={context.navHeight}>
         {blob && (
           <MainStage
-          selectedPdf={selectedPdf}
-          selectedPage={selectedPage}
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
             blob={blob}
             zoomLevel={zoomLevel}
             activeTool={activeTool}
             changeActiveTool={changeActiveTool}
             scaleInfo={scaleInfo}
             changeScaleInfo={changeScaleInfo}
+            rect={rect}
+            changeRect={changeRect}
+            polygon={polygon}
+            changePolygon={changePolygon}
           />
         )}
       </PlaygroundContainer>

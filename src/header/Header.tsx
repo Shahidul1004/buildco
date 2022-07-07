@@ -18,7 +18,7 @@ type props = {
   selectedPdf: number;
   changeSelectedPdf: React.Dispatch<React.SetStateAction<number>>;
   selectedPage: number;
-  zoomLevel: number;
+  currentZoomLevel: number;
   changeZoomLevel: React.Dispatch<React.SetStateAction<number[][]>>;
   activeTool: activeToolOptions;
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
@@ -32,7 +32,7 @@ const Header = ({
   selectedPdf,
   changeSelectedPdf,
   selectedPage,
-  zoomLevel,
+  currentZoomLevel,
   changeZoomLevel,
   activeTool,
   changeActiveTool,
@@ -53,7 +53,7 @@ const Header = ({
           <ToolsContainer
             selectedPdf={selectedPdf}
             selectedPage={selectedPage}
-            zoomLevel={zoomLevel}
+            currentZoomLevel={currentZoomLevel}
             changeZoomLevel={changeZoomLevel}
             activeTool={activeTool}
             changeActiveTool={changeActiveTool}

@@ -6,14 +6,14 @@ import CustomButton from "../reusables/Button";
 type propsType = {
   selectedPdf: number;
   selectedPage: number;
-  zoomLevel: number;
+  currentZoomLevel: number;
   changeZoomLevel: React.Dispatch<React.SetStateAction<number[][]>>;
 };
 
 const ZoomOut = ({
   selectedPdf,
   selectedPage,
-  zoomLevel,
+  currentZoomLevel,
   changeZoomLevel,
 }: propsType): JSX.Element => {
   const timerPool = useRef<NodeJS.Timeout[]>([]);
@@ -29,7 +29,7 @@ const ZoomOut = ({
     }, 100);
     timerPool.current.push(timer);
 
-    const newLevel = zoomLevel - 10;
+    const newLevel = currentZoomLevel - 10;
     if (newLevel >= 0)
       changeZoomLevel((prev) => {
         const temp = [...prev];
@@ -46,7 +46,7 @@ const ZoomOut = ({
         flexFlow: "column nowrap",
       }}
       onClick={handleClick}
-      disabled={zoomLevel <= 0}
+      disabled={currentZoomLevel <= 0}
     >
       <ZoomOutIcon
         fontSize="medium"

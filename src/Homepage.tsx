@@ -9,7 +9,13 @@ import {
 import * as pdfjsLib from "pdfjs-dist";
 import PreviewSection from "./preview/PreviewSection";
 import Playground from "./playground/Playground";
-import { activeToolOptions, scaleInfoType } from "./utils";
+import {
+  activeToolOptions,
+  polygonType,
+  rectType,
+  scaleInfoType,
+} from "./utils";
+import LoadingModal from "./modal/LoadingModal";
 
 const Homepage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -26,6 +32,11 @@ const Homepage = (): JSX.Element => {
   );
   const [scaleInfo, setScaleInfo] = useState<scaleInfoType[][]>([]);
 
+  const [rect, setRect] = useState<rectType[][][]>([]);
+  const [polygon, setPolygon] = useState<polygonType[][][]>([]);
+
+  //simplified values to use
+
   const fileUploadHandler = async (files: FileList) => {
     setLoading(true);
     const names = await getFileName(files);
@@ -33,6 +44,8 @@ const Homepage = (): JSX.Element => {
     const pages: pdfjsLib.PDFPageProxy[][] = [];
     const newZoomLevel: number[][] = [];
     const newScaleInfo: scaleInfoType[][] = [];
+    const newRect: rectType[][][] = [];
+    const newPolygon: polygonType[][][] = [];
     for (const doc of docs) {
       pages.push(
         await pdfjsExtractPages(
@@ -41,24 +54,29 @@ const Homepage = (): JSX.Element => {
         )
       );
       newZoomLevel.push([...Array(doc.numPages).keys()].map((e) => 50));
-
       newScaleInfo.push(
         [...Array(doc.numPages).keys()].map((e) => {
           return {
             calibrated: false,
             x: 1,
             y: 0,
-            prevScale: .5,
+            prevScale: 0.5,
             L: 1,
           };
         })
       );
+
+      newRect.push([...Array(doc.numPages).keys()].map((_e) => []));
+      newPolygon.push([...Array(doc.numPages).keys()].map((e) => []));
     }
     const prevCount = uploadedFiles.current.length;
     uploadedFiles.current.push(...files);
     fileName.current.push(...names);
     pdfDocs.current.push(...docs);
     pdfPages.current.push(...pages);
+
+    setRect((prev) => [...prev, ...newRect]);
+    setPolygon((prev) => [...prev, ...newPolygon]);
     setScaleInfo((prev) => [...prev, ...newScaleInfo]);
     setZoomLevel((prev) => [...prev, ...newZoomLevel]);
     setSelectedPage((prev) => [
@@ -73,52 +91,53 @@ const Homepage = (): JSX.Element => {
     setLoading(false);
   };
 
-  let level = 0;
-  if (loading === false && selectedPdf !== -1) {
-    level = zoomLevel[selectedPdf][selectedPage[selectedPdf]];
-  }
-
-  console.log(scaleInfo);
-
   return (
     <>
-      {loading === false && (
-        <Box>
-          <Header
-            onFileUpload={fileUploadHandler}
-            fileName={fileName.current}
-            pdfOrder={pdfOrder}
-            changePdfOrder={setPdfOrder}
+      <Box>
+        <Header
+          onFileUpload={fileUploadHandler}
+          fileName={fileName.current}
+          selectedPdf={selectedPdf}
+          changeSelectedPdf={setSelectedPdf}
+          selectedPage={selectedPage[selectedPdf]}
+          pdfOrder={pdfOrder}
+          changePdfOrder={setPdfOrder}
+          currentZoomLevel={
+            selectedPdf === -1
+              ? 50
+              : zoomLevel[selectedPdf][selectedPage[selectedPdf]]
+          }
+          changeZoomLevel={setZoomLevel}
+          activeTool={activeTool}
+          changeActiveTool={setActiveTool}
+        />
+        {selectedPdf !== -1 && (
+          <PreviewSection
             selectedPdf={selectedPdf}
             selectedPage={selectedPage[selectedPdf]}
-            zoomLevel={level}
-            changeZoomLevel={setZoomLevel}
-            changeSelectedPdf={setSelectedPdf}
+            changeSelectedPage={setSelectedPage}
+            pages={pdfPages.current[selectedPdf]}
+            changeLoading={setLoading}
+          />
+        )}
+        {selectedPdf !== -1 && (
+          <Playground
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage[selectedPdf]}
+            page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
+            zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
             activeTool={activeTool}
             changeActiveTool={setActiveTool}
+            scaleInfo={scaleInfo}
+            changeScaleInfo={setScaleInfo}
+            rect={rect[selectedPdf][selectedPage[selectedPdf]]}
+            changeRect={setRect}
+            polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
+            changePolygon={setPolygon}
           />
-          {selectedPdf !== -1 && (
-            <>
-              <PreviewSection
-                selectedPdf={selectedPdf}
-                selectedPage={selectedPage[selectedPdf]}
-                changeSelectedPage={setSelectedPage}
-                pages={pdfPages.current[selectedPdf]}
-              />
-              <Playground
-                selectedPdf={selectedPdf}
-                selectedPage={selectedPage[selectedPdf]}
-                page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
-                zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
-                activeTool={activeTool}
-                changeActiveTool={setActiveTool}
-                scaleInfo={scaleInfo}
-                changeScaleInfo={setScaleInfo}
-              />
-            </>
-          )}
-        </Box>
-      )}
+        )}
+      </Box>
+      {loading && <LoadingModal />}
     </>
   );
 };

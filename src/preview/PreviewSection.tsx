@@ -7,7 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import * as pdfjsLib from "pdfjs-dist";
-import {
+import React, {
   Dispatch,
   SetStateAction,
   useContext,
@@ -19,11 +19,13 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import PreviewPdf from "./PreviewPdf";
+import { InView } from "react-intersection-observer";
 type propTypes = {
   selectedPdf: number;
   selectedPage: number;
   changeSelectedPage: Dispatch<SetStateAction<number[]>>;
   pages: pdfjsLib.PDFPageProxy[];
+  changeLoading: Dispatch<SetStateAction<boolean>>;
 };
 
 const PreviewSection = ({
@@ -31,6 +33,7 @@ const PreviewSection = ({
   selectedPage,
   changeSelectedPage,
   pages,
+  changeLoading,
 }: propTypes): JSX.Element => {
   const context = useContext(Context);
   const theme = useTheme();
@@ -38,6 +41,10 @@ const PreviewSection = ({
 
   useEffect(() => {
     setShow(true);
+    changeLoading(true);
+    setTimeout(() => {
+      changeLoading(false);
+    }, Math.min(pages.length * 10, 4000));
   }, [selectedPdf]);
 
   const toggleShow = () => {
@@ -75,28 +82,36 @@ const PreviewSection = ({
       {show && (
         <PreviewContainer navHeight={context.navHeight}>
           {pages.map((page, order: number) => (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-start",
-                alignItems: "center",
-                gap: "10px",
-                margin: "20px 0px",
-              }}
-            >
-              <PreviewPdf
-                height={200}
-                width={150}
-                key={order}
-                page={page}
-                pageNumber={order}
-                isSelectedPage={selectedPage === order}
-                selectedPdf={selectedPdf}
-                changeSelectedPage={changeSelectedPage}
-              />
-              <Typography>{order + 1}</Typography>
-            </Box>
+            <InView key={order}>
+              {({ inView, ref, entry }) => (
+                <Box
+                  ref={ref}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: "10px",
+                    margin: "20px 0px",
+                  }}
+                >
+                  {inView && (
+                    <>
+                      <PreviewPdf
+                        height={200}
+                        width={150}
+                        page={page}
+                        pageNumber={order}
+                        isSelectedPage={selectedPage === order}
+                        selectedPdf={selectedPdf}
+                        changeSelectedPage={changeSelectedPage}
+                      />
+                      <Typography>{order + 1}</Typography>
+                    </>
+                  )}
+                </Box>
+              )}
+            </InView>
           ))}
         </PreviewContainer>
       )}
@@ -116,7 +131,7 @@ const PreviewContainer = styled(Box)<CustomBoxProps>(
     top: `calc(${navHeight} + 40px)`,
     left: 0,
     width: "200px",
-    height: `calc(100vh - ${navHeight})`,
+    height: `calc(100vh - ${navHeight} - 40px)`,
     background: theme.color.buttonHover,
     overflow: "hidden",
     overflowY: "auto",
