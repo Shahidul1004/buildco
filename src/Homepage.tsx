@@ -11,6 +11,7 @@ import PreviewSection from "./preview/PreviewSection";
 import Playground from "./playground/Playground";
 import {
   activeToolOptions,
+  lengthType,
   polygonType,
   rectType,
   scaleInfoType,
@@ -34,6 +35,7 @@ const Homepage = (): JSX.Element => {
 
   const [rect, setRect] = useState<rectType[][][]>([]);
   const [polygon, setPolygon] = useState<polygonType[][][]>([]);
+  const [length, setLength] = useState<lengthType[][][]>([]);
 
   //simplified values to use
 
@@ -46,6 +48,7 @@ const Homepage = (): JSX.Element => {
     const newScaleInfo: scaleInfoType[][] = [];
     const newRect: rectType[][][] = [];
     const newPolygon: polygonType[][][] = [];
+    const newLength: lengthType[][][] = [];
     for (const doc of docs) {
       pages.push(
         await pdfjsExtractPages(
@@ -68,6 +71,7 @@ const Homepage = (): JSX.Element => {
 
       newRect.push([...Array(doc.numPages).keys()].map((_e) => []));
       newPolygon.push([...Array(doc.numPages).keys()].map((e) => []));
+      newLength.push([...Array(doc.numPages).keys()].map((e) => []));
     }
     const prevCount = uploadedFiles.current.length;
     uploadedFiles.current.push(...files);
@@ -77,6 +81,7 @@ const Homepage = (): JSX.Element => {
 
     setRect((prev) => [...prev, ...newRect]);
     setPolygon((prev) => [...prev, ...newPolygon]);
+    setLength((prev) => [...prev, ...newLength]);
     setScaleInfo((prev) => [...prev, ...newScaleInfo]);
     setZoomLevel((prev) => [...prev, ...newZoomLevel]);
     setSelectedPage((prev) => [
@@ -134,6 +139,8 @@ const Homepage = (): JSX.Element => {
             changeRect={setRect}
             polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
             changePolygon={setPolygon}
+            length={length[selectedPdf][selectedPage[selectedPdf]]}
+            changeLength={setLength}
           />
         )}
       </Box>

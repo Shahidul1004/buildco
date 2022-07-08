@@ -6,6 +6,7 @@ import { createRef, RefObject, useEffect, useRef } from "react";
 import { Layer, Rect, Shape, Text, Transformer } from "react-konva";
 import {
   activeToolOptions,
+  lengthType,
   polygonType,
   rectType,
   scaleInfoType,
@@ -22,6 +23,8 @@ type propsType = {
   changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  length: lengthType[];
+  changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
 };
 
 const Select = ({
@@ -35,6 +38,8 @@ const Select = ({
   changeRect,
   polygon,
   changePolygon,
+  length,
+  changeLength,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const layerRef = useRef<Konva.Layer>(null);
@@ -42,6 +47,7 @@ const Select = ({
   const trRef = useRef<Konva.Transformer>(null);
   const rectRef = useRef(rect.map(() => createRef<Konva.Rect>()));
   const polygonRef = useRef(polygon.map(() => createRef<Konva.Shape>()));
+  const lengthRef = useRef(length.map(() => createRef<Konva.Line>()));
 
   useEffect(() => {
     const text = tooltipRef.current!;
@@ -51,14 +57,13 @@ const Select = ({
     }
     return () => {
       if (needCleanup.current) {
+        //what should i do?
         // text.hide();
         // setNewPolygon([]);
         // setMovePoint([]);
       }
     };
   }, [activeTool]);
-
-  console.log(polygon);
 
   return (
     <Layer
@@ -243,6 +248,111 @@ const Select = ({
               transformedPoints.push(y * item.scaleFactor);
             }
             changePolygon((prev) => {
+              const prevCopy = _.cloneDeep(prev);
+              const temp = prevCopy[selectedPdf][selectedPage];
+              temp.splice(index, 1, {
+                ...item,
+                points: transformedPoints,
+              });
+              return prevCopy;
+            });
+            e.target._clearTransform();
+            e.target.clearCache();
+          }}
+        />
+      ))}
+      {length.map((item, index) => (
+        <Shape
+          ref={lengthRef.current[index]}
+          key={item.key}
+          stroke="black"
+          opacity={0.5}
+          sceneFunc={(ctx, shape) => {
+            ctx.beginPath();
+            ctx.moveTo(
+              item.points[0] / item.scaleFactor,
+              item.points[1] / item.scaleFactor
+            );
+            const points = item.points;
+            for (let idx = 2; idx < points.length; idx += 2)
+              ctx.lineTo(
+                points[idx] / item.scaleFactor,
+                points[idx + 1] / item.scaleFactor
+              );
+
+            ctx.fillStrokeShape(shape);
+          }}
+          draggable={true}
+          onMouseOver={() => {
+            lengthRef.current[index].current!.getSelfRect = function () {
+              const Xs = item.points.filter((num, indx) => indx % 2 === 0);
+              const Ys = item.points.filter((num, indx) => indx % 2 === 1);
+              const Xmin = Math.min(...Xs);
+              const Xmax = Math.max(...Xs);
+              const Ymin = Math.min(...Ys);
+              const Ymax = Math.max(...Ys);
+
+              return {
+                x: Xmin / item.scaleFactor,
+                y: Ymin / item.scaleFactor,
+                width: (Xmax - Xmin) / item.scaleFactor,
+                height: (Ymax - Ymin) / item.scaleFactor,
+              };
+            };
+            trRef.current!.nodes([lengthRef.current[index].current!]);
+            trRef.current!.getLayer()!.batchDraw();
+          }}
+          onClick={() => {
+            lengthRef.current[index].current!.getSelfRect = function () {
+              const Xs = item.points.filter((num, indx) => indx % 2 === 0);
+              const Ys = item.points.filter((num, indx) => indx % 2 === 1);
+              const Xmin = Math.min(...Xs);
+              const Xmax = Math.max(...Xs);
+              const Ymin = Math.min(...Ys);
+              const Ymax = Math.max(...Ys);
+
+              return {
+                x: Xmin / item.scaleFactor,
+                y: Ymin / item.scaleFactor,
+                width: (Xmax - Xmin) / item.scaleFactor,
+                height: (Ymax - Ymin) / item.scaleFactor,
+              };
+            };
+            trRef.current!.nodes([lengthRef.current[index].current!]);
+            trRef.current!.getLayer()!.batchDraw();
+          }}
+          onDragEnd={(e: KonvaEventObject<DragEvent>) => {
+            const x = e.target.x();
+            const y = e.target.y();
+            changeLength((prev) => {
+              const prevCopy = _.cloneDeep(prev);
+              const temp = prevCopy[selectedPdf][selectedPage];
+              const points = temp[index];
+
+              temp.splice(index, 1, {
+                ...points,
+                points: points.points.map((pt, idx) => {
+                  if (idx % 2 === 0) return pt + x * item.scaleFactor;
+                  return pt + y * item.scaleFactor;
+                }),
+              });
+              return prevCopy;
+            });
+            e.target._clearTransform();
+            e.target.clearCache();
+          }}
+          onTransformEnd={(e) => {
+            const rotation = e.target.attrs.rotation;
+            const transformedPoints: number[] = [];
+            for (let i = 0; i < item.points.length; i += 2) {
+              const { x, y } = e.target.getTransform().point({
+                x: item.points[i] / item.scaleFactor,
+                y: item.points[i + 1] / item.scaleFactor,
+              });
+              transformedPoints.push(x * item.scaleFactor);
+              transformedPoints.push(y * item.scaleFactor);
+            }
+            changeLength((prev) => {
               const prevCopy = _.cloneDeep(prev);
               const temp = prevCopy[selectedPdf][selectedPage];
               temp.splice(index, 1, {

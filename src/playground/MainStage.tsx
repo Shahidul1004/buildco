@@ -4,10 +4,12 @@ import { Image, Layer, Stage } from "react-konva";
 import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
   activeToolOptions,
+  lengthType,
   polygonType,
   rectType,
   scaleInfoType,
 } from "../utils";
+import Length from "./Length";
 import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
 import Scale from "./Scale";
@@ -26,6 +28,8 @@ type propsType = {
   changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  length: lengthType[];
+  changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
 };
 
 const MainStage = ({
@@ -41,6 +45,8 @@ const MainStage = ({
   changeRect,
   polygon,
   changePolygon,
+  length,
+  changeLength,
 }: propsType): JSX.Element => {
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -85,6 +91,7 @@ const MainStage = ({
           activeToolOptions.pan,
           activeToolOptions.rectangle,
           activeToolOptions.polygon,
+          activeToolOptions.length,
         ].includes(activeTool) && (
           <Rectangle
             selectedPdf={selectedPdf}
@@ -101,6 +108,7 @@ const MainStage = ({
           activeToolOptions.pan,
           activeToolOptions.rectangle,
           activeToolOptions.polygon,
+          activeToolOptions.length,
         ].includes(activeTool) && (
           <Polygon
             selectedPdf={selectedPdf}
@@ -111,6 +119,24 @@ const MainStage = ({
             activeTool={activeTool}
             polygon={polygon}
             changePolygon={changePolygon}
+          />
+        )}
+
+        {[
+          activeToolOptions.pan,
+          activeToolOptions.rectangle,
+          activeToolOptions.polygon,
+          activeToolOptions.length,
+        ].includes(activeTool) && (
+          <Length
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            scaleInfo={scaleInfo}
+            stageRef={stageRef}
+            scaleFactor={scaleFactor}
+            activeTool={activeTool}
+            length={length}
+            changeLength={changeLength}
           />
         )}
 
@@ -126,6 +152,8 @@ const MainStage = ({
             changeRect={changeRect}
             polygon={polygon}
             changePolygon={changePolygon}
+            length={length}
+            changeLength={changeLength}
           />
         )}
       </Stage>

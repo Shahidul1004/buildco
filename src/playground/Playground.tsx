@@ -4,6 +4,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../Context";
 import {
   activeToolOptions,
+  lengthType,
   polygonType,
   rectType,
   scaleInfoType,
@@ -23,6 +24,8 @@ type propsType = {
   changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  length: lengthType[];
+  changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
 };
 
 const Playground = ({
@@ -38,6 +41,8 @@ const Playground = ({
   changeRect,
   polygon,
   changePolygon,
+  length,
+  changeLength,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,6 +102,8 @@ const Playground = ({
             changeRect={changeRect}
             polygon={polygon}
             changePolygon={changePolygon}
+            length={length}
+            changeLength={changeLength}
           />
         )}
       </PlaygroundContainer>

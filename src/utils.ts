@@ -4,6 +4,7 @@ export enum activeToolOptions {
   pan = "pan",
   rectangle = "rectangle",
   polygon = "polygon",
+  length = "length",
 }
 
 export type scaleInfoType = {
@@ -25,6 +26,12 @@ export type rectType = {
 };
 
 export type polygonType = {
+  points: number[];
+  key: number;
+  scaleFactor: number;
+};
+
+export type lengthType = {
   points: number[];
   key: number;
   scaleFactor: number;

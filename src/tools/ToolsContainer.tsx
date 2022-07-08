@@ -1,5 +1,6 @@
 import { Box, styled } from "@mui/material";
 import { activeToolOptions } from "../utils";
+import Length from "./Length";
 import Pan from "./Pan";
 import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
@@ -33,6 +34,7 @@ const ToolsContainer = ({
       <Pan activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Rectangle activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Polygon activeTool={activeTool} changeActiveTool={changeActiveTool} />
+      <Length activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <ZoomIn
         selectedPdf={selectedPdf}
         selectedPage={selectedPage}
