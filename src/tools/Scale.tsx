@@ -1,9 +1,9 @@
-import ScaleIcon from "@mui/icons-material/Scale";
 import { Typography } from "@mui/material";
 import { useState } from "react";
 import ScaleModal from "../modal/ScaleModal";
 import CustomButton from "../reusables/Button";
 import { activeToolOptions } from "../utils";
+import { ReactComponent as ScaleIcon } from "../assets/icons/scale.svg";
 
 type propsType = {
   activeTool: activeToolOptions;
@@ -27,9 +27,9 @@ const Scale = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
         disabled={activeTool === activeToolOptions["scale"]}
       >
         <ScaleIcon
-          fontSize="small"
-          color={`${
-            activeTool === activeToolOptions["scale"] ? "primary" : "inherit"
+          style={{ height: "20px" }}
+          fill={`${
+            activeTool === activeToolOptions["scale"] ? "#1976d2" : "inherit"
           }`}
         />
         <Typography

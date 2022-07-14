@@ -1,6 +1,5 @@
 import { Box, styled, Typography } from "@mui/material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-
+import { ReactComponent as ScaleIcon } from "../assets/icons/scale.svg";
 import CustomButton from "../reusables/Button";
 
 type propTypes = {
@@ -21,8 +20,29 @@ const ScaleModal = ({ onClose, onCancel }: propTypes): JSX.Element => {
             gap: "5px",
           }}
         >
-          <WarningAmberIcon />
+          <ScaleIcon style={{ height: "20px" }} />
           <Typography fontWeight="500">Find Page Scale</Typography>
+          <Box
+            sx={{
+              marginTop: "30px",
+              width: "85%",
+              display: "flex",
+              flexDirection: "column",
+              gap: "15px",
+            }}
+          >
+            <Typography fontSize="15px" fontWeight="420" lineHeight="14px">
+              1. Measure a known length on the page. Longer is better for
+              accuracy
+            </Typography>
+            <Typography fontSize="15px" fontWeight="420" lineHeight="14px">
+              2. Click to start and click again to finish
+            </Typography>
+            <Typography fontSize="15px" fontWeight="420" lineHeight="14px">
+              3. Input length according to plan to calibrate this page
+            </Typography>
+          </Box>
+
           <Box sx={{ marginTop: "25px", display: "flex", gap: "10px" }}>
             <CustomButton
               variant="outlined"

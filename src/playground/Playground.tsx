@@ -3,7 +3,9 @@ import * as pdfjsLib from "pdfjs-dist";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../Context";
 import {
+  activeGroupType,
   activeToolOptions,
+  groupType,
   lengthType,
   polygonType,
   rectType,
@@ -26,6 +28,8 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  group: groupType[];
+  activeGroup: activeGroupType;
 };
 
 const Playground = ({
@@ -43,6 +47,8 @@ const Playground = ({
   changePolygon,
   length,
   changeLength,
+  activeGroup,
+  group
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,6 +110,8 @@ const Playground = ({
             changePolygon={changePolygon}
             length={length}
             changeLength={changeLength}
+            group={group}
+            activeGroup={activeGroup}
           />
         )}
       </PlaygroundContainer>

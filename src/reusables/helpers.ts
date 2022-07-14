@@ -175,6 +175,55 @@ const pdfjsExtractPages = async (
 //     return "https://fonts.gstatic.com/s/montserrat/v23/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw9aXpsog.woff2";
 // };
 
+const getPairedPoint = (point: number[]) => {
+  const paired = [];
+  for (let idx = 0; idx < point.length; idx += 2) {
+    paired.push([point[idx], point[idx + 1]]);
+  }
+  return paired as any;
+};
+
+const rgba2hex = (rgba: any) => {
+  if (!rgba) return "#ffffff";
+  const { r, g, b, a } = rgba;
+  var outParts = [
+    r.toString(16),
+    g.toString(16),
+    b.toString(16),
+    Math.round(a * 255)
+      .toString(16)
+      .substring(0, 2),
+  ];
+  outParts.forEach(function (part, i) {
+    if (part.length === 1) {
+      outParts[i] = "0" + part;
+    }
+  });
+  return "#" + outParts.join("");
+};
+
+const isClockwise = (points: number[]) => {
+  let vertices = [...points, points[0], points[1]];
+  let area = 0.0;
+  for (let i = 2; i < vertices.length; i += 2) {
+    area +=
+      (vertices[i] - vertices[i - 2]) * (vertices[i + 1] + vertices[i + 1 - 2]);
+  }
+  return area < 0;
+};
+const polygonArea = (vertices: number[]) => {
+  var total = 0;
+  for (var i = 0, l = vertices.length / 2; i < l; i++) {
+    var addX = vertices[2 * i];
+    var addY = vertices[2 * i === vertices.length - 2 ? 1 : 2 * i + 3];
+    var subX = vertices[2 * i === vertices.length - 2 ? 0 : 2 * i + 2];
+    var subY = vertices[2 * i + 1];
+    total += addX * addY * 0.5;
+    total -= subX * subY * 0.5;
+  }
+  return Math.abs(total);
+};
+
 export {
   // readFileAsync,
   getFileName,
@@ -187,4 +236,8 @@ export {
   // createImageURL,
   // getRGBColorCode,
   // getURLforCustomFont,
+  getPairedPoint,
+  rgba2hex,
+  polygonArea,
+  isClockwise,
 };

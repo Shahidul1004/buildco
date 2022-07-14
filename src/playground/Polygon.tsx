@@ -2,8 +2,16 @@ import _ from "lodash";
 import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
 import { RefObject, useEffect, useRef, useState } from "react";
-import { Layer, Rect, Shape, Text } from "react-konva";
-import { activeToolOptions, polygonType, scaleInfoType } from "../utils";
+import { Group, Layer, Rect, Shape, Text } from "react-konva";
+import {
+  activeGroupType,
+  activeToolOptions,
+  groupType,
+  polygonType,
+  scaleInfoType,
+  unitType,
+} from "../utils";
+import { isClockwise, polygonArea } from "../reusables/helpers";
 
 type propsType = {
   selectedPdf: number;
@@ -14,6 +22,8 @@ type propsType = {
   scaleInfo: scaleInfoType[][];
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  group: groupType[];
+  activeGroup: activeGroupType;
 };
 
 const Polygon = ({
@@ -25,6 +35,8 @@ const Polygon = ({
   scaleFactor,
   polygon,
   changePolygon,
+  group,
+  activeGroup,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const [newPolygon, setNewPolygon] = useState<polygonType[]>([]);
@@ -55,19 +67,26 @@ const Polygon = ({
 
       const newPolygonObj: polygonType = {
         points: [
-          x - (stageRef.current?.attrs.x | 0),
-          y - (stageRef.current?.attrs.y | 0),
+          (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+          (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
         key: polygon.length + 1,
-        scaleFactor: scaleFactor,
+        deductRect: [],
+        group: activeGroup.shape,
       };
 
+      const { calibrated } = scaleInfo[selectedPdf][selectedPage];
       text.text(
-        "area"
-        //getPolyArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
+        0 +
+          (calibrated === false
+            ? "px2"
+            : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+              unitType.ft
+            ? "ft2"
+            : "in2")
       );
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
         y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
       text.show();
@@ -80,18 +99,39 @@ const Polygon = ({
         ...newPolygon[0],
         points: [
           ...newPolygon[0].points,
-          x - (stageRef.current?.attrs.x | 0),
-          y - (stageRef.current?.attrs.y | 0),
+          (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+          (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
-        scaleFactor: scaleFactor,
       };
 
-      text.text(
-        "area"
-        //getPolyArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
-      );
+      if (newPolygonObj.points.length >= 6) {
+        const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
+        const areaPx = polygonArea(newPolygonObj.points);
+        if (calibrated === false) text.text(areaPx + "px2");
+        else {
+          const area = (areaPx * L * L) / (x * x + y * y);
+          if (
+            group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+            unitType.ft
+          )
+            text.text(area + "ft2");
+          else text.text(144 * area + "in2");
+        }
+      } else {
+        const { calibrated } = scaleInfo[selectedPdf][selectedPage];
+        text.text(
+          0 +
+            (calibrated === false
+              ? "px2"
+              : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+                unitType.ft
+              ? "ft2"
+              : "in2")
+        );
+      }
+
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
         y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
       setNewPolygon([newPolygonObj]);
@@ -106,26 +146,46 @@ const Polygon = ({
       const { x, y } = event.target.getStage().getPointerPosition();
 
       setMovePoint([
-        x - (stageRef.current?.attrs.x | 0),
-        y - (stageRef.current?.attrs.y | 0),
+        (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       ]);
 
       const newPolygonObj: polygonType = {
         ...newPolygon[0],
         points: [
           ...newPolygon[0].points,
-          x - (stageRef.current?.attrs.x | 0),
-          y - (stageRef.current?.attrs.y | 0),
+          (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+          (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
-        scaleFactor: scaleFactor,
       };
 
-      text.text(
-        "area"
-        //getPolyArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
-      );
+      if (newPolygonObj.points.length >= 6) {
+        const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
+        const areaPx = polygonArea(newPolygonObj.points);
+        if (calibrated === false) text.text(areaPx + "px2");
+        else {
+          const area = (areaPx * L * L) / (x * x + y * y);
+          if (
+            group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+            unitType.ft
+          )
+            text.text(area + "ft2");
+          else text.text(144 * area + "in2");
+        }
+      } else {
+        const { calibrated } = scaleInfo[selectedPdf][selectedPage];
+        text.text(
+          0 +
+            (calibrated === false
+              ? "px2"
+              : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+                unitType.ft
+              ? "ft2"
+              : "in2")
+        );
+      }
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
         y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
     }
@@ -137,16 +197,22 @@ const Polygon = ({
     text.hide();
     if (newPolygon.length > 0 && newPolygon[0].points.length >= 8) {
       const actualPoints = newPolygon[0].points;
-      // const firstPoints = [actualPoints[0], actualPoints[1]]; //no need
       actualPoints.pop();
       actualPoints.pop();
+      if (!isClockwise(actualPoints)) {
+        actualPoints.reverse();
+        for (let i = 0; i < actualPoints.length; i += 2) {
+          const temp = actualPoints[i];
+          actualPoints[i] = actualPoints[i + 1];
+          actualPoints[i + 1] = temp;
+        }
+      }
       changePolygon((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const temp = prevCopy[selectedPdf][selectedPage];
         temp.push({
           ...newPolygon[0],
           points: [...actualPoints],
-          scaleFactor: scaleFactor,
         });
         prevCopy[selectedPdf][selectedPage] = temp;
         return prevCopy;
@@ -195,28 +261,47 @@ const Polygon = ({
         visible={false}
         zInde
       />
-      {polygonsToDraw.map((polygon) => (
-        <Shape
-          fill="green"
-          stroke="black"
-          opacity={0.5}
-          sceneFunc={(ctx, shape) => {
+      {polygonsToDraw.map((item, index) => (
+        <Group
+          clipFunc={(ctx) => {
             ctx.beginPath();
-            ctx.moveTo(
-              polygon.points[0] / polygon.scaleFactor,
-              polygon.points[1] / polygon.scaleFactor
-            );
-            const points = polygon.points;
-            for (let idx = 2; idx < points.length; idx += 2)
-              ctx.lineTo(
-                points[idx] / polygon.scaleFactor,
-                points[idx + 1] / polygon.scaleFactor
-              );
 
+            ctx.moveTo(item.points[0], item.points[1]);
+            for (let idx = 2; idx < item.points.length; idx += 2) {
+              ctx.lineTo(item.points[idx], item.points[idx + 1]);
+            }
+            if (item.points.length <= 4) {
+              ctx.lineTo(item.points[2], item.points[2 + 1] + 0.1);
+            }
             ctx.closePath();
-            ctx.fillStrokeShape(shape);
+
+            for (let idx = 0; idx < item.deductRect.length; idx++) {
+              const points = item.deductRect[idx].points;
+              const len = points.length;
+              ctx.moveTo(points[len - 2], points[len - 1]);
+              for (let index = len - 3; index > 0; index -= 2) {
+                ctx.lineTo(points[index - 1], points[index]);
+              }
+              ctx.closePath();
+            }
           }}
-        />
+        >
+          <Shape
+            fill="green"
+            stroke="black"
+            opacity={0.5}
+            sceneFunc={(ctx, shape) => {
+              ctx.beginPath();
+              ctx.moveTo(item.points[0], item.points[1]);
+              const points = item.points;
+              for (let idx = 2; idx < points.length; idx += 2)
+                ctx.lineTo(points[idx], points[idx + 1]);
+
+              ctx.closePath();
+              ctx.fillStrokeShape(shape);
+            }}
+          />
+        </Group>
       ))}
     </Layer>
   );

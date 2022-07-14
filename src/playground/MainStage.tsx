@@ -3,12 +3,15 @@ import { useRef, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
+  activeGroupType,
   activeToolOptions,
+  groupType,
   lengthType,
   polygonType,
   rectType,
   scaleInfoType,
 } from "../utils";
+import Deduct from "./Deduct";
 import Length from "./Length";
 import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
@@ -30,6 +33,8 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  group: groupType[];
+  activeGroup: activeGroupType;
 };
 
 const MainStage = ({
@@ -47,6 +52,7 @@ const MainStage = ({
   changePolygon,
   length,
   changeLength,
+  activeGroup,group
 }: propsType): JSX.Element => {
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -92,6 +98,7 @@ const MainStage = ({
           activeToolOptions.rectangle,
           activeToolOptions.polygon,
           activeToolOptions.length,
+          activeToolOptions.count,
         ].includes(activeTool) && (
           <Rectangle
             selectedPdf={selectedPdf}
@@ -100,8 +107,10 @@ const MainStage = ({
             stageRef={stageRef}
             scaleFactor={scaleFactor}
             activeTool={activeTool}
-            rect={rect}
-            changeRect={changeRect}
+            polygon={polygon}
+            changePolygon={changePolygon}
+            group={group}
+            activeGroup={activeGroup}
           />
         )}
         {[
@@ -109,6 +118,7 @@ const MainStage = ({
           activeToolOptions.rectangle,
           activeToolOptions.polygon,
           activeToolOptions.length,
+          activeToolOptions.count,
         ].includes(activeTool) && (
           <Polygon
             selectedPdf={selectedPdf}
@@ -119,6 +129,8 @@ const MainStage = ({
             activeTool={activeTool}
             polygon={polygon}
             changePolygon={changePolygon}
+            group={group}
+            activeGroup={activeGroup}
           />
         )}
 
@@ -127,6 +139,7 @@ const MainStage = ({
           activeToolOptions.rectangle,
           activeToolOptions.polygon,
           activeToolOptions.length,
+          activeToolOptions.count,
         ].includes(activeTool) && (
           <Length
             selectedPdf={selectedPdf}
@@ -154,6 +167,22 @@ const MainStage = ({
             changePolygon={changePolygon}
             length={length}
             changeLength={changeLength}
+          />
+        )}
+        {[activeToolOptions.deduct].includes(activeTool) && (
+          <Deduct
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            activeTool={activeTool}
+            stageRef={stageRef}
+            scaleFactor={scaleFactor}
+            scaleInfo={scaleInfo}
+            rect={rect}
+            changeRect={changeRect}
+            polygon={polygon}
+            changePolygon={changePolygon}
+            group={group}
+            activeGroup={activeGroup}
           />
         )}
       </Stage>

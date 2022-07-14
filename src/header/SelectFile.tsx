@@ -66,7 +66,6 @@ const SelectFile = ({
   const handleOpenModal = (type: "delete" | "rename") => {
     setModalType(type);
   };
-  console.log(pdfOrder);
 
   return (
     <Box
@@ -199,9 +198,17 @@ const SelectFile = ({
       )}
       {modalType === "delete" && (
         <DeleteModal
-          pdfIndex={pdfOrder.indexOf(+activePdf.current)}
-          changePdfOrder={changePdfOrder}
+          type={"Plan"}
           onClose={() => setModalType("")}
+          onDelete={() => {
+            setTimeout(() => {
+              changePdfOrder((prev) => {
+                const temp = [...prev];
+                temp.splice(pdfOrder.indexOf(+activePdf.current), 1);
+                return temp;
+              });
+            }, 10);
+          }}
         />
       )}
     </Box>

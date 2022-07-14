@@ -1,10 +1,18 @@
-import { Box, styled, TextField, Typography } from "@mui/material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-
+import {
+  Box,
+  Menu,
+  MenuItem,
+  styled,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import CustomButton from "../reusables/Button";
-import React, { useContext, useRef } from "react";
-import { Context } from "../Context";
-import { scaleInfoType } from "../utils";
+import React, { MouseEventHandler, useRef, useState } from "react";
+import { scaleInfoType, unitType } from "../utils";
+import { ReactComponent as ScaleIcon } from "../assets/icons/scale.svg";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 type propTypes = {
   selectedPdf: number;
@@ -22,7 +30,22 @@ const ScaleMeasurementModal = ({
   changeScaleInfo,
   changeShowScaleModal,
 }: propTypes): JSX.Element => {
+  const theme = useTheme();
   const textRef = useRef<any>(null);
+  const [anchorElUnit, setAnchorElUnit] = useState<null | HTMLElement>(null);
+  const openUnit = Boolean(anchorElUnit);
+  const [unit, setUnit] = useState<unitType>(unitType.ft);
+
+  const handleToggleUnit: MouseEventHandler<HTMLDivElement> = (event) => {
+    if (anchorElUnit) {
+      setAnchorElUnit(null);
+    } else {
+      setAnchorElUnit(event?.currentTarget);
+    }
+  };
+  const handleCloseUnit = () => {
+    setAnchorElUnit(null);
+  };
 
   const onClose = () => {
     const text = textRef.current?.value as string;
@@ -34,15 +57,14 @@ const ScaleMeasurementModal = ({
           calibrated: true,
           x: enteredScale.x,
           y: enteredScale.y,
-          prevScale: enteredScale.scaleFactor,
-          L: +text.trim(),
+          L: unit === unitType.ft ? +text.trim() : +text.trim() / 12.0,
         });
         temp[selectedPdf] = t;
         return temp;
       });
       changeShowScaleModal(false);
     } else {
-      alert("invalid name");
+      alert("invalid length");
     }
   };
   const onCancel = () => {
@@ -62,22 +84,108 @@ const ScaleMeasurementModal = ({
             gap: "5px",
           }}
         >
+          <ScaleIcon style={{ height: "20px" }} />
           <Typography fontWeight="500">Set Scale</Typography>
-          <Typography fontSize={14}>
-            Enter known measurement between two points (ft):
+          <Typography fontSize={14} sx={{ marginTop: "30px" }}>
+            Enter known measurement between two points (ft/in):
           </Typography>
-
-          <TextField
-            fullWidth
-            placeholder="ex:5"
-            //   innerRef={textRef}
-            inputRef={textRef}
+          <Box
             sx={{
-              "& .MuiOutlinedInput-input": {
-                padding: "10px",
-              },
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              alignItems: "center",
             }}
-          />
+          >
+            <TextField
+              placeholder="ex:5"
+              inputRef={textRef}
+              sx={{
+                "& .MuiOutlinedInput-input": {
+                  padding: "6px 10px",
+                },
+              }}
+            />
+            <Box
+              onClick={handleToggleUnit}
+              sx={{
+                width: "50px",
+                height: "33px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                backgroundColor: "#f4f4f4",
+                padding: "2px 6px",
+                ":hover": {
+                  backgroundColor: "#e4e7ed",
+                },
+              }}
+            >
+              <Typography
+                noWrap
+                fontWeight="400"
+                lineHeight="1.5"
+                letterSpacing="0.00938em"
+                fontSize="14px"
+                sx={{
+                  maxWidth: "200px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {unit}
+              </Typography>
+              {openUnit ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+            </Box>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorElUnit}
+              open={openUnit}
+              onClose={handleCloseUnit}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+              sx={{
+                paddingTop: "0px",
+                "& .MuiPaper-root": {
+                  minWidth: "50px",
+                },
+              }}
+            >
+              {["ft", "in"].map((unt, index) => (
+                <MenuItem
+                  key={index}
+                  selected={unt === unit}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "10px",
+                    color: theme.color.primary,
+                    fontSize: "14px",
+                  }}
+                >
+                  <Typography
+                    onClick={() => {
+                      handleCloseUnit();
+                      setUnit(unt === unitType.ft ? unitType.ft : unitType.in);
+                    }}
+                    noWrap
+                    sx={{
+                      maxWidth: "400px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      flexGrow: 1,
+                      fontSize: "15px",
+                    }}
+                  >
+                    {unt}
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+
           <Box sx={{ marginTop: "25px", display: "flex", gap: "10px" }}>
             <CustomButton
               variant="outlined"

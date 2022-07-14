@@ -10,13 +10,19 @@ import * as pdfjsLib from "pdfjs-dist";
 import PreviewSection from "./preview/PreviewSection";
 import Playground from "./playground/Playground";
 import {
+  activeGroupType,
   activeToolOptions,
+  groupType,
+  groupTypeName,
+  iconType,
   lengthType,
   polygonType,
   rectType,
   scaleInfoType,
+  unitType,
 } from "./utils";
 import LoadingModal from "./modal/LoadingModal";
+import GroupSection from "./group/GroupSection";
 
 const Homepage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,12 +38,24 @@ const Homepage = (): JSX.Element => {
     activeToolOptions.pan
   );
   const [scaleInfo, setScaleInfo] = useState<scaleInfoType[][]>([]);
+  const [group, setGroup] = useState<groupType[]>([
+    {
+      id: 1,
+      name: "Indivisual Measurement",
+      type: groupTypeName.all,
+      color: { r: 50, g: 50, b: 50, a: 1 },
+      unit: unitType.ft,
+      icon: iconType.circle,
+    },
+  ]);
+  const [activeGroup, setActiveGroup] = useState<activeGroupType>({
+    shape: 1,
+    count: 1,
+  });
 
   const [rect, setRect] = useState<rectType[][][]>([]);
   const [polygon, setPolygon] = useState<polygonType[][][]>([]);
   const [length, setLength] = useState<lengthType[][][]>([]);
-
-  //simplified values to use
 
   const fileUploadHandler = async (files: FileList) => {
     setLoading(true);
@@ -141,9 +159,25 @@ const Homepage = (): JSX.Element => {
             changePolygon={setPolygon}
             length={length[selectedPdf][selectedPage[selectedPdf]]}
             changeLength={setLength}
+            group={group}
+            activeGroup={activeGroup}
           />
         )}
       </Box>
+
+      {selectedPdf !== -1 &&
+        (activeTool === activeToolOptions.rectangle ||
+          activeTool === activeToolOptions.polygon ||
+          activeTool === activeToolOptions.length ||
+          activeTool === activeToolOptions.count) && (
+          <GroupSection
+            activeTool={activeTool}
+            group={group}
+            changeGroup={setGroup}
+            activeGroup={activeGroup}
+            changeActiveGroup={setActiveGroup}
+          />
+        )}
       {loading && <LoadingModal />}
     </>
   );

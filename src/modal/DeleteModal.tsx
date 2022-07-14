@@ -5,23 +5,13 @@ import CustomButton from "../reusables/Button";
 
 type propTypes = {
   onClose: () => void;
-  pdfIndex: number;
-  changePdfOrder: React.Dispatch<React.SetStateAction<number[]>>;
+  onDelete: () => void;
+  type: string;
 };
-const DeleteModal = ({
-  pdfIndex,
-  changePdfOrder,
-  onClose,
-}: propTypes): JSX.Element => {
+const DeleteModal = ({ onClose, onDelete, type }: propTypes): JSX.Element => {
   const handleDelete = () => {
     onClose();
-    setTimeout(() => {
-      changePdfOrder((prev) => {
-        const temp = [...prev];
-        temp.splice(pdfIndex, 1);
-        return temp;
-      });
-    }, 10);
+    onDelete();
   };
 
   return (
@@ -38,7 +28,7 @@ const DeleteModal = ({
           }}
         >
           <WarningAmberIcon />
-          <Typography fontWeight="500">Delete plan?</Typography>
+          <Typography fontWeight="500">Delete {type}?</Typography>
           <Typography fontWeight="500">This can't be undone</Typography>
           <Box sx={{ marginTop: "25px", display: "flex", gap: "10px" }}>
             <CustomButton
@@ -48,7 +38,7 @@ const DeleteModal = ({
                 padding: "6px",
               }}
             >
-              Delete plan
+              Delete {type}
             </CustomButton>
             <CustomButton
               variant="contained"
@@ -78,7 +68,7 @@ const OverLay = styled(Box)({
   right: 0,
   bottom: 0,
   backgroundColor: "rgba(0, 0, 0, 0.3)",
-  zIndex: 1000,
+  zIndex: 1300,
 });
 
 const ModalContainer = styled(Box)({
@@ -88,6 +78,6 @@ const ModalContainer = styled(Box)({
   transform: "translate(-50%, -50%)",
   backgroundColor: "#fff",
   padding: "20px",
-  zIndex: 1000,
+  zIndex: 2100,
   borderRadius: "5px",
 });

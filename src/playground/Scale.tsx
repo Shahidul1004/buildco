@@ -78,9 +78,12 @@ const Scale = ({
       });
 
       enteredScale.current = {
-        x: Math.abs(scale[0] - (x - (stageRef.current?.attrs.x | 0))),
-        y: Math.abs(scale[1] - (y - (stageRef.current?.attrs.y | 0))),
-        scaleFactor: scaleFactor,
+        x:
+          Math.abs(scale[0] - (x - (stageRef.current?.attrs.x | 0))) /
+          scaleFactor,
+        y:
+          Math.abs(scale[1] - (y - (stageRef.current?.attrs.y | 0))) /
+          scaleFactor,
       };
       changeShowScaleModal(true);
     }
