@@ -18,31 +18,24 @@ export type scaleInfoType = {
   L: number; //store in ft
 };
 
-export type rectType = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  key: number;
-  rotation: number;
-  deductRect: deductRectType[];
-};
-
 export type polygonType = {
+  name: string;
   points: number[];
   key: number;
   deductRect: deductRectType[];
   group: number;
+  hover: boolean;
 };
 
 export type lengthType = {
   points: number[];
   key: number;
-  scaleFactor: number;
+  group: number;
 };
 
 export enum groupTypeName {
   shape = "shape",
+  length = "length",
   count = "count",
   all = "all",
 }
@@ -65,6 +58,7 @@ export type groupType = {
 };
 export type activeGroupType = {
   shape: number;
+  length: number;
   count: number;
 };
 

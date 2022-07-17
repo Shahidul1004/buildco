@@ -224,6 +224,16 @@ const polygonArea = (vertices: number[]) => {
   return Math.abs(total);
 };
 
+const getLength = (points: number[]) => {
+  let length = 0.0;
+  for (let i = 2; i < points.length; i += 2) {
+    const deltaX = points[i] - points[i - 2];
+    const deltaY = points[i + 1] - points[i + 1 - 2];
+    length += Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  }
+  return length;
+};
+
 export {
   // readFileAsync,
   getFileName,
@@ -240,4 +250,5 @@ export {
   rgba2hex,
   polygonArea,
   isClockwise,
+  getLength,
 };

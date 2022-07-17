@@ -23,14 +23,14 @@ import { rgba2hex } from "../reusables/helpers";
 type propTypes = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   onClose: () => void;
-  groupIndex: number;
+  groupId: number;
   group: groupType[];
 };
 const EditGroupModal = ({
   changeGroup,
   onClose,
   group,
-  groupIndex,
+  groupId,
 }: propTypes): JSX.Element => {
   const theme = useTheme();
   const textRef = useRef<any>(null);
@@ -39,13 +39,13 @@ const EditGroupModal = ({
   const [anchorElIcon, setAnchorElIcon] = useState<null | HTMLElement>(null);
   const openIcon = Boolean(anchorElIcon);
   const [color, setColor] = useState<RGBColor>(
-    group.find((grp) => grp.id === groupIndex)!.color
+    group.find((grp) => grp.id === groupId)!.color
   );
   const [unit, setUnit] = useState<unitType>(
-    group.find((grp) => grp.id === groupIndex)?.unit || unitType.ft
+    group.find((grp) => grp.id === groupId)?.unit || unitType.ft
   );
   const [icon, setIcon] = useState<iconType>(
-    group.find((grp) => grp.id === groupIndex)?.icon || iconType.circle
+    group.find((grp) => grp.id === groupId)?.icon || iconType.circle
   );
 
   const handleToggleUnit: MouseEventHandler<HTMLDivElement> = (event) => {
@@ -73,14 +73,17 @@ const EditGroupModal = ({
     onClose();
     changeGroup((prev) => {
       const prevCopy = _.cloneDeep(prev);
-      const index = prevCopy.findIndex((grp) => grp.id === groupIndex)!;
+      const index = prevCopy.findIndex((grp) => grp.id === groupId)!;
       const temp = prevCopy[index];
       temp.name = textRef.current.value;
       temp.color = color;
       if (temp.type === groupTypeName.all) {
         temp.unit = unit;
         temp.icon = icon;
-      } else if (temp.type === groupTypeName.shape) {
+      } else if (
+        temp.type === groupTypeName.shape ||
+        temp.type === groupTypeName.length
+      ) {
         temp.unit = unit;
       } else {
         temp.icon = icon;
@@ -120,7 +123,7 @@ const EditGroupModal = ({
             <Typography fontSize={14}>Group name</Typography>
             <TextField
               fullWidth
-              defaultValue={group.find((grp) => grp.id === groupIndex)?.name}
+              defaultValue={group.find((grp) => grp.id === groupId)?.name}
               inputRef={textRef}
               sx={{
                 "& .MuiOutlinedInput-input": {
@@ -164,10 +167,10 @@ const EditGroupModal = ({
                 alignItems: "flex-start",
               }}
             >
-              {(group.find((grp) => grp.id === groupIndex)?.type ===
-                groupTypeName.all ||
-                group.find((grp) => grp.id === groupIndex)?.type ===
-                  groupTypeName.shape) && (
+              {(group.find((grp) => grp.id === groupId)?.type ===
+                groupTypeName.shape ||
+                group.find((grp) => grp.id === groupId)?.type ===
+                  groupTypeName.length) && (
                 <Box
                   sx={{
                     display: "flex",
@@ -220,6 +223,7 @@ const EditGroupModal = ({
                       "aria-labelledby": "basic-button",
                     }}
                     sx={{
+                      zIndex: "20000",
                       paddingTop: "0px",
                       "& .MuiPaper-root": {
                         minWidth: "50px",
@@ -261,10 +265,8 @@ const EditGroupModal = ({
                   </Menu>
                 </Box>
               )}
-              {(group.find((grp) => grp.id === groupIndex)?.type ===
-                groupTypeName.all ||
-                group.find((grp) => grp.id === groupIndex)?.type ===
-                  groupTypeName.count) && (
+              {group.find((grp) => grp.id === groupId)?.type ===
+                groupTypeName.count && (
                 <Box
                   sx={{
                     display: "flex",

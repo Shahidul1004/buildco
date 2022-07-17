@@ -74,8 +74,8 @@ const CreateGroupModal = ({
         name: textRef.current.value,
         type: newGroupType,
         color: color,
-        [newGroupType === groupTypeName.shape ? "unit" : "icon"]:
-          newGroupType === groupTypeName.shape ? unit : icon,
+        [newGroupType === groupTypeName.count ? "icon" : "unit"]:
+          newGroupType === groupTypeName.count ? icon : unit,
       },
     ]);
   };
@@ -152,7 +152,8 @@ const CreateGroupModal = ({
               }}
             >
               {(newGroupType === groupTypeName.all ||
-                newGroupType === groupTypeName.shape) && (
+                newGroupType === groupTypeName.shape ||
+                newGroupType === groupTypeName.length) && (
                 <Box
                   sx={{
                     display: "flex",

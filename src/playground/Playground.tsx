@@ -8,7 +8,6 @@ import {
   groupType,
   lengthType,
   polygonType,
-  rectType,
   scaleInfoType,
 } from "../utils";
 import MainStage from "./MainStage";
@@ -22,8 +21,6 @@ type propsType = {
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
   scaleInfo: scaleInfoType[][];
   changeScaleInfo: React.Dispatch<React.SetStateAction<scaleInfoType[][]>>;
-  rect: rectType[];
-  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
@@ -41,14 +38,12 @@ const Playground = ({
   changeActiveTool,
   scaleInfo,
   changeScaleInfo,
-  rect,
-  changeRect,
   polygon,
   changePolygon,
   length,
   changeLength,
   activeGroup,
-  group
+  group,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,8 +99,6 @@ const Playground = ({
             changeActiveTool={changeActiveTool}
             scaleInfo={scaleInfo}
             changeScaleInfo={changeScaleInfo}
-            rect={rect}
-            changeRect={changeRect}
             polygon={polygon}
             changePolygon={changePolygon}
             length={length}

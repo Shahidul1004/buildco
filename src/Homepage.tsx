@@ -17,12 +17,12 @@ import {
   iconType,
   lengthType,
   polygonType,
-  rectType,
   scaleInfoType,
   unitType,
 } from "./utils";
 import LoadingModal from "./modal/LoadingModal";
 import GroupSection from "./group/GroupSection";
+import MeasurementSection from "./measurement/MeasurementSection";
 
 const Homepage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,10 +50,10 @@ const Homepage = (): JSX.Element => {
   ]);
   const [activeGroup, setActiveGroup] = useState<activeGroupType>({
     shape: 1,
+    length: 1,
     count: 1,
   });
 
-  const [rect, setRect] = useState<rectType[][][]>([]);
   const [polygon, setPolygon] = useState<polygonType[][][]>([]);
   const [length, setLength] = useState<lengthType[][][]>([]);
 
@@ -64,7 +64,6 @@ const Homepage = (): JSX.Element => {
     const pages: pdfjsLib.PDFPageProxy[][] = [];
     const newZoomLevel: number[][] = [];
     const newScaleInfo: scaleInfoType[][] = [];
-    const newRect: rectType[][][] = [];
     const newPolygon: polygonType[][][] = [];
     const newLength: lengthType[][][] = [];
     for (const doc of docs) {
@@ -87,7 +86,6 @@ const Homepage = (): JSX.Element => {
         })
       );
 
-      newRect.push([...Array(doc.numPages).keys()].map((_e) => []));
       newPolygon.push([...Array(doc.numPages).keys()].map((e) => []));
       newLength.push([...Array(doc.numPages).keys()].map((e) => []));
     }
@@ -97,7 +95,6 @@ const Homepage = (): JSX.Element => {
     pdfDocs.current.push(...docs);
     pdfPages.current.push(...pages);
 
-    setRect((prev) => [...prev, ...newRect]);
     setPolygon((prev) => [...prev, ...newPolygon]);
     setLength((prev) => [...prev, ...newLength]);
     setScaleInfo((prev) => [...prev, ...newScaleInfo]);
@@ -153,8 +150,6 @@ const Homepage = (): JSX.Element => {
             changeActiveTool={setActiveTool}
             scaleInfo={scaleInfo}
             changeScaleInfo={setScaleInfo}
-            rect={rect[selectedPdf][selectedPage[selectedPdf]]}
-            changeRect={setRect}
             polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
             changePolygon={setPolygon}
             length={length[selectedPdf][selectedPage[selectedPdf]]}
@@ -178,6 +173,19 @@ const Homepage = (): JSX.Element => {
             changeActiveGroup={setActiveGroup}
           />
         )}
+      {selectedPdf !== -1 && (
+        <MeasurementSection
+          selectedPdf={selectedPdf}
+          selectedPage={selectedPage[selectedPdf]}
+          scaleInfo={scaleInfo[selectedPdf][selectedPage[selectedPdf]]}
+          group={group}
+          changeGroup={setGroup}
+          polygon={polygon}
+          changePolygon={setPolygon}
+          length={length}
+          changeLength={setLength}
+        />
+      )}
       {loading && <LoadingModal />}
     </>
   );

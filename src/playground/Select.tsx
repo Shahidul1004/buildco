@@ -7,11 +7,12 @@ import { Group, Layer, Rect, Shape, Text, Transformer } from "react-konva";
 import {
   activeToolOptions,
   deductRectType,
+  groupType,
   lengthType,
   polygonType,
-  rectType,
   scaleInfoType,
 } from "../utils";
+import { rgba2hex } from "../reusables/helpers";
 
 type propsType = {
   selectedPdf: number;
@@ -20,8 +21,7 @@ type propsType = {
   stageRef: RefObject<Stage>;
   scaleFactor: number;
   scaleInfo: scaleInfoType[][];
-  rect: rectType[];
-  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
+  group: groupType[];
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
@@ -35,8 +35,7 @@ const Select = ({
   stageRef,
   scaleFactor,
   scaleInfo,
-  rect,
-  changeRect,
+  group,
   polygon,
   changePolygon,
   length,
@@ -164,7 +163,11 @@ const Select = ({
           <Shape
             ref={polygonRef.current[index]}
             key={item.key}
-            fill="green"
+            fill={
+              item.hover
+                ? "pink"
+                : rgba2hex(group.find((grp) => grp.id === item.group)?.color)
+            }
             // stroke="black"
             opacity={0.5}
             sceneFunc={(ctx, shape) => {
@@ -302,39 +305,14 @@ const Select = ({
           opacity={0.5}
           sceneFunc={(ctx, shape) => {
             ctx.beginPath();
-            ctx.moveTo(
-              item.points[0] / item.scaleFactor,
-              item.points[1] / item.scaleFactor
-            );
+            ctx.moveTo(item.points[0], item.points[1]);
             const points = item.points;
             for (let idx = 2; idx < points.length; idx += 2)
-              ctx.lineTo(
-                points[idx] / item.scaleFactor,
-                points[idx + 1] / item.scaleFactor
-              );
+              ctx.lineTo(points[idx], points[idx + 1]);
 
             ctx.fillStrokeShape(shape);
           }}
           draggable={true}
-          onMouseOver={() => {
-            lengthRef.current[index].current!.getSelfRect = function () {
-              const Xs = item.points.filter((num, indx) => indx % 2 === 0);
-              const Ys = item.points.filter((num, indx) => indx % 2 === 1);
-              const Xmin = Math.min(...Xs);
-              const Xmax = Math.max(...Xs);
-              const Ymin = Math.min(...Ys);
-              const Ymax = Math.max(...Ys);
-
-              return {
-                x: Xmin / item.scaleFactor,
-                y: Ymin / item.scaleFactor,
-                width: (Xmax - Xmin) / item.scaleFactor,
-                height: (Ymax - Ymin) / item.scaleFactor,
-              };
-            };
-            trRef.current!.nodes([lengthRef.current[index].current!]);
-            trRef.current!.getLayer()!.batchDraw();
-          }}
           onClick={() => {
             lengthRef.current[index].current!.getSelfRect = function () {
               const Xs = item.points.filter((num, indx) => indx % 2 === 0);
@@ -345,10 +323,10 @@ const Select = ({
               const Ymax = Math.max(...Ys);
 
               return {
-                x: Xmin / item.scaleFactor,
-                y: Ymin / item.scaleFactor,
-                width: (Xmax - Xmin) / item.scaleFactor,
-                height: (Ymax - Ymin) / item.scaleFactor,
+                x: Xmin,
+                y: Ymin,
+                width: Xmax - Xmin,
+                height: Ymax - Ymin,
               };
             };
             trRef.current!.nodes([lengthRef.current[index].current!]);
@@ -365,8 +343,8 @@ const Select = ({
               temp.splice(index, 1, {
                 ...points,
                 points: points.points.map((pt, idx) => {
-                  if (idx % 2 === 0) return pt + x * item.scaleFactor;
-                  return pt + y * item.scaleFactor;
+                  if (idx % 2 === 0) return pt + x;
+                  return pt + y;
                 }),
               });
               return prevCopy;
@@ -378,11 +356,11 @@ const Select = ({
             const transformedPoints: number[] = [];
             for (let i = 0; i < item.points.length; i += 2) {
               const { x, y } = e.target.getTransform().point({
-                x: item.points[i] / item.scaleFactor,
-                y: item.points[i + 1] / item.scaleFactor,
+                x: item.points[i],
+                y: item.points[i + 1],
               });
-              transformedPoints.push(x * item.scaleFactor);
-              transformedPoints.push(y * item.scaleFactor);
+              transformedPoints.push(x);
+              transformedPoints.push(y);
             }
             changeLength((prev) => {
               const prevCopy = _.cloneDeep(prev);

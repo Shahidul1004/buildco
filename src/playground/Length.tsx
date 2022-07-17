@@ -3,7 +3,15 @@ import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
 import { RefObject, useEffect, useRef, useState } from "react";
 import { Layer, Rect, Line, Text } from "react-konva";
-import { activeToolOptions, lengthType, scaleInfoType } from "../utils";
+import {
+  activeGroupType,
+  activeToolOptions,
+  groupType,
+  lengthType,
+  scaleInfoType,
+  unitType,
+} from "../utils";
+import { getLength } from "../reusables/helpers";
 
 type propsType = {
   selectedPdf: number;
@@ -14,6 +22,8 @@ type propsType = {
   scaleInfo: scaleInfoType[][];
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  group: groupType[];
+  activeGroup: activeGroupType;
 };
 
 const Length = ({
@@ -25,6 +35,8 @@ const Length = ({
   scaleFactor,
   length,
   changeLength,
+  group,
+  activeGroup,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const [newLength, setNewLength] = useState<lengthType[]>([]);
@@ -55,43 +67,59 @@ const Length = ({
 
       const newLengthObj: lengthType = {
         points: [
-          x - (stageRef.current?.attrs.x | 0),
-          y - (stageRef.current?.attrs.y | 0),
+          x - (stageRef.current?.attrs.x | 0) / scaleFactor,
+          y - (stageRef.current?.attrs.y | 0) / scaleFactor,
         ],
         key: length.length + 1,
-        scaleFactor: scaleFactor,
+        group: activeGroup.shape,
       };
 
+      const { calibrated } = scaleInfo[selectedPdf][selectedPage];
       text.text(
-        "length"
-        //getPolyArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
+        0 +
+          (calibrated === false
+            ? "px"
+            : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+              unitType.ft
+            ? "ft"
+            : "in")
       );
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
         y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
       text.show();
       setNewLength([newLengthObj]);
     } else {
       const text = tooltipRef.current!;
-      const { x, y } = event.target.getStage().getPointerPosition();
+      const { x: cursorX, y: cursorY } = event.target
+        .getStage()
+        .getPointerPosition();
 
       const newLengthObj: lengthType = {
         ...newLength[0],
         points: [
           ...newLength[0].points,
-          x - (stageRef.current?.attrs.x | 0),
-          y - (stageRef.current?.attrs.y | 0),
+          cursorX - (stageRef.current?.attrs.x | 0) / scaleFactor,
+          cursorY - (stageRef.current?.attrs.y | 0) / scaleFactor,
         ],
-        scaleFactor: scaleFactor,
       };
 
-      text.text(
-        "length"
-        //getPolyArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
-      );
+      const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
+      const length = getLength(newLengthObj.points);
+      if (calibrated === false) text.text(length + "px");
+      else {
+        const area = (length * L) / Math.sqrt(x * x + y * y);
+        if (
+          group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+          unitType.ft
+        )
+          text.text(area + "ft");
+        else text.text(12 * area + "in");
+      }
+
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
         y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
       setNewLength([newLengthObj]);
@@ -103,29 +131,38 @@ const Length = ({
     if (activeTool !== activeToolOptions.length) return;
     if (newLength.length > 0) {
       const text = tooltipRef.current!;
-      const { x, y } = event.target.getStage().getPointerPosition();
+      const { x: cursorX, y: cursorY } = event.target
+        .getStage()
+        .getPointerPosition();
 
       setMovePoint([
-        x - (stageRef.current?.attrs.x | 0),
-        y - (stageRef.current?.attrs.y | 0),
+        cursorX - (stageRef.current?.attrs.x | 0) / scaleFactor,
+        cursorY - (stageRef.current?.attrs.y | 0) / scaleFactor,
       ]);
 
       const newLengthObj: lengthType = {
         ...newLength[0],
         points: [
           ...newLength[0].points,
-          x - (stageRef.current?.attrs.x | 0),
-          y - (stageRef.current?.attrs.y | 0),
+          cursorX - (stageRef.current?.attrs.x | 0) / scaleFactor,
+          cursorY - (stageRef.current?.attrs.y | 0) / scaleFactor,
         ],
-        scaleFactor: scaleFactor,
       };
+      const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
+      const length = getLength(newLengthObj.points);
+      if (calibrated === false) text.text(length + "px");
+      else {
+        const area = (length * L) / Math.sqrt(x * x + y * y);
+        if (
+          group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+          unitType.ft
+        )
+          text.text(area + "ft");
+        else text.text(12 * area + "in");
+      }
 
-      text.text(
-        "length"
-        //getPolyArea(scaleInfo[selectedPdf][selectedPage], newRectObj).toString()
-      );
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
         y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
     }
@@ -137,7 +174,6 @@ const Length = ({
     text.hide();
     if (newLength.length > 0 && newLength[0].points.length >= 6) {
       const actualPoints = newLength[0].points;
-      // const firstPoints = [actualPoints[0], actualPoints[1]]; //no need
       actualPoints.pop();
       actualPoints.pop();
       changeLength((prev) => {
@@ -146,7 +182,6 @@ const Length = ({
         temp.push({
           ...newLength[0],
           points: [...actualPoints],
-          scaleFactor: scaleFactor,
         });
         prevCopy[selectedPdf][selectedPage] = temp;
         return prevCopy;
@@ -194,7 +229,8 @@ const Length = ({
       />
       {lengthsToDraw.map((length) => (
         <Line
-          points={length.points.map((point) => point / length.scaleFactor)}
+          points={length.points}
+          key={length.key}
           fill="green"
           stroke="black"
           strokeWidth={5}

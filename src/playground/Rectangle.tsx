@@ -68,9 +68,11 @@ const Rectangle = ({
           (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
           (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
+        name: `rect ${polygon.length + 1}`,
         key: polygon.length + 1,
         deductRect: [],
         group: activeGroup.shape,
+        hover: false,
       };
 
       const { calibrated } = scaleInfo[selectedPdf][selectedPage];

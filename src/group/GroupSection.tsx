@@ -20,7 +20,12 @@ import _ from "lodash";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { activeToolOptions, groupType, groupTypeName } from "../utils";
+import {
+  activeGroupType,
+  activeToolOptions,
+  groupType,
+  groupTypeName,
+} from "../utils";
 import CustomButton from "../reusables/Button";
 import CreateGroupModal from "../modal/CreateGroupModal";
 import DeleteModal from "../modal/DeleteModal";
@@ -32,16 +37,8 @@ type propsType = {
   activeTool: activeToolOptions;
   group: groupType[];
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
-  activeGroup: {
-    shape: number;
-    count: number;
-  };
-  changeActiveGroup: React.Dispatch<
-    React.SetStateAction<{
-      shape: number;
-      count: number;
-    }>
-  >;
+  activeGroup: activeGroupType;
+  changeActiveGroup: React.Dispatch<React.SetStateAction<activeGroupType>>;
 };
 
 const GroupSection = ({
@@ -53,7 +50,6 @@ const GroupSection = ({
 }: propsType): JSX.Element => {
   const [filteredGroups, setFilteredGroups] = useState<groupType[]>([]);
   const anchorElOptionId = useRef<any>(null);
-
   const context = useContext(Context);
   const theme = useTheme();
 
@@ -71,14 +67,26 @@ const GroupSection = ({
   const [anchorElColor, setAnchorElColor] = useState<null | HTMLElement>(null);
   const openColor = Boolean(anchorElColor);
 
+  const currentGroup = filteredGroups.find(
+    (grp) =>
+      grp.id ===
+      (activeTool === activeToolOptions.count
+        ? activeGroup.count
+        : activeTool === activeToolOptions.length
+        ? activeGroup.length
+        : activeGroup.shape)
+  );
+
   useEffect(() => {
+    const groupName =
+      activeTool === activeToolOptions.count
+        ? groupTypeName.count
+        : activeTool === activeToolOptions.length
+        ? groupTypeName.length
+        : groupTypeName.shape;
+
     const availableGroups = group.filter((grp) => {
-      return (
-        grp.type ===
-          (activeTool === activeToolOptions.count
-            ? groupTypeName.count
-            : groupTypeName.shape) || grp.type === groupTypeName.all
-      );
+      return grp.type === groupName || grp.type === groupTypeName.all;
     });
     let found = false;
     for (const grp of availableGroups) {
@@ -86,21 +94,27 @@ const GroupSection = ({
         grp.id ===
         (activeTool === activeToolOptions.count
           ? activeGroup.count
+          : activeTool === activeToolOptions.length
+          ? activeGroup.length
           : activeGroup.shape)
       ) {
         found = true;
         break;
       }
     }
-    setFilteredGroups(availableGroups);
     if (!found)
       activeTool === activeToolOptions.count
         ? changeActiveGroup((prev) => {
             return { ...prev, count: 1 };
           })
+        : activeTool === activeToolOptions.length
+        ? changeActiveGroup((prev) => {
+            return { ...prev, length: 1 };
+          })
         : changeActiveGroup((prev) => {
             return { ...prev, shape: 1 };
           });
+    setFilteredGroups(availableGroups);
   }, [group, activeTool]);
 
   const handleToggleList: MouseEventHandler<HTMLDivElement> = (event) => {
@@ -172,15 +186,7 @@ const GroupSection = ({
           >
             <CreateNewFolderIcon
               sx={{
-                color: rgba2hex(
-                  filteredGroups.find(
-                    (grp) =>
-                      grp.id ===
-                      (activeTool === activeToolOptions.count
-                        ? activeGroup.count
-                        : activeGroup.shape)
-                  )?.color!
-                ),
+                color: rgba2hex(currentGroup?.color),
               }}
             />
 
@@ -196,15 +202,7 @@ const GroupSection = ({
                 textOverflow: "ellipsis",
               }}
             >
-              {
-                filteredGroups.find(
-                  (grp) =>
-                    grp.id ===
-                    (activeTool === activeToolOptions.count
-                      ? activeGroup.count
-                      : activeGroup.shape)
-                )?.name
-              }
+              {currentGroup?.name}
             </Typography>
           </Box>
           {openList ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
@@ -230,12 +228,7 @@ const GroupSection = ({
           {filteredGroups.map((group, index) => (
             <MenuItem
               key={index}
-              selected={
-                group.id ===
-                (activeTool === activeToolOptions.count
-                  ? activeGroup.count
-                  : activeGroup.shape)
-              }
+              selected={group.id === currentGroup?.id}
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -250,6 +243,10 @@ const GroupSection = ({
                   if (activeTool === activeToolOptions.count)
                     changeActiveGroup((prev) => {
                       return { ...prev, count: group.id };
+                    });
+                  else if (activeTool === activeToolOptions.length)
+                    changeActiveGroup((prev) => {
+                      return { ...prev, length: group.id };
                     });
                   else
                     changeActiveGroup((prev) => {
@@ -267,11 +264,12 @@ const GroupSection = ({
               >
                 {group.name}
               </Typography>
-
-              <MoreHorizIcon
-                id={group.id.toString()}
-                onClick={handleToggleOption}
-              />
+              {group.id !== 1 && (
+                <MoreHorizIcon
+                  id={group.id.toString()}
+                  onClick={handleToggleOption}
+                />
+              )}
             </MenuItem>
           ))}
         </Menu>
@@ -286,24 +284,25 @@ const GroupSection = ({
           }}
         >
           {anchorElOption?.id !== "1" && (
-            <MenuItem
-              onClick={() => {
-                handleOpenModal("delete");
-                handleCloseOption();
-              }}
-            >
-              Delete
-            </MenuItem>
+            <>
+              <MenuItem
+                onClick={() => {
+                  handleOpenModal("delete");
+                  handleCloseOption();
+                }}
+              >
+                Delete
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleCloseOption();
+                  handleOpenModal("edit");
+                }}
+              >
+                Edit
+              </MenuItem>
+            </>
           )}
-
-          <MenuItem
-            onClick={() => {
-              handleCloseOption();
-              handleOpenModal("edit");
-            }}
-          >
-            Edit
-          </MenuItem>
         </Menu>
 
         <CustomButton
@@ -322,6 +321,8 @@ const GroupSection = ({
           newGroupType={
             activeTool === activeToolOptions.count
               ? groupTypeName.count
+              : activeTool === activeToolOptions.length
+              ? groupTypeName.length
               : groupTypeName.shape
           }
         />
@@ -346,7 +347,7 @@ const GroupSection = ({
       {modalType === "edit" && (
         <EditGroupModal
           onClose={() => setModalType("")}
-          groupIndex={+anchorElOptionId.current}
+          groupId={+anchorElOptionId.current}
           group={group}
           changeGroup={changeGroup}
         />
@@ -363,7 +364,7 @@ interface CustomBoxProps extends BoxProps {
 const Container = styled(Box)<CustomBoxProps>(({ theme, navHeight }) => ({
   position: "fixed",
   top: `calc( ${navHeight} + 2px)`,
-  left: "50%",
+  left: "350px",
   backgroundColor: "white",
   height: "50px",
   width: "450px",

@@ -10,7 +10,6 @@ import {
   deductRectType,
   groupType,
   polygonType,
-  rectType,
   scaleInfoType,
   unitType,
 } from "../utils";
@@ -24,8 +23,6 @@ type propsType = {
   stageRef: RefObject<Stage>;
   scaleFactor: number;
   scaleInfo: scaleInfoType[][];
-  rect: rectType[];
-  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   group: groupType[];
@@ -39,8 +36,6 @@ const Deduct = ({
   stageRef,
   scaleFactor,
   scaleInfo,
-  rect,
-  changeRect,
   polygon,
   changePolygon,
   group,

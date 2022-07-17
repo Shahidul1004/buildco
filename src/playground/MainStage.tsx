@@ -8,7 +8,6 @@ import {
   groupType,
   lengthType,
   polygonType,
-  rectType,
   scaleInfoType,
 } from "../utils";
 import Deduct from "./Deduct";
@@ -27,8 +26,6 @@ type propsType = {
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
   scaleInfo: scaleInfoType[][];
   changeScaleInfo: React.Dispatch<React.SetStateAction<scaleInfoType[][]>>;
-  rect: rectType[];
-  changeRect: React.Dispatch<React.SetStateAction<rectType[][][]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
@@ -46,13 +43,12 @@ const MainStage = ({
   changeActiveTool,
   scaleInfo,
   changeScaleInfo,
-  rect,
-  changeRect,
   polygon,
   changePolygon,
   length,
   changeLength,
-  activeGroup,group
+  activeGroup,
+  group,
 }: propsType): JSX.Element => {
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -150,6 +146,8 @@ const MainStage = ({
             activeTool={activeTool}
             length={length}
             changeLength={changeLength}
+            group={group}
+            activeGroup={activeGroup}
           />
         )}
 
@@ -161,8 +159,7 @@ const MainStage = ({
             stageRef={stageRef}
             scaleFactor={scaleFactor}
             scaleInfo={scaleInfo}
-            rect={rect}
-            changeRect={changeRect}
+            group={group}
             polygon={polygon}
             changePolygon={changePolygon}
             length={length}
@@ -177,8 +174,6 @@ const MainStage = ({
             stageRef={stageRef}
             scaleFactor={scaleFactor}
             scaleInfo={scaleInfo}
-            rect={rect}
-            changeRect={changeRect}
             polygon={polygon}
             changePolygon={changePolygon}
             group={group}
