@@ -5,6 +5,7 @@ import { Context } from "../Context";
 import {
   activeGroupType,
   activeToolOptions,
+  countType,
   groupType,
   lengthType,
   polygonType,
@@ -25,6 +26,8 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  count: countType[];
+  changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
 };
@@ -42,6 +45,8 @@ const Playground = ({
   changePolygon,
   length,
   changeLength,
+  count,
+  changeCount,
   activeGroup,
   group,
 }: propsType): JSX.Element => {
@@ -103,6 +108,8 @@ const Playground = ({
             changePolygon={changePolygon}
             length={length}
             changeLength={changeLength}
+            count={count}
+            changeCount={changeCount}
             group={group}
             activeGroup={activeGroup}
           />

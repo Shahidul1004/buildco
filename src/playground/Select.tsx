@@ -2,12 +2,22 @@ import _ from "lodash";
 import Konva from "konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
-import { createRef, RefObject, useEffect, useRef } from "react";
-import { Group, Layer, Rect, Shape, Text, Transformer } from "react-konva";
+import { createRef, RefObject, useRef } from "react";
+import {
+  Circle,
+  Group,
+  Layer,
+  Rect,
+  RegularPolygon,
+  Shape,
+  Transformer,
+} from "react-konva";
 import {
   activeToolOptions,
+  countType,
   deductRectType,
   groupType,
+  iconType,
   lengthType,
   polygonType,
   scaleInfoType,
@@ -26,6 +36,8 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  count: countType[];
+  changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
 };
 
 const Select = ({
@@ -40,10 +52,10 @@ const Select = ({
   changePolygon,
   length,
   changeLength,
+  count,
+  changeCount,
 }: propsType): JSX.Element => {
-  const needCleanup = useRef<boolean>(false);
   const layerRef = useRef<Konva.Layer>(null);
-  const tooltipRef = useRef<Konva.Text>(null);
   const trRef = useRef<Konva.Transformer>(null);
   const polygonRef = useRef(polygon.map(() => createRef<Konva.Shape>()));
   const lengthRef = useRef(length.map(() => createRef<Konva.Line>()));
@@ -68,18 +80,25 @@ const Select = ({
     return { x: ptX + deltaX, y: ptY + deltaY };
   };
 
-  useEffect(() => {
-    const text = tooltipRef.current!;
-    if (activeTool === activeToolOptions.select) {
-      needCleanup.current = true;
-      //   layerRef.current?.moveToTop();
-    }
-    return () => {
-      if (needCleanup.current) {
-        text.hide();
-      }
-    };
-  }, [activeTool]);
+  const CountDragEndHandler = (
+    e: KonvaEventObject<DragEvent>,
+    index: number
+  ) => {
+    const x = e.target.x();
+    const y = e.target.y();
+    changeCount((prev) => {
+      const prevCopy = _.cloneDeep(prev);
+      const temp = prevCopy[selectedPdf][selectedPage];
+      const counts = temp[index];
+      temp.splice(index, 1, {
+        ...counts,
+        points: [x, y],
+      });
+      return prevCopy;
+    });
+    e.target._clearTransform();
+    e.target.clearCache();
+  };
 
   return (
     <Layer
@@ -97,20 +116,6 @@ const Select = ({
         height={stageRef.current?.getStage().attrs.height}
         width={stageRef.current?.getStage().attrs.width}
       />
-      <Text
-        id="select-tooltip"
-        ref={tooltipRef}
-        text=""
-        fontFamily="Calibri"
-        fontSize={30}
-        padding={5}
-        textFill="white"
-        fill="black"
-        alpha={1}
-        visible={false}
-        zInde
-      />
-
       {polygon.map((item, index) => (
         <Group
           clipFunc={(ctx) => {
@@ -168,8 +173,9 @@ const Select = ({
                 ? "pink"
                 : rgba2hex(group.find((grp) => grp.id === item.group)?.color)
             }
-            // stroke="black"
-            opacity={0.5}
+            stroke="black"
+            strokeWidth={2 / scaleFactor}
+            opacity={0.25}
             sceneFunc={(ctx, shape) => {
               ctx.beginPath();
               ctx.moveTo(item.points[0], item.points[1]);
@@ -181,6 +187,18 @@ const Select = ({
               ctx.fillStrokeShape(shape);
             }}
             draggable={true}
+            onMouseEnter={() => {
+              (layerRef.current?.getStage()?.container())!.style!.cursor =
+                "move";
+              const temp = polygonRef.current[index]?.current!;
+              temp.opacity(0.3);
+            }}
+            onMouseLeave={() => {
+              (layerRef.current?.getStage()?.container())!.style!.cursor =
+                "default";
+              const temp = polygonRef.current[index]?.current!;
+              temp.opacity(0.25);
+            }}
             onClick={() => {
               polygonRef.current[index].current!.getSelfRect = function () {
                 const Xs = item.points.filter((num, indx) => indx % 2 === 0);
@@ -299,9 +317,14 @@ const Select = ({
       ))}
       {length.map((item, index) => (
         <Shape
-          ref={lengthRef.current[index]}
           key={item.key}
-          stroke="black"
+          ref={lengthRef.current[index]}
+          stroke={
+            item.hover
+              ? "pink"
+              : rgba2hex(group.find((grp) => grp.id === item.group)?.color)
+          }
+          strokeWidth={2 / scaleFactor}
           opacity={0.5}
           sceneFunc={(ctx, shape) => {
             ctx.beginPath();
@@ -375,6 +398,64 @@ const Select = ({
             e.target.clearCache();
           }}
         />
+      ))}
+      {count.map((cnt, index) => (
+        <>
+          {cnt.type === iconType.circle ? (
+            <Circle
+              key={cnt.key}
+              x={cnt.points[0]}
+              y={cnt.points[1]}
+              radius={10}
+              fill={
+                cnt.hover
+                  ? "pink"
+                  : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
+              }
+              stroke="black"
+              strokeWidth={1 / scaleFactor}
+              opacity={0.5}
+              draggable
+              onDragEnd={(e) => CountDragEndHandler(e, index)}
+            />
+          ) : cnt.type === iconType.triangle ? (
+            <RegularPolygon
+              key={cnt.key}
+              sides={3}
+              x={cnt.points[0]}
+              y={cnt.points[1]}
+              radius={10}
+              fill={
+                cnt.hover
+                  ? "pink"
+                  : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
+              }
+              stroke="black"
+              strokeWidth={1 / scaleFactor}
+              opacity={0.5}
+              draggable
+              onDragEnd={(e) => CountDragEndHandler(e, index)}
+            />
+          ) : (
+            <RegularPolygon
+              key={cnt.key}
+              sides={4}
+              x={cnt.points[0]}
+              y={cnt.points[1]}
+              radius={10}
+              fill={
+                cnt.hover
+                  ? "pink"
+                  : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
+              }
+              stroke="black"
+              strokeWidth={1 / scaleFactor}
+              opacity={0.5}
+              draggable
+              onDragEnd={(e) => CountDragEndHandler(e, index)}
+            />
+          )}
+        </>
       ))}
       <Transformer ref={trRef} />
     </Layer>

@@ -11,7 +11,7 @@ import {
   scaleInfoType,
   unitType,
 } from "../utils";
-import { getLength } from "../reusables/helpers";
+import { getLength, rgba2hex } from "../reusables/helpers";
 
 type propsType = {
   selectedPdf: number;
@@ -67,22 +67,23 @@ const Length = ({
 
       const newLengthObj: lengthType = {
         points: [
-          x - (stageRef.current?.attrs.x | 0) / scaleFactor,
-          y - (stageRef.current?.attrs.y | 0) / scaleFactor,
+          (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+          (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
         key: length.length + 1,
-        group: activeGroup.shape,
+        group: activeGroup.length,
+        hover: false,
       };
 
       const { calibrated } = scaleInfo[selectedPdf][selectedPage];
       text.text(
         0 +
           (calibrated === false
-            ? "px"
-            : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+            ? " px"
+            : group.find((grp) => grp.id === activeGroup.length)?.unit ===
               unitType.ft
-            ? "ft"
-            : "in")
+            ? " ft"
+            : " in")
       );
       text.position({
         x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
@@ -100,27 +101,27 @@ const Length = ({
         ...newLength[0],
         points: [
           ...newLength[0].points,
-          cursorX - (stageRef.current?.attrs.x | 0) / scaleFactor,
-          cursorY - (stageRef.current?.attrs.y | 0) / scaleFactor,
+          (cursorX - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+          (cursorY - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
       };
 
       const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
       const length = getLength(newLengthObj.points);
-      if (calibrated === false) text.text(length + "px");
+      if (calibrated === false) text.text(length.toFixed(2) + " px");
       else {
         const area = (length * L) / Math.sqrt(x * x + y * y);
         if (
-          group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+          group.find((grp) => grp.id === activeGroup.length)?.unit ===
           unitType.ft
         )
-          text.text(area + "ft");
-        else text.text(12 * area + "in");
+          text.text(area.toFixed(2) + " ft");
+        else text.text((12 * area).toFixed(2) + " in");
       }
 
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
-        y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
+        x: (cursorX - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
+        y: (cursorY - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
       setNewLength([newLengthObj]);
       setMovePoint([]);
@@ -136,34 +137,34 @@ const Length = ({
         .getPointerPosition();
 
       setMovePoint([
-        cursorX - (stageRef.current?.attrs.x | 0) / scaleFactor,
-        cursorY - (stageRef.current?.attrs.y | 0) / scaleFactor,
+        (cursorX - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+        (cursorY - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       ]);
 
       const newLengthObj: lengthType = {
         ...newLength[0],
         points: [
           ...newLength[0].points,
-          cursorX - (stageRef.current?.attrs.x | 0) / scaleFactor,
-          cursorY - (stageRef.current?.attrs.y | 0) / scaleFactor,
+          (cursorX - (stageRef.current?.attrs.x | 0)) / scaleFactor,
+          (cursorY - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
       };
       const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
       const length = getLength(newLengthObj.points);
-      if (calibrated === false) text.text(length + "px");
+      if (calibrated === false) text.text(length.toFixed(2) + " px");
       else {
         const area = (length * L) / Math.sqrt(x * x + y * y);
         if (
-          group.find((grp) => grp.id === activeGroup.shape)?.unit ===
+          group.find((grp) => grp.id === activeGroup.length)?.unit ===
           unitType.ft
         )
-          text.text(area + "ft");
-        else text.text(12 * area + "in");
+          text.text(area.toFixed(2) + " ft");
+        else text.text((12 * area).toFixed(2) + " in");
       }
 
       text.position({
-        x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
-        y: (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
+        x: (cursorX - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
+        y: (cursorY - (stageRef.current?.attrs.y | 0)) / scaleFactor,
       });
     }
   };
@@ -219,21 +220,22 @@ const Length = ({
         ref={tooltipRef}
         text=""
         fontFamily="Calibri"
-        fontSize={30}
+        fontSize={25 / scaleFactor}
         padding={5}
         textFill="white"
         fill="black"
         alpha={1}
-        visible={false}
-        zInde
       />
       {lengthsToDraw.map((length) => (
         <Line
-          points={length.points}
           key={length.key}
-          fill="green"
-          stroke="black"
-          strokeWidth={5}
+          points={length.points}
+          stroke={
+            length.hover
+              ? "pink"
+              : rgba2hex(group.find((grp) => grp.id === length.group)?.color)
+          }
+          strokeWidth={2 / scaleFactor}
           opacity={0.5}
         />
       ))}

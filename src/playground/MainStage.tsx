@@ -5,11 +5,13 @@ import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
   activeGroupType,
   activeToolOptions,
+  countType,
   groupType,
   lengthType,
   polygonType,
   scaleInfoType,
 } from "../utils";
+import Count from "./Count";
 import Deduct from "./Deduct";
 import Length from "./Length";
 import Polygon from "./Polygon";
@@ -30,6 +32,8 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  count: countType[];
+  changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
 };
@@ -47,6 +51,8 @@ const MainStage = ({
   changePolygon,
   length,
   changeLength,
+  count,
+  changeCount,
   activeGroup,
   group,
 }: propsType): JSX.Element => {
@@ -89,13 +95,7 @@ const MainStage = ({
             activeTool={activeTool}
           />
         )}
-        {[
-          activeToolOptions.pan,
-          activeToolOptions.rectangle,
-          activeToolOptions.polygon,
-          activeToolOptions.length,
-          activeToolOptions.count,
-        ].includes(activeTool) && (
+        {[activeToolOptions.rectangle].includes(activeTool) && (
           <Rectangle
             selectedPdf={selectedPdf}
             selectedPage={selectedPage}
@@ -111,7 +111,6 @@ const MainStage = ({
         )}
         {[
           activeToolOptions.pan,
-          activeToolOptions.rectangle,
           activeToolOptions.polygon,
           activeToolOptions.length,
           activeToolOptions.count,
@@ -164,6 +163,8 @@ const MainStage = ({
             changePolygon={changePolygon}
             length={length}
             changeLength={changeLength}
+            count={count}
+            changeCount={changeCount}
           />
         )}
         {[activeToolOptions.deduct].includes(activeTool) && (
@@ -176,6 +177,26 @@ const MainStage = ({
             scaleInfo={scaleInfo}
             polygon={polygon}
             changePolygon={changePolygon}
+            group={group}
+            activeGroup={activeGroup}
+          />
+        )}
+        {[
+          activeToolOptions.pan,
+          activeToolOptions.rectangle,
+          activeToolOptions.polygon,
+          activeToolOptions.length,
+          activeToolOptions.count,
+        ].includes(activeTool) && (
+          <Count
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            scaleInfo={scaleInfo}
+            stageRef={stageRef}
+            scaleFactor={scaleFactor}
+            activeTool={activeTool}
+            count={count}
+            changeCount={changeCount}
             group={group}
             activeGroup={activeGroup}
           />

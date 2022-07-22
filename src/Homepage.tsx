@@ -12,6 +12,7 @@ import Playground from "./playground/Playground";
 import {
   activeGroupType,
   activeToolOptions,
+  countType,
   groupType,
   groupTypeName,
   iconType,
@@ -56,6 +57,7 @@ const Homepage = (): JSX.Element => {
 
   const [polygon, setPolygon] = useState<polygonType[][][]>([]);
   const [length, setLength] = useState<lengthType[][][]>([]);
+  const [count, setCount] = useState<countType[][][]>([]);
 
   const fileUploadHandler = async (files: FileList) => {
     setLoading(true);
@@ -66,6 +68,7 @@ const Homepage = (): JSX.Element => {
     const newScaleInfo: scaleInfoType[][] = [];
     const newPolygon: polygonType[][][] = [];
     const newLength: lengthType[][][] = [];
+    const newCount: countType[][][] = [];
     for (const doc of docs) {
       pages.push(
         await pdfjsExtractPages(
@@ -88,6 +91,7 @@ const Homepage = (): JSX.Element => {
 
       newPolygon.push([...Array(doc.numPages).keys()].map((e) => []));
       newLength.push([...Array(doc.numPages).keys()].map((e) => []));
+      newCount.push([...Array(doc.numPages).keys()].map((e) => []));
     }
     const prevCount = uploadedFiles.current.length;
     uploadedFiles.current.push(...files);
@@ -97,6 +101,7 @@ const Homepage = (): JSX.Element => {
 
     setPolygon((prev) => [...prev, ...newPolygon]);
     setLength((prev) => [...prev, ...newLength]);
+    setCount((prev) => [...prev, ...newCount]);
     setScaleInfo((prev) => [...prev, ...newScaleInfo]);
     setZoomLevel((prev) => [...prev, ...newZoomLevel]);
     setSelectedPage((prev) => [
@@ -154,6 +159,8 @@ const Homepage = (): JSX.Element => {
             changePolygon={setPolygon}
             length={length[selectedPdf][selectedPage[selectedPdf]]}
             changeLength={setLength}
+            count={count[selectedPdf][selectedPage[selectedPdf]]}
+            changeCount={setCount}
             group={group}
             activeGroup={activeGroup}
           />

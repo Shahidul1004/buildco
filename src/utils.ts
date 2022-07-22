@@ -31,6 +31,15 @@ export type lengthType = {
   points: number[];
   key: number;
   group: number;
+  hover: boolean;
+};
+
+export type countType = {
+  points: number[];
+  type: iconType;
+  key: number;
+  group: number;
+  hover: boolean;
 };
 
 export enum groupTypeName {

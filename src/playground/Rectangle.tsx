@@ -11,7 +11,7 @@ import {
   scaleInfoType,
   unitType,
 } from "../utils";
-import { polygonArea } from "../reusables/helpers";
+import { polygonArea, rgba2hex } from "../reusables/helpers";
 
 type propsType = {
   selectedPdf: number;
@@ -79,11 +79,11 @@ const Rectangle = ({
       text.text(
         0 +
           (calibrated === false
-            ? "px2"
+            ? " px2"
             : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
               unitType.ft
-            ? "ft2"
-            : "in2")
+            ? " ft2"
+            : " in2")
       );
       text.position({
         x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
@@ -118,26 +118,26 @@ const Rectangle = ({
       if (newPolygonObj.points.length >= 6) {
         const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
         const areaPx = polygonArea(newPolygonObj.points);
-        if (calibrated === false) text.text(areaPx + "px2");
+        if (calibrated === false) text.text(areaPx.toFixed(2) + " px2");
         else {
           const area = (areaPx * L * L) / (x * x + y * y);
           if (
             group.find((grp) => grp.id === activeGroup.shape)?.unit ===
             unitType.ft
           )
-            text.text(area + "ft2");
-          else text.text(144 * area + "in2");
+            text.text(area.toFixed(2) + " ft2");
+          else text.text((144 * area).toFixed(2) + " in2");
         }
       } else {
         const { calibrated } = scaleInfo[selectedPdf][selectedPage];
         text.text(
           0 +
             (calibrated === false
-              ? "px2"
+              ? " px2"
               : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
                 unitType.ft
-              ? "ft2"
-              : "in2")
+              ? " ft2"
+              : " in2")
         );
       }
 
@@ -201,12 +201,11 @@ const Rectangle = ({
         ref={tooltipRef}
         text=""
         fontFamily="Calibri"
-        fontSize={30}
+        fontSize={25 / scaleFactor}
         padding={5}
         textFill="white"
         fill="black"
         alpha={1}
-        visible={false}
       />
       {polygonsToDraw.map((item, index) => (
         <Group
@@ -234,9 +233,15 @@ const Rectangle = ({
           }}
         >
           <Shape
-            fill="green"
+            key={item.key}
+            fill={
+              item.hover
+                ? "pink"
+                : rgba2hex(group.find((grp) => grp.id === item.group)?.color)
+            }
             stroke="black"
-            opacity={0.5}
+            strokeWidth={2 / scaleFactor}
+            opacity={0.25}
             sceneFunc={(ctx, shape) => {
               ctx.beginPath();
               ctx.moveTo(item.points[0], item.points[1]);

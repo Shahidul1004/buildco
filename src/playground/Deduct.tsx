@@ -14,7 +14,7 @@ import {
   unitType,
 } from "../utils";
 import * as turf from "@turf/turf";
-import { getPairedPoint, polygonArea } from "../reusables/helpers";
+import { getPairedPoint, polygonArea, rgba2hex } from "../reusables/helpers";
 
 type propsType = {
   selectedPdf: number;
@@ -67,6 +67,7 @@ const Deduct = ({
     index: number,
     event: KonvaEventObject<MouseEvent>
   ) => {
+    (layerRef.current?.getStage()?.container())!.style!.cursor = "crosshair";
     if (newDeductRect.length > 0) setNewDeductRect([]);
     const text = tooltipRef.current!;
     const { x, y } = event.target.getStage()!.getPointerPosition()!;
@@ -81,11 +82,11 @@ const Deduct = ({
     text.text(
       0 +
         (calibrated === false
-          ? "px2"
+          ? " px2"
           : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
             unitType.ft
-          ? "ft2"
-          : "in2")
+          ? " ft2"
+          : " in2")
     );
     text.position({
       x: (x - (stageRef.current?.attrs.x | 0)) / scaleFactor + 35,
@@ -158,26 +159,26 @@ const Deduct = ({
         if (newRectObj.points.length >= 6) {
           const { x, y, L, calibrated } = scaleInfo[selectedPdf][selectedPage];
           const areaPx = polygonArea(newRectObj.points);
-          if (calibrated === false) text.text(areaPx + "px2");
+          if (calibrated === false) text.text(areaPx.toFixed(2) + " px2");
           else {
             const area = (areaPx * L * L) / (x * x + y * y);
             if (
               group.find((grp) => grp.id === activeGroup.shape)?.unit ===
               unitType.ft
             )
-              text.text(area + "ft2");
-            else text.text(144 * area + "in2");
+              text.text(area.toFixed(2) + " ft2");
+            else text.text((144 * area).toFixed(2) + " in2");
           }
         } else {
           const { calibrated } = scaleInfo[selectedPdf][selectedPage];
           text.text(
             0 +
               (calibrated === false
-                ? "px2"
+                ? " px2"
                 : group.find((grp) => grp.id === activeGroup.shape)?.unit ===
                   unitType.ft
-                ? "ft2"
-                : "in2")
+                ? " ft2"
+                : " in2")
           );
         }
         text.position({
@@ -189,6 +190,7 @@ const Deduct = ({
     }
   };
   const handleMouseUp = (event: KonvaEventObject<MouseEvent>) => {
+    (layerRef.current?.getStage()?.container())!.style!.cursor = "default";
     if (newDeductRect.length === 1) {
       const text = tooltipRef.current!;
       text.hide();
@@ -291,12 +293,11 @@ const Deduct = ({
         ref={tooltipRef}
         text=""
         fontFamily="Calibri"
-        fontSize={30}
+        fontSize={25 / scaleFactor}
         padding={5}
         textFill="white"
         fill="black"
         alpha={1}
-        visible={false}
       />
 
       {polygon.map((item, index) => (
@@ -329,9 +330,14 @@ const Deduct = ({
           <Shape
             ref={polygonRef.current[index]}
             key={item.key}
-            fill="green"
-            // stroke="black"
-            opacity={0.5}
+            fill={
+              item.hover
+                ? "pink"
+                : rgba2hex(group.find((grp) => grp.id === item.group)?.color)
+            }
+            stroke="black"
+            strokeWidth={2 / scaleFactor}
+            opacity={0.25}
             sceneFunc={(ctx, shape) => {
               ctx.beginPath();
               ctx.moveTo(item.points[0], item.points[1]);
