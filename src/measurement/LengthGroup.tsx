@@ -8,11 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import { createRef, useEffect, useRef, useState } from "react";
-import { groupType, polygonType, scaleInfoType, unitType } from "../utils";
+import { groupType, lengthType, scaleInfoType, unitType } from "../utils";
 import FolderTwoToneIcon from "@mui/icons-material/FolderTwoTone";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { polygonArea, rgba2hex } from "../reusables/helpers";
+import { getLength, rgba2hex } from "../reusables/helpers";
 import _ from "lodash";
 import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -26,11 +26,11 @@ type propsType = {
   groups: groupType[];
   groupIndex: number;
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
-  polygon: polygonType[];
-  changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  length: lengthType[];
+  changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
 };
 
-const ShapeGroup = ({
+const LengthGroup = ({
   selectedPdf,
   selectedPage,
   scaleInfo,
@@ -38,14 +38,14 @@ const ShapeGroup = ({
   groups,
   groupIndex,
   changeGroup,
-  polygon,
-  changePolygon,
+  length,
+  changeLength,
 }: propsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(true);
   const [filteredIndex, setFilteredIndex] = useState<number[]>([]);
-  const polygonAreas = useRef<number[]>([]);
-  const totalArea = useRef<number>(0);
+  const indivisualLengths = useRef<number[]>([]);
+  const totalLength = useRef<number>(0);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState<number>(40);
   const rowRefs = useRef(filteredIndex.map(() => createRef<any>()));
@@ -73,21 +73,17 @@ const ShapeGroup = ({
 
   useEffect(() => {
     const indeces: number[] = [];
-    polygon.map((poly, index) => {
-      if (poly.group === group.id) indeces.push(index);
+    length.map((len, index) => {
+      if (len.group === group.id) indeces.push(index);
     });
-    polygonAreas.current.length = 0;
+    indivisualLengths.current.length = 0;
     let total = 0.0;
     for (let idx = 0; idx < indeces.length; idx++) {
-      let area = polygonArea(polygon[indeces[idx]].points);
-      const deducts = polygon[indeces[idx]].deductRect;
-      for (const deduct of deducts) {
-        area -= polygonArea(deduct.points);
-      }
-      polygonAreas.current.push(area);
+      let area = getLength(length[indeces[idx]].points);
+      indivisualLengths.current.push(area);
       total += area;
     }
-    totalArea.current = total;
+    totalLength.current = total;
 
     rowRefs.current = indeces.map(() => createRef<HTMLDivElement>());
     setRowsHeight((prev) => {
@@ -95,31 +91,31 @@ const ShapeGroup = ({
     });
 
     setFilteredIndex(indeces);
-  }, [group, polygon]);
+  }, [group, length]);
 
   return (
     <Container>
       <GroupHeader
         onMouseEnter={() => {
-          changePolygon((prev) => {
+          changeLength((prev) => {
             const prevCopy = _.cloneDeep(prev);
-            const polyList = prevCopy[selectedPdf][selectedPage];
+            const lenList = prevCopy[selectedPdf][selectedPage];
             for (const filterIndex of filteredIndex) {
-              polyList[filterIndex].hover = true;
+              lenList[filterIndex].hover = true;
             }
-            prevCopy[selectedPdf][selectedPage] = polyList;
+            prevCopy[selectedPdf][selectedPage] = lenList;
             return prevCopy;
           });
           setHover(true);
         }}
         onMouseLeave={() => {
-          changePolygon((prev) => {
+          changeLength((prev) => {
             const prevCopy = _.cloneDeep(prev);
-            const polyList = prevCopy[selectedPdf][selectedPage];
+            const lenList = prevCopy[selectedPdf][selectedPage];
             for (const filterIndex of filteredIndex) {
-              polyList[filterIndex].hover = false;
+              lenList[filterIndex].hover = false;
             }
-            prevCopy[selectedPdf][selectedPage] = polyList;
+            prevCopy[selectedPdf][selectedPage] = lenList;
             return prevCopy;
           });
           setHover(false);
@@ -201,16 +197,20 @@ const ShapeGroup = ({
             }}
           >
             {scaleInfo.calibrated === false
-              ? `${totalArea.current.toFixed(2)} px2`
+              ? `${totalLength.current.toFixed(2)} px`
               : group.unit === unitType.ft
               ? `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} ft2`
+                  (totalLength.current * scaleInfo.L) /
+                  Math.sqrt(
+                    scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                  )
+                ).toFixed(2)} ft`
               : `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L * 144) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} in2`}
+                  (totalLength.current * scaleInfo.L * 12) /
+                  Math.sqrt(
+                    1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                  )
+                ).toFixed(2)} in`}
           </Typography>
         </Field>
         <Field
@@ -241,16 +241,20 @@ const ShapeGroup = ({
             }}
           >
             {scaleInfo.calibrated === false
-              ? `${totalArea.current.toFixed(2)} px2`
+              ? `${totalLength.current.toFixed(2)} px`
               : group.unit === unitType.ft
               ? `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} ft2`
+                  (totalLength.current * scaleInfo.L) /
+                  Math.sqrt(
+                    scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                  )
+                ).toFixed(2)} ft`
               : `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L * 144) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} in2`}
+                  (totalLength.current * scaleInfo.L * 12) /
+                  Math.sqrt(
+                    1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                  )
+                ).toFixed(2)} in`}
           </Typography>
         </Field>
         <Field sx={{ width: "50px", justifyContent: "center" }}>
@@ -263,14 +267,14 @@ const ShapeGroup = ({
         filteredIndex.map((index, idx) => (
           <Row
             onMouseEnter={() => {
-              changePolygon((prev) => {
+              changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 prevCopy[selectedPdf][selectedPage][index].hover = true;
                 return prevCopy;
               });
             }}
             onMouseLeave={() => {
-              changePolygon((prev) => {
+              changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 prevCopy[selectedPdf][selectedPage][index].hover = false;
                 return prevCopy;
@@ -315,7 +319,7 @@ const ShapeGroup = ({
                   });
                 }}
                 onBlur={(e) => {
-                  changePolygon((prev) => {
+                  changeLength((prev) => {
                     const prevCopy = _.cloneDeep(prev);
                     const target = prevCopy[selectedPdf][selectedPage][index];
                     target.name = e.target.innerText;
@@ -324,7 +328,7 @@ const ShapeGroup = ({
                   });
                 }}
               >
-                {polygon[index]?.name}
+                {length[index]?.name}
               </Box>
             </Field>
             <Field
@@ -343,21 +347,20 @@ const ShapeGroup = ({
                 }}
               >
                 {scaleInfo.calibrated === false
-                  ? `${polygonAreas.current[idx].toFixed(2)} px2`
+                  ? `${indivisualLengths.current[idx].toFixed(2)} px`
                   : group.unit === unitType.ft
                   ? `${(
-                      (polygonAreas.current[idx] * scaleInfo.L * scaleInfo.L) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} ft2`
+                      (indivisualLengths.current[idx] * scaleInfo.L) /
+                      Math.sqrt(
+                        scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                      )
+                    ).toFixed(2)} ft`
                   : `${(
-                      (polygonAreas.current[idx] *
-                        scaleInfo.L *
-                        scaleInfo.L *
-                        144) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} in2`}
+                      (indivisualLengths.current[idx] * scaleInfo.L * 12) /
+                      Math.sqrt(
+                        scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                      )
+                    ).toFixed(2)} in`}
               </Typography>
             </Field>
             <Field
@@ -382,21 +385,20 @@ const ShapeGroup = ({
                 }}
               >
                 {scaleInfo.calibrated === false
-                  ? `${polygonAreas.current[idx].toFixed(2)} px2`
+                  ? `${indivisualLengths.current[idx].toFixed(2)} px`
                   : group.unit === unitType.ft
                   ? `${(
-                      (polygonAreas.current[idx] * scaleInfo.L * scaleInfo.L) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} ft2`
+                      (indivisualLengths.current[idx] * scaleInfo.L) /
+                      Math.sqrt(
+                        scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                      )
+                    ).toFixed(2)} ft`
                   : `${(
-                      (polygonAreas.current[idx] *
-                        scaleInfo.L *
-                        scaleInfo.L *
-                        144) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} in2`}
+                      (indivisualLengths.current[idx] * scaleInfo.L * 12) /
+                      Math.sqrt(
+                        scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                      )
+                    ).toFixed(2)} in`}
               </Typography>
             </Field>
             <Field sx={{ width: "50px", justifyContent: "center" }}>
@@ -437,12 +439,12 @@ const ShapeGroup = ({
         <MenuItem
           onClick={() => {
             if (clickRef.current === "groupHeader") {
-              changePolygon((prev) => {
+              changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 for (let i = 0; i < prevCopy.length; i++) {
                   for (let j = 0; j < prevCopy[i].length; j++) {
                     prevCopy[i][j] = prevCopy[i][j].filter(
-                      (poly) => poly.group !== group.id
+                      (len) => len.group !== group.id
                     );
                   }
                 }
@@ -454,11 +456,11 @@ const ShapeGroup = ({
                 return prevCopy;
               });
             } else {
-              changePolygon((prev) => {
+              changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
-                const polyList = prevCopy[selectedPdf][selectedPage];
-                polyList.splice(+clickRef.current, 1);
-                prevCopy[selectedPdf][selectedPage] = polyList;
+                const lenList = prevCopy[selectedPdf][selectedPage];
+                lenList.splice(+clickRef.current, 1);
+                prevCopy[selectedPdf][selectedPage] = lenList;
                 return prevCopy;
               });
               setFilteredIndex([]);
@@ -481,7 +483,7 @@ const ShapeGroup = ({
   );
 };
 
-export default ShapeGroup;
+export default LengthGroup;
 
 const Container = styled(Box)({
   minHeight: "35px",

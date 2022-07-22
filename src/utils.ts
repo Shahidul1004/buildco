@@ -28,6 +28,7 @@ export type polygonType = {
 };
 
 export type lengthType = {
+  name: string;
   points: number[];
   key: number;
   group: number;

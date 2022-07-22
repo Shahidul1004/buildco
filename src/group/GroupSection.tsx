@@ -334,7 +334,6 @@ const GroupSection = ({
           onDelete={() => {
             changeGroup((prev) => {
               const prevCopy = _.cloneDeep(prev);
-              console.log(anchorElOptionId.current);
 
               const updatedGroup = prevCopy.filter(
                 (grp) => grp.id.toString() !== anchorElOptionId.current

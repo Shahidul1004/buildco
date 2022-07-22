@@ -70,6 +70,7 @@ const Length = ({
           (x - (stageRef.current?.attrs.x | 0)) / scaleFactor,
           (y - (stageRef.current?.attrs.y | 0)) / scaleFactor,
         ],
+        name: `length${length.length + 1}`,
         key: length.length + 1,
         group: activeGroup.length,
         hover: false,

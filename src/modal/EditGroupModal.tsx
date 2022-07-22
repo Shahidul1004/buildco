@@ -223,7 +223,7 @@ const EditGroupModal = ({
                       "aria-labelledby": "basic-button",
                     }}
                     sx={{
-                      zIndex: "20000",
+                      zIndex: 20000,
                       paddingTop: "0px",
                       "& .MuiPaper-root": {
                         minWidth: "50px",
@@ -329,6 +329,7 @@ const EditGroupModal = ({
                       "& .MuiPaper-root": {
                         minWidth: "50px",
                       },
+                      zIndex: 20000,
                     }}
                   >
                     {["CircleIcon", "ChangeHistoryIcon", "CropSquareIcon"].map(

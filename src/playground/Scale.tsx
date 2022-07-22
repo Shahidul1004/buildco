@@ -63,7 +63,6 @@ const Scale = ({
         y - (stageRef.current?.attrs.y | 0),
       ]);
     } else if (scalling.current === true) {
-      console.log("down2");
       scalling.current = false;
       event.target.getStage().container().style.cursor = "default";
       const { x, y } = event.target.getStage().getPointerPosition();
@@ -92,7 +91,6 @@ const Scale = ({
   const handleMouseMoveImageLayer = (event: any) => {
     if (activeTool !== activeToolOptions.scale) return;
     if (scale.length > 0 && scalling.current) {
-      console.log("move");
       const { x, y } = event.target.getStage().getPointerPosition();
       setScale((prev) => {
         const temp = [...prev];

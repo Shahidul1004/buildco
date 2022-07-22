@@ -191,6 +191,8 @@ const Homepage = (): JSX.Element => {
           changePolygon={setPolygon}
           length={length}
           changeLength={setLength}
+          count={count}
+          changeCount={setCount}
         />
       )}
       {loading && <LoadingModal />}

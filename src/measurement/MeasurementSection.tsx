@@ -1,13 +1,8 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  styled,
-  useTheme,
-} from "@mui/material";
+import { Box, BoxProps, Button, styled, useTheme } from "@mui/material";
 import { useContext, useState } from "react";
 import { Context } from "../Context";
 import {
+  countType,
   groupType,
   groupTypeName,
   lengthType,
@@ -19,6 +14,8 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Title from "./Title";
 import ShapeGroup from "./ShapeGroup";
+import LengthGroup from "./LengthGroup";
+import CountGroup from "./CountGroup";
 
 type propsType = {
   selectedPdf: number;
@@ -30,6 +27,8 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[][][];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  count: countType[][][];
+  changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
 };
 
 const MeasurementSection = ({
@@ -42,6 +41,8 @@ const MeasurementSection = ({
   changePolygon,
   length,
   changeLength,
+  count,
+  changeCount,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const theme = useTheme();
@@ -84,7 +85,7 @@ const MeasurementSection = ({
           <Title />
           {group.map((grp, index) => (
             <>
-              {grp.type === groupTypeName.shape && (
+              {grp.type === groupTypeName.shape ? (
                 <ShapeGroup
                   selectedPdf={selectedPdf}
                   selectedPage={selectedPage}
@@ -96,6 +97,34 @@ const MeasurementSection = ({
                   changeGroup={changeGroup}
                   polygon={polygon[selectedPdf][selectedPage]}
                   changePolygon={changePolygon}
+                />
+              ) : grp.type === groupTypeName.length ? (
+                <LengthGroup
+                  selectedPdf={selectedPdf}
+                  selectedPage={selectedPage}
+                  scaleInfo={scaleInfo}
+                  key={index}
+                  groupIndex={index}
+                  group={grp}
+                  groups={group}
+                  changeGroup={changeGroup}
+                  length={length[selectedPdf][selectedPage]}
+                  changeLength={changeLength}
+                />
+              ) : grp.type === groupTypeName.all ? (
+                <></>
+              ) : (
+                <CountGroup
+                  selectedPdf={selectedPdf}
+                  selectedPage={selectedPage}
+                  scaleInfo={scaleInfo}
+                  key={index}
+                  groupIndex={index}
+                  group={grp}
+                  groups={group}
+                  changeGroup={changeGroup}
+                  count={count[selectedPdf][selectedPage]}
+                  changeCount={changeCount}
                 />
               )}
             </>
