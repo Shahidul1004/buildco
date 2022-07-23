@@ -1,5 +1,6 @@
 import { Box, styled } from "@mui/material";
 import { activeToolOptions } from "../utils";
+import Annotate from "./Annotate";
 import Count from "./Count";
 import Deduct from "./Deduct";
 import Length from "./Length";
@@ -37,8 +38,10 @@ const ToolsContainer = ({
       <Rectangle activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Polygon activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Deduct activeTool={activeTool} changeActiveTool={changeActiveTool} />
-      <Count activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Length activeTool={activeTool} changeActiveTool={changeActiveTool} />
+      <Count activeTool={activeTool} changeActiveTool={changeActiveTool} />
+      <Annotate activeTool={activeTool} changeActiveTool={changeActiveTool} />
+
       <ZoomIn
         selectedPdf={selectedPdf}
         selectedPage={selectedPage}

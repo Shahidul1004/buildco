@@ -16,6 +16,7 @@ import Title from "./Title";
 import ShapeGroup from "./ShapeGroup";
 import LengthGroup from "./LengthGroup";
 import CountGroup from "./CountGroup";
+import DefaultGroup from "./DefaultGroup";
 
 type propsType = {
   selectedPdf: number;
@@ -129,6 +130,23 @@ const MeasurementSection = ({
               )}
             </>
           ))}
+          <DefaultGroup
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            scaleInfo={scaleInfo}
+            groupIndex={group.findIndex(
+              (grp) => grp.type === groupTypeName.all
+            )}
+            group={group.find((grp) => grp.type === groupTypeName.all)!}
+            groups={group}
+            changeGroup={changeGroup}
+            polygon={polygon[selectedPdf][selectedPage]}
+            changePolygon={changePolygon}
+            length={length[selectedPdf][selectedPage]}
+            changeLength={changeLength}
+            count={count[selectedPdf][selectedPage]}
+            changeCount={changeCount}
+          />
         </Container>
       )}
     </>

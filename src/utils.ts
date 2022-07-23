@@ -9,6 +9,7 @@ export enum activeToolOptions {
   length = "length",
   count = "count",
   deduct = "deduct",
+  annotate = "annotate",
 }
 
 export type scaleInfoType = {
