@@ -44,6 +44,7 @@ const ZoomIn = ({
   return (
     <CustomButton
       sx={{
+        padding: "0px 6px",
         display: "flex",
         flexFlow: "column nowrap",
       }}
@@ -53,8 +54,9 @@ const ZoomIn = ({
       <ZoomInIcon
         fontSize="medium"
         color={`${click ? "primary" : "inherit"}`}
+        style={{ width: "20px", height: "20px" }}
       />
-      <Typography fontSize={13} color={`${click ? "primary" : "inherit"}`}>
+      <Typography fontSize={12} color={`${click ? "primary" : "inherit"}`}>
         Zoom In
       </Typography>
     </CustomButton>

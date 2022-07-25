@@ -15,8 +15,6 @@ import React, {
   useState,
 } from "react";
 import { Context } from "../Context";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import PreviewPdf from "./PreviewPdf";
 import { InView } from "react-intersection-observer";
@@ -37,85 +35,52 @@ const PreviewSection = ({
 }: propTypes): JSX.Element => {
   const context = useContext(Context);
   const theme = useTheme();
-  const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
-    setShow(true);
     changeLoading(true);
     setTimeout(() => {
       changeLoading(false);
     }, Math.min(pages.length * 10, 4000));
   }, [selectedPdf]);
 
-  const toggleShow = () => {
-    setShow((prev) => !prev);
-  };
+  console.log(pages);
 
   return (
-    <>
-      <Button
-        variant="contained"
-        endIcon={show ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+    <PreviewContainer navHeight={context.navHeight}>
+      <Box
         sx={{
-          position: "fixed",
-          top: `calc(${context.navHeight} + 2px)`,
-          left: 0,
-          width: "200px",
-          height: "30px",
-          color: theme.color.primary,
-          backgroundColor: "white",
-          zIndex: 10000,
-          borderRadius: 0,
-          boxShadow:
-            "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
-          ":hover": {
-            color: theme.color.primary,
-            backgroundColor: theme.color.buttonHover,
-            boxShadow:
-              "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
-          },
+          display: "flex",
+          alignItems: "center",
+          overflowX: "auto",
         }}
-        onClick={toggleShow}
       >
-        PAGE
-      </Button>
-      {show && (
-        <PreviewContainer navHeight={context.navHeight}>
-          {pages.map((page, order: number) => (
-            <InView key={order}>
-              {({ inView, ref, entry }) => (
-                <Box
-                  ref={ref}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    gap: "10px",
-                    margin: "20px 0px",
-                  }}
-                >
-                  {inView && (
-                    <>
-                      <PreviewPdf
-                        height={200}
-                        width={150}
-                        page={page}
-                        pageNumber={order}
-                        isSelectedPage={selectedPage === order}
-                        selectedPdf={selectedPdf}
-                        changeSelectedPage={changeSelectedPage}
-                      />
-                      <Typography>{order + 1}</Typography>
-                    </>
-                  )}
-                </Box>
-              )}
-            </InView>
-          ))}
-        </PreviewContainer>
-      )}
-    </>
+        {pages.map((page, order: number) => (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              gap: "5px",
+              margin: "20px",
+            }}
+          >
+            <PreviewPdf
+              height={200}
+              width={200}
+              page={page}
+              pageNumber={order}
+              isSelectedPage={selectedPage === order}
+              selectedPdf={selectedPdf}
+              changeSelectedPage={changeSelectedPage}
+            />
+            <Typography fontSize="14px" sx={{ color: "#333333" }}>
+              page {order + 1}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </PreviewContainer>
   );
 };
 
@@ -128,15 +93,19 @@ interface CustomBoxProps extends BoxProps {
 const PreviewContainer = styled(Box)<CustomBoxProps>(
   ({ navHeight, theme }) => ({
     position: "fixed",
-    top: `calc(${navHeight} + 40px)`,
-    left: 0,
-    width: "200px",
-    height: `calc(100vh - ${navHeight} - 40px)`,
-    background: theme.color.buttonHover,
-    overflow: "hidden",
-    overflowY: "auto",
-    zIndex: 10000,
-    boxShadow:
-      "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
+    top: "50px",
+    left: "5%",
+    width: "90%",
+    boxSizing: "border-box",
+    backgroundColor: "white",
+    borderRadius: "32px",
+    boxShadow: "0px 1px 4px 0px gray",
+    padding: "10px",
+    paddingTop: "70px",
+    paddingLeft: "30px",
+    paddingRight: "30px",
+    display: "flex",
+    alignItems: "center",
+    zIndex: 700,
   })
 );

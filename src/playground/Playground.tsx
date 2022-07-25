@@ -128,10 +128,10 @@ interface CustomBoxProps extends BoxProps {
 const PlaygroundContainer = styled(Box)<CustomBoxProps>(
   ({ theme, navHeight }) => ({
     position: "fixed",
-    top: navHeight,
+    top: 0,
     left: 0,
     width: "100vw",
-    height: `calc(100vh - ${navHeight})`,
+    height: "100vh",
     backgroundColor: theme.color.secondary,
   })
 );

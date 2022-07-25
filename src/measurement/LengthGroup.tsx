@@ -257,7 +257,7 @@ const LengthGroup = ({
                 ).toFixed(2)} in`}
           </Typography>
         </Field>
-        <Field sx={{ width: "50px", justifyContent: "center" }}>
+        <Field sx={{ width: "60px", justifyContent: "center" }}>
           <IconButton id="groupHeader" onClick={handleToggleOption}>
             <MoreHorizIcon sx={{ color: hover ? "#0066c3" : "inherit" }} />
           </IconButton>
@@ -401,7 +401,7 @@ const LengthGroup = ({
                     ).toFixed(2)} in`}
               </Typography>
             </Field>
-            <Field sx={{ width: "50px", justifyContent: "center" }}>
+            <Field sx={{ width: "60px", justifyContent: "center" }}>
               <IconButton id={`${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
                   sx={{
@@ -488,7 +488,8 @@ export default LengthGroup;
 const Container = styled(Box)({
   minHeight: "35px",
   boxSizing: "border-box",
-  width: "100%",
+  width: "460px",
+  borderLeft: "1px solid #d6dae5",
   borderBottom: "1px solid #d6dae5",
   display: "flex",
   flexDirection: "column",

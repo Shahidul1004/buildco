@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
@@ -66,11 +66,13 @@ const MainStage = ({
       ? 0.5 * (1 + (zoomLevel - 50) / 50.0)
       : 0.5 * (1 + (0.5 * (zoomLevel - 50)) / 50.0);
 
-  if (activeTool === activeToolOptions.pan) {
-    stageRef.current?.getStage().draggable(true);
-  } else {
-    stageRef.current?.getStage().draggable(false);
-  }
+  useEffect(() => {
+    if (activeTool === activeToolOptions.pan) {
+      stageRef.current?.getStage().draggable(true);
+    } else {
+      stageRef.current?.getStage().draggable(false);
+    }
+  }, [activeTool]);
 
   return (
     <>

@@ -47,109 +47,80 @@ const MeasurementSection = ({
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const theme = useTheme();
-  const [show, setShow] = useState<boolean>(false);
-
-  const toggleShow = () => {
-    setShow((prev) => !prev);
-  };
 
   return (
-    <>
-      <Button
-        variant="contained"
-        endIcon={show ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+    <Container navHeight={context.navHeight} sx={{ cursor: "pointer" }}>
+      <Box
         sx={{
-          position: "fixed",
-          top: `calc(${context.navHeight} + 2px)`,
-          right: 0,
-          width: "450px",
-          height: "30px",
-          color: theme.color.primary,
-          backgroundColor: "white",
-          zIndex: 10000,
-          borderRadius: 0,
-          boxShadow:
-            "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
-          ":hover": {
-            color: theme.color.primary,
-            backgroundColor: theme.color.buttonHover,
-            boxShadow:
-              "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
-          },
+          overflow: "hidden",
+          overflowY: "auto",
+          maxHeight: "calc(100vh - 300px)",
         }}
-        onClick={toggleShow}
       >
-        MEASUREMENTS
-      </Button>
-      {show && (
-        <Container navHeight={context.navHeight} sx={{ cursor: "pointer" }}>
-          <Title />
-          {group.map((grp, index) => (
-            <>
-              {grp.type === groupTypeName.shape ? (
-                <ShapeGroup
-                  selectedPdf={selectedPdf}
-                  selectedPage={selectedPage}
-                  scaleInfo={scaleInfo}
-                  key={index}
-                  groupIndex={index}
-                  group={grp}
-                  groups={group}
-                  changeGroup={changeGroup}
-                  polygon={polygon[selectedPdf][selectedPage]}
-                  changePolygon={changePolygon}
-                />
-              ) : grp.type === groupTypeName.length ? (
-                <LengthGroup
-                  selectedPdf={selectedPdf}
-                  selectedPage={selectedPage}
-                  scaleInfo={scaleInfo}
-                  key={index}
-                  groupIndex={index}
-                  group={grp}
-                  groups={group}
-                  changeGroup={changeGroup}
-                  length={length[selectedPdf][selectedPage]}
-                  changeLength={changeLength}
-                />
-              ) : grp.type === groupTypeName.all ? (
-                <></>
-              ) : (
-                <CountGroup
-                  selectedPdf={selectedPdf}
-                  selectedPage={selectedPage}
-                  scaleInfo={scaleInfo}
-                  key={index}
-                  groupIndex={index}
-                  group={grp}
-                  groups={group}
-                  changeGroup={changeGroup}
-                  count={count[selectedPdf][selectedPage]}
-                  changeCount={changeCount}
-                />
-              )}
-            </>
-          ))}
-          <DefaultGroup
-            selectedPdf={selectedPdf}
-            selectedPage={selectedPage}
-            scaleInfo={scaleInfo}
-            groupIndex={group.findIndex(
-              (grp) => grp.type === groupTypeName.all
+        <Title />
+        {group.map((grp, index) => (
+          <>
+            {grp.type === groupTypeName.shape ? (
+              <ShapeGroup
+                selectedPdf={selectedPdf}
+                selectedPage={selectedPage}
+                scaleInfo={scaleInfo}
+                key={index}
+                groupIndex={index}
+                group={grp}
+                groups={group}
+                changeGroup={changeGroup}
+                polygon={polygon[selectedPdf][selectedPage]}
+                changePolygon={changePolygon}
+              />
+            ) : grp.type === groupTypeName.length ? (
+              <LengthGroup
+                selectedPdf={selectedPdf}
+                selectedPage={selectedPage}
+                scaleInfo={scaleInfo}
+                key={index}
+                groupIndex={index}
+                group={grp}
+                groups={group}
+                changeGroup={changeGroup}
+                length={length[selectedPdf][selectedPage]}
+                changeLength={changeLength}
+              />
+            ) : grp.type === groupTypeName.all ? (
+              <></>
+            ) : (
+              <CountGroup
+                selectedPdf={selectedPdf}
+                selectedPage={selectedPage}
+                scaleInfo={scaleInfo}
+                key={index}
+                groupIndex={index}
+                group={grp}
+                groups={group}
+                changeGroup={changeGroup}
+                count={count[selectedPdf][selectedPage]}
+                changeCount={changeCount}
+              />
             )}
-            group={group.find((grp) => grp.type === groupTypeName.all)!}
-            groups={group}
-            changeGroup={changeGroup}
-            polygon={polygon[selectedPdf][selectedPage]}
-            changePolygon={changePolygon}
-            length={length[selectedPdf][selectedPage]}
-            changeLength={changeLength}
-            count={count[selectedPdf][selectedPage]}
-            changeCount={changeCount}
-          />
-        </Container>
-      )}
-    </>
+          </>
+        ))}
+        <DefaultGroup
+          selectedPdf={selectedPdf}
+          selectedPage={selectedPage}
+          scaleInfo={scaleInfo}
+          groupIndex={group.findIndex((grp) => grp.type === groupTypeName.all)}
+          group={group.find((grp) => grp.type === groupTypeName.all)!}
+          groups={group}
+          changeGroup={changeGroup}
+          polygon={polygon[selectedPdf][selectedPage]}
+          changePolygon={changePolygon}
+          length={length[selectedPdf][selectedPage]}
+          changeLength={changeLength}
+          count={count[selectedPdf][selectedPage]}
+          changeCount={changeCount}
+        />
+      </Box>
+    </Container>
   );
 };
 
@@ -160,16 +131,19 @@ interface CustomBoxProps extends BoxProps {
 }
 const Container = styled(Box)<CustomBoxProps>(({ theme, navHeight }) => ({
   position: "fixed",
-  top: `calc( ${navHeight} + 30px + 2px)`,
-  right: "0px",
+  top: "50px",
+  right: "5%",
+  width: "510px",
+  // maxHeight: "200px",
   backgroundColor: "white",
-  height: "500px",
-  width: "450px",
-  boxShadow:
-    "0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
-  zIndex: 13000,
+  borderRadius: "32px",
+  boxShadow: "0px 3px 4px 0px gray",
+  padding: "75px 0px 100px 0px",
+  paddingLeft: "25px",
+  paddingRight: "25px",
+  boxSizing: "border-box",
+  zIndex: 600,
 
-  display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
   alignItems: "center",

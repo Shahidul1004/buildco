@@ -16,6 +16,7 @@ const Polygon = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
   return (
     <CustomButton
       sx={{
+        padding: "0px 6px",
         display: "flex",
         flexFlow: "column nowrap",
       }}
@@ -27,9 +28,10 @@ const Polygon = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
         color={`${
           activeTool === activeToolOptions.polygon ? "primary" : "inherit"
         }`}
+        style={{ width: "20px", height: "20px" }}
       />
       <Typography
-        fontSize={13}
+        fontSize={12}
         color={`${
           activeTool === activeToolOptions.polygon ? "primary" : "inherit"
         }`}

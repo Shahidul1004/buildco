@@ -24,6 +24,7 @@ import {
 import LoadingModal from "./modal/LoadingModal";
 import GroupSection from "./group/GroupSection";
 import MeasurementSection from "./measurement/MeasurementSection";
+import InitialUpload from "./fileUpload/InitialUpload";
 
 const Homepage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,6 +35,8 @@ const Homepage = (): JSX.Element => {
   const [pdfOrder, setPdfOrder] = useState<number[]>([]);
   const [selectedPdf, setSelectedPdf] = useState<number>(-1);
   const [selectedPage, setSelectedPage] = useState<number[]>([]);
+  const [showPage, setShowPage] = useState<boolean>(false);
+  const [showMeasurements, setShowMeasurements] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<number[][]>([]);
   const [activeTool, setActiveTool] = useState<activeToolOptions>(
     activeToolOptions.pan
@@ -61,6 +64,7 @@ const Homepage = (): JSX.Element => {
 
   const fileUploadHandler = async (files: FileList) => {
     setLoading(true);
+    setShowPage(false);
     const names = await getFileName(files);
     const docs = await PdfjsDocument(files);
     const pages: pdfjsLib.PDFPageProxy[][] = [];
@@ -109,16 +113,101 @@ const Homepage = (): JSX.Element => {
       ...[...Array(files.length).keys()].map((ind) => 0),
     ]);
 
+    setSelectedPdf(0);
     setPdfOrder((prev) => [
       ...prev,
       ...[...Array(files.length).keys()].map((ind) => ind + prevCount),
     ]);
+
     setLoading(false);
   };
 
   return (
     <>
-      <Box>
+      {pdfOrder.length === 0 && (
+        <InitialUpload onFileUpload={fileUploadHandler} />
+      )}
+      {selectedPdf !== -1 && pdfOrder.length > 0 && (
+        <>
+          <Header
+            onFileUpload={fileUploadHandler}
+            fileName={fileName.current}
+            selectedPdf={selectedPdf}
+            changeSelectedPdf={setSelectedPdf}
+            selectedPage={selectedPage[selectedPdf]}
+            pdfOrder={pdfOrder}
+            changePdfOrder={setPdfOrder}
+            currentZoomLevel={
+              selectedPdf === -1
+                ? 50
+                : zoomLevel[selectedPdf][selectedPage[selectedPdf]]
+            }
+            changeZoomLevel={setZoomLevel}
+            activeTool={activeTool}
+            changeActiveTool={setActiveTool}
+            showPage={showPage}
+            toggleShowPage={setShowPage}
+            showMeasurements={showMeasurements}
+            toggleShowMeasurements={setShowMeasurements}
+            group={group}
+            changeGroup={setGroup}
+            activeGroup={activeGroup}
+            changeActiveGroup={setActiveGroup}
+            scaleInfo={scaleInfo}
+            polygon={polygon}
+            changePolygon={setPolygon}
+            length={length}
+            changeLength={setLength}
+            count={count}
+            changeCount={setCount}
+          />
+
+          <Playground
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage[selectedPdf]}
+            page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
+            zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
+            activeTool={activeTool}
+            changeActiveTool={setActiveTool}
+            scaleInfo={scaleInfo}
+            changeScaleInfo={setScaleInfo}
+            polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
+            changePolygon={setPolygon}
+            length={length[selectedPdf][selectedPage[selectedPdf]]}
+            changeLength={setLength}
+            count={count[selectedPdf][selectedPage[selectedPdf]]}
+            changeCount={setCount}
+            group={group}
+            activeGroup={activeGroup}
+          />
+
+          {showPage && (
+            <PreviewSection
+              selectedPdf={selectedPdf}
+              selectedPage={selectedPage[selectedPdf]}
+              changeSelectedPage={setSelectedPage}
+              pages={pdfPages.current[selectedPdf]}
+              changeLoading={setLoading}
+            />
+          )}
+          {showMeasurements && (
+            <MeasurementSection
+              selectedPdf={selectedPdf}
+              selectedPage={selectedPage[selectedPdf]}
+              scaleInfo={scaleInfo[selectedPdf][selectedPage[selectedPdf]]}
+              group={group}
+              changeGroup={setGroup}
+              polygon={polygon}
+              changePolygon={setPolygon}
+              length={length}
+              changeLength={setLength}
+              count={count}
+              changeCount={setCount}
+            />
+          )}
+        </>
+      )}
+      {/* <Box>
         <Header
           onFileUpload={fileUploadHandler}
           fileName={fileName.current}
@@ -195,7 +284,7 @@ const Homepage = (): JSX.Element => {
           changeCount={setCount}
         />
       )}
-      {loading && <LoadingModal />}
+      {loading && <LoadingModal />} */}
     </>
   );
 };

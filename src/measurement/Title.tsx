@@ -15,7 +15,7 @@ const Title = (): JSX.Element => {
         <Settings fill="#c3c3ca" />
       </TitleField>
       <TitleField sx={{ width: "90px" }}>Total</TitleField>
-      <TitleField sx={{ width: "50px" }} />
+      <TitleField sx={{ width: "60px" }} />
     </Container>
   );
 };
@@ -25,13 +25,15 @@ export default Title;
 const Container = styled(Box)({
   height: "35px",
   boxSizing: "border-box",
-  width: "100%",
+  width: "460px",
   backgroundColor: "#f4f4f4",
+  borderLeft: "1px solid #d6dae5",
   borderTop: "1px solid #d6dae5",
   borderBottom: "1px solid #d6dae5",
   display: "flex",
   justifyContent: "flex-start",
   alignItems: "center",
+  // position: "fixed",
 });
 
 const TitleField = styled(Box)({

@@ -19,6 +19,7 @@ const Rectangle = ({
   return (
     <CustomButton
       sx={{
+        padding: "0px 6px",
         display: "flex",
         flexFlow: "column nowrap",
       }}
@@ -30,9 +31,10 @@ const Rectangle = ({
         color={`${
           activeTool === activeToolOptions.rectangle ? "primary" : "inherit"
         }`}
+        style={{ width: "20px", height: "20px" }}
       />
       <Typography
-        fontSize={13}
+        fontSize={12}
         color={`${
           activeTool === activeToolOptions.rectangle ? "primary" : "inherit"
         }`}

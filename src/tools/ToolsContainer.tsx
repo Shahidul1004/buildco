@@ -4,6 +4,7 @@ import Annotate from "./Annotate";
 import Count from "./Count";
 import Deduct from "./Deduct";
 import Length from "./Length";
+import Page from "./Page";
 import Pan from "./Pan";
 import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
@@ -20,6 +21,8 @@ type propsType = {
   changeZoomLevel: React.Dispatch<React.SetStateAction<number[][]>>;
   activeTool: activeToolOptions;
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
+  showPage: boolean;
+  toggleShowPage: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ToolsContainer = ({
@@ -29,19 +32,21 @@ const ToolsContainer = ({
   changeZoomLevel,
   activeTool,
   changeActiveTool,
+  showPage,
+  toggleShowPage,
 }: propsType): JSX.Element => {
   return (
     <Container>
+      <Page showPage={showPage} toggleShowPage={toggleShowPage} />
       <Select activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Scale activeTool={activeTool} changeActiveTool={changeActiveTool} />
-      <Pan activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Rectangle activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Polygon activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Deduct activeTool={activeTool} changeActiveTool={changeActiveTool} />
-      <Length activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Count activeTool={activeTool} changeActiveTool={changeActiveTool} />
+      <Length activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <Annotate activeTool={activeTool} changeActiveTool={changeActiveTool} />
-
+      <Pan activeTool={activeTool} changeActiveTool={changeActiveTool} />
       <ZoomIn
         selectedPdf={selectedPdf}
         selectedPage={selectedPage}

@@ -481,7 +481,7 @@ const DefaultGroup = ({
                     ).toFixed(2)} in`}
               </Typography>
             </Field>
-            <Field sx={{ width: "50px", justifyContent: "center" }}>
+            <Field sx={{ width: "60px", justifyContent: "center" }}>
               <IconButton id={`length ${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
                   sx={{ color: length[index]?.hover ? "#0066c3" : "inherit" }}
@@ -591,7 +591,7 @@ const DefaultGroup = ({
               {`count ${groupSize.current}`}
             </Typography>
           </Field>
-          <Field sx={{ width: "50px", justifyContent: "center" }}>
+          <Field sx={{ width: "60px", justifyContent: "center" }}>
             <IconButton id={`count -1`} onClick={handleToggleOption}>
               <MoreHorizIcon
                 sx={{
@@ -663,7 +663,8 @@ export default DefaultGroup;
 const Container = styled(Box)({
   minHeight: "35px",
   boxSizing: "border-box",
-  width: "100%",
+  width: "460px",
+  borderLeft: "1px solid #d6dae5",
   borderBottom: "1px solid #d6dae5",
   display: "flex",
   flexDirection: "column",

@@ -20,6 +20,7 @@ const Scale = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     <>
       <CustomButton
         sx={{
+          padding: "0px 6px",
           display: "flex",
           flexFlow: "column nowrap",
         }}
@@ -27,13 +28,13 @@ const Scale = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
         disabled={activeTool === activeToolOptions["scale"]}
       >
         <ScaleIcon
-          style={{ height: "20px" }}
+          style={{ width: "16px", height: "18px" }}
           fill={`${
             activeTool === activeToolOptions["scale"] ? "#1976d2" : "inherit"
           }`}
         />
         <Typography
-          fontSize={13}
+          fontSize={12}
           color={`${
             activeTool === activeToolOptions["scale"] ? "primary" : "inherit"
           }`}

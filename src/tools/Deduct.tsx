@@ -16,6 +16,7 @@ const Deduct = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
   return (
     <CustomButton
       sx={{
+        padding: "0px 6px",
         display: "flex",
         flexFlow: "column nowrap",
       }}
@@ -26,10 +27,11 @@ const Deduct = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
         fill={`${
           activeTool === activeToolOptions.deduct ? "#1976d2" : "inherit"
         }`}
+        style={{ width: "16px", height: "18px" }}
       />
 
       <Typography
-        fontSize={13}
+        fontSize={12}
         color={`${
           activeTool === activeToolOptions.deduct ? "primary" : "inherit"
         }`}
