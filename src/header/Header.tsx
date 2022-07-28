@@ -1,16 +1,11 @@
-import { useContext, useState } from "react";
+import { MutableRefObject } from "react";
 
 import { styled, Box } from "@mui/material";
-import AppBar, { AppBarProps } from "@mui/material/AppBar";
-import Toolbar, { ToolbarProps } from "@mui/material/Toolbar";
-import Typography, { TypographyProps } from "@mui/material/Typography";
+import Typography from "@mui/material/Typography";
 import { ReactComponent as LogoIcon } from "../assets/icons/logo.svg";
 
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-
-import { Context } from "../Context";
-import FileSection from "./FileSection";
 import ToolsContainer from "../tools/ToolsContainer";
 import {
   activeGroupType,
@@ -21,10 +16,7 @@ import {
   polygonType,
   scaleInfoType,
 } from "../utils";
-import Page from "../tools/Page";
-import PreviewSection from "../preview/PreviewSection";
 import GroupSection from "../group/GroupSection";
-import MeasurementSection from "../measurement/MeasurementSection";
 
 type props = {
   onFileUpload: (files: FileList) => void;
@@ -53,6 +45,9 @@ type props = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[][][];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Header = ({
@@ -82,11 +77,10 @@ const Header = ({
   changeLength,
   count,
   changeCount,
+  undoStack,
+  redoStack,
+  captureStates,
 }: props): JSX.Element => {
-  const context = useContext(Context);
-
-  console.log(activeTool);
-
   return (
     <Wrapper>
       <ToolBar>
@@ -100,6 +94,9 @@ const Header = ({
           changeActiveTool={changeActiveTool}
           showPage={showPage}
           toggleShowPage={toggleShowPage}
+          undoStack={undoStack}
+          redoStack={redoStack}
+          captureStates={captureStates}
         />
 
         {(activeTool === activeToolOptions.rectangle ||
@@ -159,7 +156,6 @@ export default Header;
 const ToolBar = styled(Box)({
   position: "fixed",
   top: "50px",
-  // left: "5%",
   width: "90%",
   boxSizing: "border-box",
   backgroundColor: "white",
@@ -179,35 +175,3 @@ const Wrapper = styled(Box)({
   display: "flex",
   justifyContent: "center",
 });
-
-interface CustomAppBarProps extends AppBarProps {
-  height: string;
-}
-const CustomAppBar = styled(AppBar)<CustomAppBarProps>(({ theme, height }) => ({
-  position: "fixed",
-  backgroundColor: theme.color.navbar,
-  height: height,
-}));
-
-interface CustomToolbarProps extends ToolbarProps {
-  height: string;
-}
-const CustomToolbar = styled(Toolbar)<CustomToolbarProps>(({ height }) => ({
-  minHeight: "40px !important",
-  height: height,
-}));
-
-const Logo = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontStyle: "normal",
-  fontWeight: 700,
-  fontSize: "17px",
-  lineHeight: "30px",
-  background:
-    "linear-gradient(90deg, #F9E4E4 -5.26%, #E90C0C 71.33%, #AD1C1C 110.53%)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  [theme.breakpoints.up("md")]: {
-    fontSize: "20px",
-  },
-}));

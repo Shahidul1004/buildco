@@ -25,16 +25,18 @@ const Length = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     >
       <LengthIcon
         fill={`${
-          activeTool === activeToolOptions.length ? "#1976d2" : "inherit"
+          activeTool === activeToolOptions.length ? "#FFBC01" : "inherit"
         }`}
         style={{ width: "18px", height: "18px" }}
       />
 
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.length ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.length ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Length
       </Typography>

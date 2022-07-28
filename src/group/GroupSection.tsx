@@ -1,21 +1,5 @@
-import {
-  Box,
-  BoxProps,
-  Menu,
-  MenuItem,
-  MenuProps,
-  styled,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import {
-  MouseEventHandler,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Context } from "../Context";
+import { Box, Menu, MenuItem, Typography, useTheme } from "@mui/material";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import _ from "lodash";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -52,7 +36,6 @@ const GroupSection = ({
 }: propsType): JSX.Element => {
   const [filteredGroups, setFilteredGroups] = useState<groupType[]>([]);
   const anchorElOptionId = useRef<any>(null);
-  const context = useContext(Context);
   const theme = useTheme();
 
   const [modalType, setModalType] = useState<string>("");
@@ -67,8 +50,6 @@ const GroupSection = ({
     null
   );
   const openOption = Boolean(anchorElOption);
-  const [anchorElColor, setAnchorElColor] = useState<null | HTMLElement>(null);
-  const openColor = Boolean(anchorElColor);
 
   const currentGroup = filteredGroups.find(
     (grp) =>
@@ -120,8 +101,6 @@ const GroupSection = ({
     setFilteredGroups(availableGroups);
   }, [group, activeTool]);
 
-  console.log(filteredGroups);
-
   const handleToggleList: MouseEventHandler<HTMLDivElement> = (event) => {
     if (anchorElList) {
       setAnchorElList(null);
@@ -136,13 +115,6 @@ const GroupSection = ({
       setAnchorElOption(event?.currentTarget);
     }
   };
-  const handleToggleColor: MouseEventHandler<HTMLDivElement> = (event) => {
-    if (anchorElColor) {
-      setAnchorElColor(null);
-    } else {
-      setAnchorElColor(event?.currentTarget);
-    }
-  };
 
   const handleCloseList = () => {
     setAnchorElList(null);
@@ -151,9 +123,6 @@ const GroupSection = ({
     anchorElOptionId.current = anchorElOption?.id;
     setAnchorElOption(null);
     setAnchorElList(null);
-  };
-  const handleCloseColor = () => {
-    setAnchorElColor(null);
   };
 
   return (
@@ -388,86 +357,3 @@ const GroupSection = ({
 };
 
 export default GroupSection;
-
-const GroupContainer = styled(Box)({
-  position: "fixed",
-  top: "50px",
-  left: "800px",
-  width: "230px",
-  backgroundColor: "white",
-  borderRadius: "32px",
-  boxShadow: "0px 1px 4px 0px gray",
-  padding: "10px",
-  paddingTop: "70px",
-  paddingLeft: "30px",
-  paddingRight: "30px",
-  display: "flex",
-  alignItems: "center",
-  zIndex: 700,
-});
-
-const StyledMenu = styled((props: MenuProps) => (
-  <Menu
-    elevation={0}
-    anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "right",
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "right",
-    }}
-    {...props}
-  />
-))(({ theme }) => ({
-  "& .MuiPaper-root": {
-    zIndex: -10,
-    borderRadius: 0,
-    marginTop: "10px",
-    minWidth: 180,
-    backgroundColor: "red",
-
-    // color:
-    //   theme.palette.mode === "light"
-    //     ? "rgb(55, 65, 81)"
-    //     : theme.palette.grey[300],
-    // boxShadow:
-    //   "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
-
-    // "& .MuiMenu-list": {
-    //   padding: "4px 0",
-    // },
-    // "& .MuiMenuItem-root": {
-    //   "& .MuiSvgIcon-root": {
-    //     fontSize: 18,
-    //     color: theme.palette.text.secondary,
-    //     marginRight: theme.spacing(1.5),
-    //   },
-    //   "&:active": {
-    //     backgroundColor: alpha(
-    //       theme.palette.primary.main,
-    //       theme.palette.action.selectedOpacity
-    //     ),
-    //   },
-    // },
-  },
-}));
-
-interface CustomBoxProps extends BoxProps {
-  navHeight: string;
-}
-const Container = styled(Box)<CustomBoxProps>(({ theme, navHeight }) => ({
-  position: "fixed",
-  top: `calc( ${navHeight} + 2px)`,
-  left: "350px",
-  backgroundColor: "white",
-  height: "50px",
-  width: "450px",
-  boxShadow:
-    "0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
-  zIndex: 1200,
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: "5px",
-}));

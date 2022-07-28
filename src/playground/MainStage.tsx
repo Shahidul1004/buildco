@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
@@ -36,6 +36,9 @@ type propsType = {
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const MainStage = ({
@@ -55,6 +58,9 @@ const MainStage = ({
   changeCount,
   activeGroup,
   group,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -109,6 +115,9 @@ const MainStage = ({
             changePolygon={changePolygon}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
         {[
@@ -128,6 +137,9 @@ const MainStage = ({
             changePolygon={changePolygon}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
 
@@ -149,6 +161,9 @@ const MainStage = ({
             changeLength={changeLength}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
 
@@ -167,6 +182,9 @@ const MainStage = ({
             changeLength={changeLength}
             count={count}
             changeCount={changeCount}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
         {[activeToolOptions.deduct].includes(activeTool) && (
@@ -181,6 +199,9 @@ const MainStage = ({
             changePolygon={changePolygon}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
         {[
@@ -201,6 +222,9 @@ const MainStage = ({
             changeCount={changeCount}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
       </Stage>

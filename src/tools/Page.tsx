@@ -21,10 +21,18 @@ const Page = ({ showPage, toggleShowPage }: propsType): JSX.Element => {
       >
         <PictureAsPdfIcon
           fontSize="small"
-          color={`${showPage ? "primary" : "inherit"}`}
-          style={{ width: "20px", height: "20px" }}
+          style={{
+            width: "20px",
+            height: "20px",
+            color: `${showPage ? "#FFBC01" : "inherit"}`,
+          }}
         />
-        <Typography fontSize={12} color={`${showPage ? "primary" : "inherit"}`}>
+        <Typography
+          fontSize={12}
+          sx={{
+            color: `${showPage ? "#FFBC01" : "inherit"}`,
+          }}
+        >
           Page
         </Typography>
       </CustomButton>

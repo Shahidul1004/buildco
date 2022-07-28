@@ -25,16 +25,21 @@ const Polygon = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     >
       <HexagonOutlinedIcon
         fontSize="medium"
-        color={`${
-          activeTool === activeToolOptions.polygon ? "primary" : "inherit"
-        }`}
-        style={{ width: "20px", height: "20px" }}
+        style={{
+          width: "20px",
+          height: "20px",
+          color: `${
+            activeTool === activeToolOptions.polygon ? "#FFBC01" : "inherit"
+          }`,
+        }}
       />
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.polygon ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.polygon ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Polygon
       </Typography>

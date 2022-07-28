@@ -67,6 +67,14 @@ const CreateGroupModal = ({
 
   const handleCreate = () => {
     onClose();
+    let extra = {};
+    if (newGroupType === groupTypeName.shape) {
+      extra = {
+        height: 0,
+        depth: 0,
+        pitch: 0,
+      };
+    }
     changeGroup((prev) => [
       ...prev,
       {
@@ -76,6 +84,7 @@ const CreateGroupModal = ({
         color: color,
         [newGroupType === groupTypeName.count ? "icon" : "unit"]:
           newGroupType === groupTypeName.count ? icon : unit,
+        ...extra,
       },
     ]);
   };

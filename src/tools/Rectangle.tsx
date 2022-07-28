@@ -28,16 +28,21 @@ const Rectangle = ({
     >
       <Crop54SharpIcon
         fontSize="medium"
-        color={`${
-          activeTool === activeToolOptions.rectangle ? "primary" : "inherit"
-        }`}
-        style={{ width: "20px", height: "20px" }}
+        style={{
+          width: "20px",
+          height: "20px",
+          color: `${
+            activeTool === activeToolOptions.rectangle ? "#FFBC01" : "inherit"
+          }`,
+        }}
       />
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.rectangle ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.rectangle ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Rectangle
       </Typography>

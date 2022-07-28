@@ -26,6 +26,9 @@ export type polygonType = {
   deductRect: deductRectType[];
   group: number;
   hover: boolean;
+  height: number;
+  depth: number;
+  pitch: number;
 };
 
 export type lengthType = {
@@ -66,6 +69,9 @@ export type groupType = {
   color: RGBColor;
   unit?: unitType;
   icon?: iconType;
+  height?: number;
+  depth?: number;
+  pitch?: number;
 };
 export type activeGroupType = {
   shape: number;

@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import * as pdfjsLib from "pdfjs-dist";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 

@@ -30,14 +30,16 @@ const Scale = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
         <ScaleIcon
           style={{ width: "16px", height: "18px" }}
           fill={`${
-            activeTool === activeToolOptions["scale"] ? "#1976d2" : "inherit"
+            activeTool === activeToolOptions["scale"] ? "#FFBC01" : "inherit"
           }`}
         />
         <Typography
           fontSize={12}
-          color={`${
-            activeTool === activeToolOptions["scale"] ? "primary" : "inherit"
-          }`}
+          sx={{
+            color: `${
+              activeTool === activeToolOptions.scale ? "#FFBC01" : "inherit"
+            }`,
+          }}
         >
           Scale
         </Typography>

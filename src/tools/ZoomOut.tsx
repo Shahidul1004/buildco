@@ -51,10 +51,16 @@ const ZoomOut = ({
     >
       <ZoomOutIcon
         fontSize="medium"
-        color={`${click ? "primary" : "inherit"}`}
-        style={{ width: "20px", height: "20px" }}
+        style={{
+          width: "20px",
+          height: "20px",
+          color: `${click ? "#FFBC01" : "inherit"}`,
+        }}
       />
-      <Typography fontSize={12} color={`${click ? "primary" : "inherit"}`}>
+      <Typography
+        fontSize={12}
+        sx={{ color: `${click ? "#FFBC01" : "inherit"}` }}
+      >
         Zoom Out
       </Typography>
     </CustomButton>

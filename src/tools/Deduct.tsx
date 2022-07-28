@@ -25,16 +25,18 @@ const Deduct = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     >
       <DeductIcon
         fill={`${
-          activeTool === activeToolOptions.deduct ? "#1976d2" : "inherit"
+          activeTool === activeToolOptions.deduct ? "#FFBC01" : "inherit"
         }`}
         style={{ width: "16px", height: "18px" }}
       />
 
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.deduct ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.deduct ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Deduct
       </Typography>

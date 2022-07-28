@@ -25,6 +25,7 @@ import LoadingModal from "./modal/LoadingModal";
 import GroupSection from "./group/GroupSection";
 import MeasurementSection from "./measurement/MeasurementSection";
 import InitialUpload from "./fileUpload/InitialUpload";
+import _ from "lodash";
 
 const Homepage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -61,6 +62,14 @@ const Homepage = (): JSX.Element => {
   const [polygon, setPolygon] = useState<polygonType[][][]>([]);
   const [length, setLength] = useState<lengthType[][][]>([]);
   const [count, setCount] = useState<countType[][][]>([]);
+  const undoStack = useRef<(() => void)[]>([]);
+  const redoStack = useRef<(() => void)[]>([]);
+
+  const captureStates = () => {
+    setPolygon((prev) => _.cloneDeep(polygon));
+    setLength((prev) => _.cloneDeep(length));
+    setCount((prev) => _.cloneDeep(count));
+  };
 
   const fileUploadHandler = async (files: FileList) => {
     setLoading(true);
@@ -160,6 +169,9 @@ const Homepage = (): JSX.Element => {
             changeLength={setLength}
             count={count}
             changeCount={setCount}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
 
           <Playground
@@ -179,6 +191,9 @@ const Homepage = (): JSX.Element => {
             changeCount={setCount}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
 
           {showPage && (

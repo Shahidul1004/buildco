@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
 import _ from "lodash";
-import { RefObject, useEffect, useRef } from "react";
+import { MutableRefObject, RefObject, useEffect, useRef } from "react";
 import { Circle, Layer, Rect, RegularPolygon } from "react-konva";
 import { rgba2hex } from "../reusables/helpers";
 import {
@@ -24,6 +24,9 @@ type propsType = {
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Count = ({
@@ -37,6 +40,9 @@ const Count = ({
   changeCount,
   group,
   activeGroup,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const layerRef = useRef<Konva.Layer>(null);
@@ -64,6 +70,8 @@ const Count = ({
       type: group.find((grp) => grp.id === activeGroup.count)?.icon!,
     };
 
+    undoStack.current.push(captureStates);
+    redoStack.current.length = 0;
     changeCount((prev) => {
       const prevCopy = _.cloneDeep(prev);
       const temp = prevCopy[selectedPdf][selectedPage];

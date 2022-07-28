@@ -1,6 +1,5 @@
 import OpenWithIcon from "@mui/icons-material/OpenWith";
 import { Typography } from "@mui/material";
-import { useState } from "react";
 
 import CustomButton from "../reusables/Button";
 import { activeToolOptions } from "../utils";
@@ -27,16 +26,21 @@ const Pan = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
       >
         <OpenWithIcon
           fontSize="small"
-          color={`${
-            activeTool === activeToolOptions["pan"] ? "primary" : "inherit"
-          }`}
-          style={{ width: "20px", height: "20px" }}
+          style={{
+            width: "20px",
+            height: "20px",
+            color: `${
+              activeTool === activeToolOptions.pan ? "#FFBC01" : "inherit"
+            }`,
+          }}
         />
         <Typography
           fontSize={12}
-          color={`${
-            activeTool === activeToolOptions["pan"] ? "primary" : "inherit"
-          }`}
+          sx={{
+            color: `${
+              activeTool === activeToolOptions.pan ? "#FFBC01" : "inherit"
+            }`,
+          }}
         >
           Pan
         </Typography>

@@ -1,7 +1,13 @@
 import _ from "lodash";
 import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
-import { RefObject, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Layer, Rect, Line, Text } from "react-konva";
 import {
   activeGroupType,
@@ -24,6 +30,9 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Length = ({
@@ -37,6 +46,9 @@ const Length = ({
   changeLength,
   group,
   activeGroup,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const [newLength, setNewLength] = useState<lengthType[]>([]);
@@ -178,6 +190,9 @@ const Length = ({
       const actualPoints = newLength[0].points;
       actualPoints.pop();
       actualPoints.pop();
+
+      undoStack.current.push(captureStates);
+      redoStack.current.length = 0;
       changeLength((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const temp = prevCopy[selectedPdf][selectedPage];

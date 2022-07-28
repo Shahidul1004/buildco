@@ -1,4 +1,5 @@
 import * as pdfjsLib from "pdfjs-dist";
+import { scaleInfoType } from "../utils";
 pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.entry.js");
 
 // const readFileAsync = (file: File) => {
@@ -234,6 +235,72 @@ const getLength = (points: number[]) => {
   return length;
 };
 
+const getScaledVolume = (
+  area: number,
+  scaleInfo: scaleInfoType,
+  unit: string,
+  height: number | undefined,
+  depth: number | undefined,
+  pitch: number | undefined
+) => {
+  const dim = height || depth || pitch;
+  if (unit === "px") {
+    if (dim) {
+      return `${(area * dim).toFixed(2)} px3`;
+    } else {
+      return `${area.toFixed(2)} px2`;
+    }
+  } else if (unit === "ft") {
+    if (dim) {
+      return `${(
+        (area * scaleInfo.L * scaleInfo.L * dim) /
+        (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
+      ).toFixed(2)} ft3`;
+    } else {
+      return `${(
+        (area * scaleInfo.L * scaleInfo.L) /
+        (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
+      ).toFixed(2)} ft2`;
+    }
+  } else if (unit === "in") {
+    if (dim) {
+      return `${(
+        (area * scaleInfo.L * scaleInfo.L * dim * 144) /
+        (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
+      ).toFixed(2)} in3`;
+    } else {
+      return `${(
+        (area * scaleInfo.L * scaleInfo.L * 144) /
+        (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
+      ).toFixed(2)} in2`;
+    }
+  } else {
+    return "0 unit";
+  }
+};
+
+const getScaledArea = (
+  area: number,
+  scaleInfo: scaleInfoType,
+  unit: string
+) => {
+  if (unit === "px") {
+    return `${area.toFixed(2)} px2`;
+  } else if (unit === "ft") {
+    return `${(
+      (area * scaleInfo.L * scaleInfo.L) /
+      (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
+    ).toFixed(2)} ft2`;
+  } else if (unit === "in") {
+    return `${(
+      (area * scaleInfo.L * scaleInfo.L * 144) /
+      (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
+    ).toFixed(2)} in2`;
+  } else {
+    return "0 unit";
+  }
+};
+
 export {
   // readFileAsync,
   getFileName,
@@ -251,4 +318,6 @@ export {
   polygonArea,
   isClockwise,
   getLength,
+  getScaledVolume,
+  getScaledArea,
 };

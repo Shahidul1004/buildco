@@ -25,16 +25,21 @@ const Count = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     >
       <CountIcon
         fill={`${
-          activeTool === activeToolOptions.count ? "#1976d2" : "inherit"
+          activeTool === activeToolOptions.count ? "#FFBC01" : "inherit"
         }`}
-        style={{ width: "20px", height: "20px" }}
+        style={{
+          width: "20px",
+          height: "20px",
+        }}
       />
 
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.count ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.count ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Count
       </Typography>

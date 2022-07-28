@@ -2,7 +2,7 @@ import _ from "lodash";
 import Konva from "konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
-import { createRef, RefObject, useRef } from "react";
+import { createRef, MutableRefObject, RefObject, useRef } from "react";
 import {
   Circle,
   Group,
@@ -38,6 +38,9 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Select = ({
@@ -54,6 +57,9 @@ const Select = ({
   changeLength,
   count,
   changeCount,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const layerRef = useRef<Konva.Layer>(null);
   const trRef = useRef<Konva.Transformer>(null);
@@ -86,6 +92,9 @@ const Select = ({
   ) => {
     const x = e.target.x();
     const y = e.target.y();
+
+    undoStack.current.push(captureStates);
+    redoStack.current.length = 0;
     changeCount((prev) => {
       const prevCopy = _.cloneDeep(prev);
       const temp = prevCopy[selectedPdf][selectedPage];
@@ -230,6 +239,8 @@ const Select = ({
               const x = e.target.x();
               const y = e.target.y();
 
+              undoStack.current.push(captureStates);
+              redoStack.current.length = 0;
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const polygons = prevCopy[selectedPdf][selectedPage];
@@ -270,6 +281,8 @@ const Select = ({
               transformer = e.target.getTransform();
             }}
             onTransformEnd={(e) => {
+              undoStack.current.push(captureStates);
+              redoStack.current.length = 0;
               const transformedPoints: number[] = [];
               for (let i = 0; i < item.points.length; i += 2) {
                 const { x, y } = e.target.getTransform().point({
@@ -279,7 +292,8 @@ const Select = ({
                 transformedPoints.push(x);
                 transformedPoints.push(y);
               }
-              const transformedDeducts: deductRectType[] = item.deductRect.map(
+              const deductRects = _.cloneDeep(item.deductRect);
+              const transformedDeducts: deductRectType[] = deductRects.map(
                 (deduct) => {
                   const key = deduct.key;
                   const points = deduct.points;
@@ -299,6 +313,7 @@ const Select = ({
                   };
                 }
               );
+
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const temp = prevCopy[selectedPdf][selectedPage];
@@ -358,6 +373,9 @@ const Select = ({
           onDragEnd={(e: KonvaEventObject<DragEvent>) => {
             const x = e.target.x();
             const y = e.target.y();
+
+            undoStack.current.push(captureStates);
+            redoStack.current.length = 0;
             changeLength((prev) => {
               const prevCopy = _.cloneDeep(prev);
               const temp = prevCopy[selectedPdf][selectedPage];
@@ -376,6 +394,8 @@ const Select = ({
             e.target.clearCache();
           }}
           onTransformEnd={(e) => {
+            undoStack.current.push(captureStates);
+            redoStack.current.length = 0;
             const transformedPoints: number[] = [];
             for (let i = 0; i < item.points.length; i += 2) {
               const { x, y } = e.target.getTransform().point({
@@ -385,6 +405,7 @@ const Select = ({
               transformedPoints.push(x);
               transformedPoints.push(y);
             }
+
             changeLength((prev) => {
               const prevCopy = _.cloneDeep(prev);
               const temp = prevCopy[selectedPdf][selectedPage];

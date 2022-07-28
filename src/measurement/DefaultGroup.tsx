@@ -19,10 +19,17 @@ import {
 import FolderTwoToneIcon from "@mui/icons-material/FolderTwoTone";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { getLength, polygonArea, rgba2hex } from "../reusables/helpers";
+import {
+  getLength,
+  getScaledArea,
+  getScaledVolume,
+  polygonArea,
+  rgba2hex,
+} from "../reusables/helpers";
 import _ from "lodash";
 import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import AddDimensionModal from "../modal/AddDimension";
 
 type propsType = {
   selectedPdf: number;
@@ -67,6 +74,12 @@ const DefaultGroup = ({
   const polygonAreas = useRef<number[]>([]);
   const indivisualLengths = useRef<number[]>([]);
   const groupSize = useRef<number>(0);
+
+  const dimensionType = useRef<string>("");
+  const dimensionId = useRef<number>(0);
+  const dimensionArea = useRef<string>("");
+  const dimensionAreaUnit = useRef<string>("");
+  const [modalType, setModalType] = useState<string>("");
 
   const clickRef = useRef<string>("");
   const [anchorElOption, setAnchorElOption] = useState<null | HTMLElement>(
@@ -226,6 +239,7 @@ const DefaultGroup = ({
                   },
                 }}
                 contentEditable
+                suppressContentEditableWarning={true}
                 onKeyDown={(e) => {
                   setPolyRowsHeight((prev) => {
                     const copy = [...prev];
@@ -265,26 +279,20 @@ const DefaultGroup = ({
                   alignItems: "center",
                 }}
               >
-                {scaleInfo.calibrated === false
-                  ? `${polygonAreas.current[idx].toFixed(2)} px2`
-                  : group.unit === unitType.ft
-                  ? `${(
-                      (polygonAreas.current[idx] * scaleInfo.L * scaleInfo.L) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} ft2`
-                  : `${(
-                      (polygonAreas.current[idx] *
-                        scaleInfo.L *
-                        scaleInfo.L *
-                        144) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} in2`}
+                {getScaledArea(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in
+                )}
               </Typography>
             </Field>
             <Field
               sx={{
+                height: `${polyRowsHeight[idx]}px`,
                 padding: "0px 10px",
                 width: "40px",
                 cursor: "pointer",
@@ -292,8 +300,37 @@ const DefaultGroup = ({
                   backgroundColor: "#f4f4f4",
                 },
               }}
+              onClick={() => {
+                dimensionId.current = polygon[index].key;
+                dimensionType.current = "polygon";
+                dimensionArea.current = getScaledArea(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in
+                );
+                dimensionAreaUnit.current =
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in;
+                setModalType("addDimension");
+              }}
             >
-              <Settings fill={polygon[index]?.hover ? "#0066c3" : "#c3c3ca"} />
+              <Settings
+                fill={
+                  polygon[index]?.hover ||
+                  polygon[index]?.height ||
+                  polygon[index]?.depth ||
+                  polygon[index]?.pitch
+                    ? "#0066c3"
+                    : "#c3c3ca"
+                }
+              />
             </Field>
             <Field
               sx={{
@@ -310,25 +347,21 @@ const DefaultGroup = ({
                   alignItems: "center",
                 }}
               >
-                {scaleInfo.calibrated === false
-                  ? `${polygonAreas.current[idx].toFixed(2)} px2`
-                  : group.unit === unitType.ft
-                  ? `${(
-                      (polygonAreas.current[idx] * scaleInfo.L * scaleInfo.L) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} ft2`
-                  : `${(
-                      (polygonAreas.current[idx] *
-                        scaleInfo.L *
-                        scaleInfo.L *
-                        144) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} in2`}
+                {getScaledVolume(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in,
+                  polygon[index]?.height,
+                  polygon[index]?.depth,
+                  polygon[index]?.pitch
+                )}
               </Typography>
             </Field>
-            <Field sx={{ width: "50px", justifyContent: "center" }}>
+            <Field sx={{ width: "60px", justifyContent: "center" }}>
               <IconButton id={`polygon ${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
                   sx={{ color: polygon[index]?.hover ? "#0066c3" : "inherit" }}
@@ -381,6 +414,7 @@ const DefaultGroup = ({
                   },
                 }}
                 contentEditable
+                suppressContentEditableWarning={true}
                 onKeyDown={(e) => {
                   setLengthRowsHeight((prev) => {
                     const copy = [...prev];
@@ -654,6 +688,26 @@ const DefaultGroup = ({
           Delete
         </MenuItem>
       </Menu>
+
+      {modalType === "addDimension" && (
+        <AddDimensionModal
+          onClose={() => setModalType("")}
+          type={dimensionType.current}
+          id={dimensionId.current}
+          area={dimensionArea.current}
+          unit={dimensionAreaUnit.current}
+          selectedPdf={selectedPdf}
+          selectedPage={selectedPage}
+          group={group}
+          groupIndex={groupIndex}
+          changeGroup={changeGroup}
+          polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
+          polygonIndex={polygon.findIndex(
+            (poly) => poly.key === dimensionId.current
+          )}
+          changePolygon={changePolygon}
+        />
+      )}
     </Container>
   );
 };

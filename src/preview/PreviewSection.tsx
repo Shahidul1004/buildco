@@ -1,23 +1,9 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  styled,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, BoxProps, styled, Typography } from "@mui/material";
 import * as pdfjsLib from "pdfjs-dist";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { Context } from "../Context";
 
 import PreviewPdf from "./PreviewPdf";
-import { InView } from "react-intersection-observer";
 type propTypes = {
   selectedPdf: number;
   selectedPage: number;
@@ -34,7 +20,6 @@ const PreviewSection = ({
   changeLoading,
 }: propTypes): JSX.Element => {
   const context = useContext(Context);
-  const theme = useTheme();
 
   useEffect(() => {
     changeLoading(true);

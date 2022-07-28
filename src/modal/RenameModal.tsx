@@ -1,6 +1,6 @@
 import { Box, styled, TextField, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { MutableRefObject, useRef } from "react";
+import { useRef } from "react";
 import CustomButton from "../reusables/Button";
 
 type propTypes = {
@@ -53,7 +53,6 @@ const RenameModal = ({
             <TextField
               fullWidth
               defaultValue={fileName[parseInt(pdfIndex)]}
-              //   innerRef={textRef}
               inputRef={textRef}
               sx={{
                 "& .MuiOutlinedInput-input": {

@@ -1,6 +1,12 @@
 import { Box, BoxProps, styled } from "@mui/material";
 import * as pdfjsLib from "pdfjs-dist";
-import { useContext, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Context } from "../Context";
 import {
   activeGroupType,
@@ -30,6 +36,9 @@ type propsType = {
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Playground = ({
@@ -49,6 +58,9 @@ const Playground = ({
   changeCount,
   activeGroup,
   group,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -112,6 +124,9 @@ const Playground = ({
             changeCount={changeCount}
             group={group}
             activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
       </PlaygroundContainer>

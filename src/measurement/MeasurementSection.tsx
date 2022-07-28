@@ -1,5 +1,5 @@
-import { Box, BoxProps, Button, styled, useTheme } from "@mui/material";
-import { useContext, useState } from "react";
+import { Box, BoxProps, styled } from "@mui/material";
+import { useContext } from "react";
 import { Context } from "../Context";
 import {
   countType,
@@ -9,9 +9,6 @@ import {
   polygonType,
   scaleInfoType,
 } from "../utils";
-
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Title from "./Title";
 import ShapeGroup from "./ShapeGroup";
 import LengthGroup from "./LengthGroup";
@@ -46,7 +43,6 @@ const MeasurementSection = ({
   changeCount,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
-  const theme = useTheme();
 
   return (
     <Container navHeight={context.navHeight} sx={{ cursor: "pointer" }}>
@@ -134,7 +130,6 @@ const Container = styled(Box)<CustomBoxProps>(({ theme, navHeight }) => ({
   top: "50px",
   right: "5%",
   width: "510px",
-  // maxHeight: "200px",
   backgroundColor: "white",
   borderRadius: "32px",
   boxShadow: "0px 3px 4px 0px gray",

@@ -25,16 +25,18 @@ const Select = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     >
       <Cursor
         fill={`${
-          activeTool === activeToolOptions.select ? "#1976d2" : "inherit"
+          activeTool === activeToolOptions.select ? "#FFBC01" : "inherit"
         }`}
         style={{ width: "20px", height: "20px" }}
       />
 
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.select ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.select ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Select
       </Typography>

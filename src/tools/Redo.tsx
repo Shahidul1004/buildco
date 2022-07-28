@@ -1,20 +1,18 @@
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import RedoIcon from "@mui/icons-material/Redo";
 import { Typography } from "@mui/material";
-import { useRef, useState } from "react";
+import { MutableRefObject, useRef, useState } from "react";
 import CustomButton from "../reusables/Button";
 
 type propsType = {
-  selectedPdf: number;
-  selectedPage: number;
-  currentZoomLevel: number;
-  changeZoomLevel: React.Dispatch<React.SetStateAction<number[][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
-const ZoomIn = ({
-  selectedPdf,
-  selectedPage,
-  currentZoomLevel,
-  changeZoomLevel,
+const Redo = ({
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const timerPool = useRef<NodeJS.Timeout[]>([]);
   const [click, setClick] = useState<boolean>(false);
@@ -31,15 +29,11 @@ const ZoomIn = ({
     }, 100);
     timerPool.current.push(timer);
 
-    const newLevel = currentZoomLevel + 10;
-    if (newLevel <= 100)
-      changeZoomLevel((prev) => {
-        const temp = [...prev];
-        const selectedPdfZooms = temp[selectedPdf];
-        selectedPdfZooms[selectedPage] = newLevel;
-        temp.splice(selectedPdf, 1, selectedPdfZooms);
-        return temp;
-      });
+    if (redoStack.current.length > 0) {
+      const top = redoStack.current.pop()!;
+      undoStack.current.push(captureStates);
+      top();
+    }
   };
   return (
     <CustomButton
@@ -49,9 +43,9 @@ const ZoomIn = ({
         flexFlow: "column nowrap",
       }}
       onClick={handleClick}
-      disabled={currentZoomLevel >= 100}
+      disabled={redoStack.current.length <= 0}
     >
-      <ZoomInIcon
+      <RedoIcon
         fontSize="medium"
         style={{
           width: "20px",
@@ -63,10 +57,10 @@ const ZoomIn = ({
         fontSize={12}
         sx={{ color: `${click ? "#FFBC01" : "inherit"}` }}
       >
-        Zoom In
+        Redo
       </Typography>
     </CustomButton>
   );
 };
 
-export default ZoomIn;
+export default Redo;

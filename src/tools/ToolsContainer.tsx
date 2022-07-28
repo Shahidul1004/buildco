@@ -1,4 +1,5 @@
 import { Box, styled } from "@mui/material";
+import { MutableRefObject } from "react";
 import { activeToolOptions } from "../utils";
 import Annotate from "./Annotate";
 import Count from "./Count";
@@ -8,9 +9,11 @@ import Page from "./Page";
 import Pan from "./Pan";
 import Polygon from "./Polygon";
 import Rectangle from "./Rectangle";
+import Redo from "./Redo";
 
 import Scale from "./Scale";
 import Select from "./Select";
+import Undo from "./Undo";
 import ZoomIn from "./ZoomIn";
 import ZoomOut from "./ZoomOut";
 
@@ -23,6 +26,9 @@ type propsType = {
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
   showPage: boolean;
   toggleShowPage: React.Dispatch<React.SetStateAction<boolean>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const ToolsContainer = ({
@@ -34,6 +40,9 @@ const ToolsContainer = ({
   changeActiveTool,
   showPage,
   toggleShowPage,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   return (
     <Container>
@@ -58,6 +67,16 @@ const ToolsContainer = ({
         selectedPage={selectedPage}
         currentZoomLevel={currentZoomLevel}
         changeZoomLevel={changeZoomLevel}
+      />
+      <Undo
+        undoStack={undoStack}
+        redoStack={redoStack}
+        captureStates={captureStates}
+      />
+      <Redo
+        undoStack={undoStack}
+        redoStack={redoStack}
+        captureStates={captureStates}
       />
     </Container>
   );

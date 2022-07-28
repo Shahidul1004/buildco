@@ -1,7 +1,13 @@
 import _ from "lodash";
 import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
-import { RefObject, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Group, Layer, Rect, Shape, Text } from "react-konva";
 import {
   activeGroupType,
@@ -24,6 +30,9 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Rectangle = ({
@@ -37,6 +46,9 @@ const Rectangle = ({
   changePolygon,
   group,
   activeGroup,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const [newPolygon, setNewPolygon] = useState<polygonType[]>([]);
@@ -73,6 +85,9 @@ const Rectangle = ({
         deductRect: [],
         group: activeGroup.shape,
         hover: false,
+        height: 0,
+        depth: 0,
+        pitch: 0,
       };
 
       const { calibrated } = scaleInfo[selectedPdf][selectedPage];
@@ -168,6 +183,9 @@ const Rectangle = ({
             : [prevX, prevY, prevX, curY, curX, curY, curX, prevY],
       };
       setNewPolygon([]);
+
+      undoStack.current.push(captureStates);
+      redoStack.current.length = 0;
       changePolygon((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const currentList = prevCopy[selectedPdf][selectedPage];

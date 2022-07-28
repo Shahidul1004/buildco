@@ -2,7 +2,14 @@ import _ from "lodash";
 import Konva from "konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
-import { createRef, RefObject, useEffect, useRef, useState } from "react";
+import {
+  createRef,
+  MutableRefObject,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Group, Layer, Rect, Shape, Text, Transformer } from "react-konva";
 import {
   activeGroupType,
@@ -27,6 +34,9 @@ type propsType = {
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const Deduct = ({
@@ -40,6 +50,9 @@ const Deduct = ({
   changePolygon,
   group,
   activeGroup,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const needCleanup = useRef<boolean>(false);
   const layerRef = useRef<Konva.Layer>(null);
@@ -53,7 +66,6 @@ const Deduct = ({
     const text = tooltipRef.current!;
     if (activeTool === activeToolOptions.deduct) {
       needCleanup.current = true;
-      //   layerRef.current?.moveToTop();
     }
     return () => {
       if (needCleanup.current) {
@@ -261,6 +273,8 @@ const Deduct = ({
         return;
       }
 
+      undoStack.current.push(captureStates);
+      redoStack.current.length = 0;
       changePolygon((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const currentList = prevCopy[selectedPdf][selectedPage];

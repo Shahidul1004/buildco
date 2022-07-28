@@ -12,11 +12,17 @@ import { groupType, polygonType, scaleInfoType, unitType } from "../utils";
 import FolderTwoToneIcon from "@mui/icons-material/FolderTwoTone";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { polygonArea, rgba2hex } from "../reusables/helpers";
+import {
+  getScaledArea,
+  getScaledVolume,
+  polygonArea,
+  rgba2hex,
+} from "../reusables/helpers";
 import _ from "lodash";
 import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditGroupModal from "../modal/EditGroupModal";
+import AddDimensionModal from "../modal/AddDimension";
 
 type propsType = {
   selectedPdf: number;
@@ -50,6 +56,11 @@ const ShapeGroup = ({
   const [headerHeight, setHeaderHeight] = useState<number>(40);
   const rowRefs = useRef(filteredIndex.map(() => createRef<any>()));
   const [rowsHeight, setRowsHeight] = useState<number[]>([]);
+
+  const dimensionType = useRef<string>("");
+  const dimensionId = useRef<number>(0);
+  const dimensionArea = useRef<string>("");
+  const dimensionAreaUnit = useRef<string>("");
 
   const [modalType, setModalType] = useState<string>("");
   const clickRef = useRef<string>("");
@@ -167,6 +178,7 @@ const ShapeGroup = ({
               },
             }}
             contentEditable
+            suppressContentEditableWarning={true}
             onKeyDown={(e) => {
               setHeaderHeight(headerRef.current?.clientHeight!);
             }}
@@ -200,21 +212,20 @@ const ShapeGroup = ({
               alignItems: "center",
             }}
           >
-            {scaleInfo.calibrated === false
-              ? `${totalArea.current.toFixed(2)} px2`
-              : group.unit === unitType.ft
-              ? `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} ft2`
-              : `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L * 144) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} in2`}
+            {getScaledArea(
+              totalArea.current,
+              scaleInfo,
+              scaleInfo.calibrated === false
+                ? "px"
+                : group.unit === unitType.ft
+                ? unitType.ft
+                : unitType.in
+            )}
           </Typography>
         </Field>
         <Field
           sx={{
+            height: `${headerHeight}px`,
             padding: "0px 10px",
             width: "40px",
             cursor: "pointer",
@@ -222,8 +233,34 @@ const ShapeGroup = ({
               backgroundColor: "#f4f4f4",
             },
           }}
+          onClick={() => {
+            dimensionId.current = group.id;
+            dimensionType.current = "group";
+            dimensionArea.current = getScaledArea(
+              totalArea.current,
+              scaleInfo,
+              scaleInfo.calibrated === false
+                ? "px"
+                : group.unit === unitType.ft
+                ? unitType.ft
+                : unitType.in
+            );
+            dimensionAreaUnit.current =
+              scaleInfo.calibrated === false
+                ? "px"
+                : group.unit === unitType.ft
+                ? unitType.ft
+                : unitType.in;
+            setModalType("addDimension");
+          }}
         >
-          <Settings fill={hover ? "#0066c3" : "#c3c3ca"} />
+          <Settings
+            fill={
+              hover || group.height || group.depth || group.pitch
+                ? "#0066c3"
+                : "#c3c3ca"
+            }
+          />
         </Field>
         <Field
           sx={{
@@ -240,20 +277,43 @@ const ShapeGroup = ({
               alignItems: "center",
             }}
           >
-            {scaleInfo.calibrated === false
-              ? `${totalArea.current.toFixed(2)} px2`
-              : group.unit === unitType.ft
-              ? `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} ft2`
-              : `${(
-                  (totalArea.current * scaleInfo.L * scaleInfo.L * 144) /
-                  (1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y)
-                ).toFixed(2)} in2`}
+            {filteredIndex
+              .map((index, idx) => {
+                return +getScaledVolume(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in,
+                  polygon[index]?.height || group.height,
+                  polygon[index]?.depth || group.depth,
+                  polygon[index]?.pitch || group.pitch
+                ).split(" ")[0];
+              })
+              .reduce((prev, curr) => prev + curr, 0)
+              .toFixed(2) +
+              (group.height || group.depth || group.pitch
+                ? scaleInfo.calibrated === false
+                  ? " px3"
+                  : group.unit === unitType.ft
+                  ? " ft3"
+                  : " in3"
+                : scaleInfo.calibrated === false
+                ? " px2"
+                : group.unit === unitType.ft
+                ? " ft2"
+                : " in2")}
           </Typography>
         </Field>
-        <Field sx={{ width: "60px", justifyContent: "center" }}>
+        <Field
+          sx={{
+            width: "60px",
+            justifyContent: "center",
+            height: `${headerHeight}px`,
+          }}
+        >
           <IconButton id="groupHeader" onClick={handleToggleOption}>
             <MoreHorizIcon sx={{ color: hover ? "#0066c3" : "inherit" }} />
           </IconButton>
@@ -287,7 +347,7 @@ const ShapeGroup = ({
             >
               <Box
                 sx={{
-                  height: "100%",
+                  height: "20px",
                   width: "5px",
                   backgroundColor: rgba2hex(group.color),
                   marginRight: "5px",
@@ -303,6 +363,7 @@ const ShapeGroup = ({
                   },
                 }}
                 contentEditable
+                suppressContentEditableWarning={true}
                 onKeyDown={(e) => {
                   setRowsHeight((prev) => {
                     const copy = [...prev];
@@ -342,30 +403,64 @@ const ShapeGroup = ({
                   alignItems: "center",
                 }}
               >
-                {scaleInfo.calibrated === false
-                  ? `${polygonAreas.current[idx].toFixed(2)} px2`
-                  : group.unit === unitType.ft
-                  ? `${(
-                      (polygonAreas.current[idx] * scaleInfo.L * scaleInfo.L) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} ft2`
-                  : `${(
-                      (polygonAreas.current[idx] *
-                        scaleInfo.L *
-                        scaleInfo.L *
-                        144) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} in2`}
+                {getScaledArea(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in
+                )}
               </Typography>
             </Field>
             <Field
               sx={{
+                height: `${rowsHeight[idx]}px`,
                 padding: "0px 10px",
                 width: "40px",
+                cursor: "pointer",
+                ":hover": {
+                  backgroundColor: "#f4f4f4",
+                },
               }}
-            />
+              onClick={() => {
+                dimensionId.current = polygon[index].key;
+                dimensionType.current = "polygon";
+                dimensionArea.current = getScaledArea(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in
+                );
+                dimensionAreaUnit.current =
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in;
+                setModalType("addDimension");
+              }}
+            >
+              {(group.height || group.depth || group.pitch)! > 0 && (
+                <Settings
+                  fill={
+                    polygon[index]?.hover ||
+                    (polygon[index]?.height &&
+                      polygon[index]?.height !== group.height) ||
+                    (polygon[index]?.depth &&
+                      polygon[index]?.depth !== group.depth) ||
+                    (polygon[index]?.pitch &&
+                      polygon[index]?.pitch !== group.pitch)
+                      ? "#0066c3"
+                      : "#c3c3ca"
+                  }
+                />
+              )}
+            </Field>
             <Field
               sx={{
                 height: `${rowsHeight[idx]}px`,
@@ -381,32 +476,30 @@ const ShapeGroup = ({
                   alignItems: "center",
                 }}
               >
-                {scaleInfo.calibrated === false
-                  ? `${polygonAreas.current[idx].toFixed(2)} px2`
-                  : group.unit === unitType.ft
-                  ? `${(
-                      (polygonAreas.current[idx] * scaleInfo.L * scaleInfo.L) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} ft2`
-                  : `${(
-                      (polygonAreas.current[idx] *
-                        scaleInfo.L *
-                        scaleInfo.L *
-                        144) /
-                      (1.0 * scaleInfo.x * scaleInfo.x +
-                        scaleInfo.y * scaleInfo.y)
-                    ).toFixed(2)} in2`}
+                {getScaledVolume(
+                  polygonAreas.current[idx],
+                  scaleInfo,
+                  scaleInfo.calibrated === false
+                    ? "px"
+                    : group.unit === unitType.ft
+                    ? unitType.ft
+                    : unitType.in,
+                  polygon[index]?.height || group.height,
+                  polygon[index]?.depth || group.depth,
+                  polygon[index]?.pitch || group.pitch
+                )}
               </Typography>
             </Field>
-            <Field sx={{ width: "60px", justifyContent: "center" }}>
+            <Field
+              sx={{
+                width: "60px",
+                justifyContent: "center",
+                height: `${rowsHeight[idx]}px`,
+              }}
+            >
               <IconButton id={`${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
-                  sx={{
-                    ":hover": {
-                      color: "#0066c3",
-                    },
-                  }}
+                  sx={{ color: polygon[index]?.hover ? "#0066c3" : "inherit" }}
                 />
               </IconButton>
             </Field>
@@ -475,6 +568,25 @@ const ShapeGroup = ({
           groupId={group.id}
           changeGroup={changeGroup}
           onClose={() => setModalType("")}
+        />
+      )}
+      {modalType === "addDimension" && (
+        <AddDimensionModal
+          onClose={() => setModalType("")}
+          type={dimensionType.current}
+          id={dimensionId.current}
+          area={dimensionArea.current}
+          unit={dimensionAreaUnit.current}
+          selectedPdf={selectedPdf}
+          selectedPage={selectedPage}
+          group={group}
+          groupIndex={groupIndex}
+          changeGroup={changeGroup}
+          polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
+          polygonIndex={polygon.findIndex(
+            (poly) => poly.key === dimensionId.current
+          )}
+          changePolygon={changePolygon}
         />
       )}
     </Container>

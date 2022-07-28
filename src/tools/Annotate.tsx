@@ -26,17 +26,22 @@ const Annotate = ({ activeTool, changeActiveTool }: propsType): JSX.Element => {
     >
       <CreateIcon
         fontSize="medium"
-        color={`${
-          activeTool === activeToolOptions.annotate ? "primary" : "inherit"
-        }`}
-        style={{ width: "20px", height: "20px" }}
+        style={{
+          width: "20px",
+          height: "20px",
+          color: `${
+            activeTool === activeToolOptions.annotate ? "#FFBC01" : "inherit"
+          }`,
+        }}
       />
 
       <Typography
         fontSize={12}
-        color={`${
-          activeTool === activeToolOptions.annotate ? "primary" : "inherit"
-        }`}
+        sx={{
+          color: `${
+            activeTool === activeToolOptions.annotate ? "#FFBC01" : "inherit"
+          }`,
+        }}
       >
         Annotate
       </Typography>
