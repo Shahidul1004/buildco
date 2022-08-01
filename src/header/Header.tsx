@@ -1,6 +1,6 @@
 import { MutableRefObject } from "react";
 
-import { styled, Box } from "@mui/material";
+import { styled, Box, BoxProps } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { ReactComponent as LogoIcon } from "../assets/icons/logo.svg";
 
@@ -83,7 +83,14 @@ const Header = ({
 }: props): JSX.Element => {
   return (
     <Wrapper>
-      <ToolBar>
+      <ToolBar
+        isGroupOpen={
+          activeTool === activeToolOptions.rectangle ||
+          activeTool === activeToolOptions.polygon ||
+          activeTool === activeToolOptions.length ||
+          activeTool === activeToolOptions.count
+        }
+      >
         <LogoIcon style={{ width: "90px", paddingRight: "10px" }} />
         <ToolsContainer
           selectedPdf={selectedPdf}
@@ -153,10 +160,14 @@ const Header = ({
 
 export default Header;
 
-const ToolBar = styled(Box)({
+interface CustomBoxProps extends BoxProps {
+  isGroupOpen: boolean;
+}
+
+const ToolBar = styled(Box)<CustomBoxProps>(({ isGroupOpen }) => ({
   position: "fixed",
   top: "50px",
-  width: "90%",
+  width: isGroupOpen ? "1430px" : "1030px",
   boxSizing: "border-box",
   backgroundColor: "white",
   borderRadius: "32px",
@@ -167,8 +178,9 @@ const ToolBar = styled(Box)({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  gap: "10px",
   zIndex: 900,
-});
+}));
 
 const Wrapper = styled(Box)({
   width: "100%",

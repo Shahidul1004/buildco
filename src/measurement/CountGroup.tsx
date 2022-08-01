@@ -12,7 +12,6 @@ import { countType, groupType, iconType, scaleInfoType } from "../utils";
 
 import { rgba2hex } from "../reusables/helpers";
 import _ from "lodash";
-import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditGroupModal from "../modal/EditGroupModal";
 import CircleIcon from "@mui/icons-material/Circle";
@@ -179,14 +178,8 @@ const CountGroup = ({
           sx={{
             padding: "0px 10px",
             width: "40px",
-            cursor: "pointer",
-            ":hover": {
-              backgroundColor: "#f4f4f4",
-            },
           }}
-        >
-          <Settings fill={hover ? "#0066c3" : "#c3c3ca"} />
-        </Field>
+        ></Field>
         <Field
           sx={{
             height: `${headerHeight}px`,
@@ -207,7 +200,7 @@ const CountGroup = ({
         </Field>
         <Field sx={{ width: "60px", justifyContent: "center" }}>
           <IconButton id="groupHeader" onClick={handleToggleOption}>
-            <MoreHorizIcon sx={{ color: hover ? "#0066c3" : "inherit" }} />
+            <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
           </IconButton>
         </Field>
       </GroupHeader>

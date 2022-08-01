@@ -128,13 +128,19 @@ const GroupSection = ({
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
       <Typography
-        color="#272424"
-        fontSize="17px"
+        noWrap
         fontWeight="500"
-        fontStyle="normal"
-        lineHeight="14px"
+        lineHeight="1.5"
+        letterSpacing="0.00938em"
+        fontSize="14px"
+        sx={{
+          color: "#4b4646",
+          maxWidth: "180px",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
       >
-        Group
+        GROUP
       </Typography>
 
       <Box
@@ -303,10 +309,6 @@ const GroupSection = ({
         sx={{
           borderRadius: "10px",
           padding: "3px 6px",
-          boxShadow: "0px 1px 3px 0px gray",
-          ":hover": {
-            boxShadow: "0px 1px 5px 0px gray",
-          },
         }}
         onClick={() => handleOpenModal("create")}
       >

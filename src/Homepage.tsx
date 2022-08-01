@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import { useRef, useState } from "react";
 import Header from "./header/Header";
 import {
@@ -22,7 +21,6 @@ import {
   unitType,
 } from "./utils";
 import LoadingModal from "./modal/LoadingModal";
-import GroupSection from "./group/GroupSection";
 import MeasurementSection from "./measurement/MeasurementSection";
 import InitialUpload from "./fileUpload/InitialUpload";
 import _ from "lodash";
@@ -203,6 +201,12 @@ const Homepage = (): JSX.Element => {
               changeSelectedPage={setSelectedPage}
               pages={pdfPages.current[selectedPdf]}
               changeLoading={setLoading}
+              isGroupOpen={
+                activeTool === activeToolOptions.rectangle ||
+                activeTool === activeToolOptions.polygon ||
+                activeTool === activeToolOptions.length ||
+                activeTool === activeToolOptions.count
+              }
             />
           )}
           {showMeasurements && (
@@ -218,6 +222,12 @@ const Homepage = (): JSX.Element => {
               changeLength={setLength}
               count={count}
               changeCount={setCount}
+              isGroupOpen={
+                activeTool === activeToolOptions.rectangle ||
+                activeTool === activeToolOptions.polygon ||
+                activeTool === activeToolOptions.length ||
+                activeTool === activeToolOptions.count
+              }
             />
           )}
         </>

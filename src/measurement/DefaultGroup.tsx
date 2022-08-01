@@ -30,6 +30,7 @@ import _ from "lodash";
 import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AddDimensionModal from "../modal/AddDimension";
+import CreatePortal from "../reusables/CreatePortal";
 
 type propsType = {
   selectedPdf: number;
@@ -327,7 +328,7 @@ const DefaultGroup = ({
                   polygon[index]?.height ||
                   polygon[index]?.depth ||
                   polygon[index]?.pitch
-                    ? "#0066c3"
+                    ? "#FFBC01"
                     : "#c3c3ca"
                 }
               />
@@ -364,7 +365,7 @@ const DefaultGroup = ({
             <Field sx={{ width: "60px", justifyContent: "center" }}>
               <IconButton id={`polygon ${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
-                  sx={{ color: polygon[index]?.hover ? "#0066c3" : "inherit" }}
+                  sx={{ color: polygon[index]?.hover ? "#FFBC01" : "inherit" }}
                 />
               </IconButton>
             </Field>
@@ -475,13 +476,13 @@ const DefaultGroup = ({
               sx={{
                 padding: "0px 10px",
                 width: "40px",
-                cursor: "pointer",
-                ":hover": {
-                  backgroundColor: "#f4f4f4",
-                },
+                // cursor: "pointer",
+                // ":hover": {
+                //   backgroundColor: "#f4f4f4",
+                // },
               }}
             >
-              <Settings fill={length[index]?.hover ? "#0066c3" : "#c3c3ca"} />
+              {/* <Settings fill={length[index]?.hover ? "#0066c3" : "#c3c3ca"} /> */}
             </Field>
             <Field
               sx={{
@@ -518,7 +519,7 @@ const DefaultGroup = ({
             <Field sx={{ width: "60px", justifyContent: "center" }}>
               <IconButton id={`length ${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
-                  sx={{ color: length[index]?.hover ? "#0066c3" : "inherit" }}
+                  sx={{ color: length[index]?.hover ? "#FFBC01" : "inherit" }}
                 />
               </IconButton>
             </Field>
@@ -598,16 +599,8 @@ const DefaultGroup = ({
             sx={{
               padding: "0px 10px",
               width: "40px",
-              cursor: "pointer",
-              ":hover": {
-                backgroundColor: "#f4f4f4",
-              },
             }}
-          >
-            <Settings
-              fill={count[countFilteredIndex[0]]?.hover ? "#0066c3" : "#c3c3ca"}
-            />
-          </Field>
+          ></Field>
           <Field
             sx={{
               width: "90px",
@@ -630,7 +623,7 @@ const DefaultGroup = ({
               <MoreHorizIcon
                 sx={{
                   color: count[countFilteredIndex[0]]?.hover
-                    ? "#0066c3"
+                    ? "#FFBC01"
                     : "inherit",
                 }}
               />
@@ -690,23 +683,25 @@ const DefaultGroup = ({
       </Menu>
 
       {modalType === "addDimension" && (
-        <AddDimensionModal
-          onClose={() => setModalType("")}
-          type={dimensionType.current}
-          id={dimensionId.current}
-          area={dimensionArea.current}
-          unit={dimensionAreaUnit.current}
-          selectedPdf={selectedPdf}
-          selectedPage={selectedPage}
-          group={group}
-          groupIndex={groupIndex}
-          changeGroup={changeGroup}
-          polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
-          polygonIndex={polygon.findIndex(
-            (poly) => poly.key === dimensionId.current
-          )}
-          changePolygon={changePolygon}
-        />
+        <CreatePortal>
+          <AddDimensionModal
+            onClose={() => setModalType("")}
+            type={dimensionType.current}
+            id={dimensionId.current}
+            area={dimensionArea.current}
+            unit={dimensionAreaUnit.current}
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            group={group}
+            groupIndex={groupIndex}
+            changeGroup={changeGroup}
+            polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
+            polygonIndex={polygon.findIndex(
+              (poly) => poly.key === dimensionId.current
+            )}
+            changePolygon={changePolygon}
+          />
+        </CreatePortal>
       )}
     </Container>
   );

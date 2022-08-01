@@ -10,6 +10,7 @@ type propTypes = {
   changeSelectedPage: Dispatch<SetStateAction<number[]>>;
   pages: pdfjsLib.PDFPageProxy[];
   changeLoading: Dispatch<SetStateAction<boolean>>;
+  isGroupOpen: boolean;
 };
 
 const PreviewSection = ({
@@ -18,6 +19,7 @@ const PreviewSection = ({
   changeSelectedPage,
   pages,
   changeLoading,
+  isGroupOpen,
 }: propTypes): JSX.Element => {
   const context = useContext(Context);
 
@@ -31,7 +33,7 @@ const PreviewSection = ({
   console.log(pages);
 
   return (
-    <PreviewContainer navHeight={context.navHeight}>
+    <PreviewContainer navHeight={context.navHeight} isGroupOpen={isGroupOpen}>
       <Box
         sx={{
           display: "flex",
@@ -73,14 +75,15 @@ export default PreviewSection;
 
 interface CustomBoxProps extends BoxProps {
   navHeight: string;
+  isGroupOpen: boolean;
 }
 
 const PreviewContainer = styled(Box)<CustomBoxProps>(
-  ({ navHeight, theme }) => ({
+  ({ navHeight, isGroupOpen, theme }) => ({
     position: "fixed",
     top: "50px",
-    left: "5%",
-    width: "90%",
+    left: isGroupOpen ? `calc(50% - 715px)` : `calc(50% - 515px)`,
+    width: isGroupOpen ? "1430px" : "1030px",
     boxSizing: "border-box",
     backgroundColor: "white",
     borderRadius: "32px",

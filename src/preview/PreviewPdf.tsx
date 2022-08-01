@@ -52,7 +52,7 @@ const PreviewPdf = ({
         position: "relative",
         height: dimension ? dimension.height : height,
         width: dimension ? dimension.width : width,
-        border: isSelectedPage ? "2px solid green" : "2px solid transparent",
+        border: isSelectedPage ? "2px solid #FFBC01" : "2px solid transparent",
         boxShadow: "0 0 8px 0px rgb(0 0 0 / 20%)",
         ":hover": {
           boxShadow: "0 0 8px 4px rgb(0 0 0 / 20%)",

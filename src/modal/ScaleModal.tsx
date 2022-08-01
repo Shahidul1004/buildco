@@ -48,7 +48,11 @@ const ScaleModal = ({ onClose, onCancel }: propTypes): JSX.Element => {
               variant="outlined"
               onClick={onCancel}
               sx={{
-                padding: "6px",
+                padding: "6px 8px",
+                borderColor: "#FFBC01",
+                ":hover": {
+                  borderColor: "#FFBC01",
+                },
               }}
             >
               Cancel
@@ -57,8 +61,8 @@ const ScaleModal = ({ onClose, onCancel }: propTypes): JSX.Element => {
               variant="contained"
               Color="white"
               hovercolor="white"
-              backgroundcolor="primary.main"
-              hoverbackgroudcolor="primary.dark"
+              backgroundcolor="#FFBC01"
+              hoverbackgroudcolor="#ffa700"
               onClick={onClose}
               sx={{
                 padding: "6px 20px",

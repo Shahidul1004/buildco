@@ -23,6 +23,7 @@ import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditGroupModal from "../modal/EditGroupModal";
 import AddDimensionModal from "../modal/AddDimension";
+import CreatePortal from "../reusables/CreatePortal";
 
 type propsType = {
   selectedPdf: number;
@@ -257,7 +258,7 @@ const ShapeGroup = ({
           <Settings
             fill={
               hover || group.height || group.depth || group.pitch
-                ? "#0066c3"
+                ? "#FFBC01"
                 : "#c3c3ca"
             }
           />
@@ -315,7 +316,7 @@ const ShapeGroup = ({
           }}
         >
           <IconButton id="groupHeader" onClick={handleToggleOption}>
-            <MoreHorizIcon sx={{ color: hover ? "#0066c3" : "inherit" }} />
+            <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
           </IconButton>
         </Field>
       </GroupHeader>
@@ -448,14 +449,14 @@ const ShapeGroup = ({
               {(group.height || group.depth || group.pitch)! > 0 && (
                 <Settings
                   fill={
-                    polygon[index]?.hover ||
+                    (hover === false && polygon[index]?.hover) ||
                     (polygon[index]?.height &&
                       polygon[index]?.height !== group.height) ||
                     (polygon[index]?.depth &&
                       polygon[index]?.depth !== group.depth) ||
                     (polygon[index]?.pitch &&
                       polygon[index]?.pitch !== group.pitch)
-                      ? "#0066c3"
+                      ? "#FFBC01"
                       : "#c3c3ca"
                   }
                 />
@@ -499,7 +500,12 @@ const ShapeGroup = ({
             >
               <IconButton id={`${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
-                  sx={{ color: polygon[index]?.hover ? "#0066c3" : "inherit" }}
+                  sx={{
+                    color:
+                      hover === false && polygon[index]?.hover
+                        ? "#FFBC01"
+                        : "inherit",
+                  }}
                 />
               </IconButton>
             </Field>
@@ -571,23 +577,25 @@ const ShapeGroup = ({
         />
       )}
       {modalType === "addDimension" && (
-        <AddDimensionModal
-          onClose={() => setModalType("")}
-          type={dimensionType.current}
-          id={dimensionId.current}
-          area={dimensionArea.current}
-          unit={dimensionAreaUnit.current}
-          selectedPdf={selectedPdf}
-          selectedPage={selectedPage}
-          group={group}
-          groupIndex={groupIndex}
-          changeGroup={changeGroup}
-          polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
-          polygonIndex={polygon.findIndex(
-            (poly) => poly.key === dimensionId.current
-          )}
-          changePolygon={changePolygon}
-        />
+        <CreatePortal>
+          <AddDimensionModal
+            onClose={() => setModalType("")}
+            type={dimensionType.current}
+            id={dimensionId.current}
+            area={dimensionArea.current}
+            unit={dimensionAreaUnit.current}
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            group={group}
+            groupIndex={groupIndex}
+            changeGroup={changeGroup}
+            polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
+            polygonIndex={polygon.findIndex(
+              (poly) => poly.key === dimensionId.current
+            )}
+            changePolygon={changePolygon}
+          />
+        </CreatePortal>
       )}
     </Container>
   );

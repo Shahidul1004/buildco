@@ -217,13 +217,13 @@ const LengthGroup = ({
           sx={{
             padding: "0px 10px",
             width: "40px",
-            cursor: "pointer",
-            ":hover": {
-              backgroundColor: "#f4f4f4",
-            },
+            // cursor: "pointer",
+            // ":hover": {
+            //   backgroundColor: "#f4f4f4",
+            // },
           }}
         >
-          <Settings fill={hover ? "#0066c3" : "#c3c3ca"} />
+          {/* <Settings fill={hover ? "#FFBC01" : "#c3c3ca"} /> */}
         </Field>
         <Field
           sx={{
@@ -259,7 +259,7 @@ const LengthGroup = ({
         </Field>
         <Field sx={{ width: "60px", justifyContent: "center" }}>
           <IconButton id="groupHeader" onClick={handleToggleOption}>
-            <MoreHorizIcon sx={{ color: hover ? "#0066c3" : "inherit" }} />
+            <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
           </IconButton>
         </Field>
       </GroupHeader>
@@ -405,9 +405,10 @@ const LengthGroup = ({
               <IconButton id={`${index}`} onClick={handleToggleOption}>
                 <MoreHorizIcon
                   sx={{
-                    ":hover": {
-                      color: "#0066c3",
-                    },
+                    color:
+                      hover === false && length[index]?.hover
+                        ? "#FFBC01"
+                        : "inherit",
                   }}
                 />
               </IconButton>

@@ -15,12 +15,12 @@ const InitialUpload = ({ onFileUpload }: props): JSX.Element => {
 
   const dragOverHandler = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    dropZoneRef.current!.style.border = "2px solid #2a272757";
-    dropZoneRef.current!.style.boxShadow = "0px 0px 100px 0px gray inset";
+    dropZoneRef.current!.style.border = "2px solid #FFBC01";
+    dropZoneRef.current!.style.boxShadow = "0px 0px 100px 0px #ffbc0140 inset";
   };
   const dragLeaveHandler = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    dropZoneRef.current!.style.border = "2px dashed #2a272757";
+    dropZoneRef.current!.style.border = "2px dashed #FFBC01";
     dropZoneRef.current!.style.boxShadow = "none";
   };
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +35,7 @@ const InitialUpload = ({ onFileUpload }: props): JSX.Element => {
       dropZoneRef.current!.style.boxShadow = "0px 0px 10px 0px red inset";
       return;
     }
-    dropZoneRef.current!.style.border = "2px dashed #2a272757";
+    dropZoneRef.current!.style.border = "2px dashed #FFBC01";
     dropZoneRef.current!.style.boxShadow = "none";
     setUploadedFiles(files);
   };
@@ -72,8 +72,10 @@ const InitialUpload = ({ onFileUpload }: props): JSX.Element => {
                 color: "#4499e6",
               }}
             >
-              <CloudUploadIcon />
-              <Typography sx={{ fontSize: "20px", fontWeight: "400" }}>
+              <CloudUploadIcon sx={{ color: "#FFBC01" }} />
+              <Typography
+                sx={{ fontSize: "20px", fontWeight: "400", color: "#FFBC01" }}
+              >
                 Upload
               </Typography>
             </Box>
@@ -85,7 +87,7 @@ const InitialUpload = ({ onFileUpload }: props): JSX.Element => {
             sx={{
               fontSize: "12px",
               fontWeight: "400",
-              color: "#2a272757",
+              color: "#1e1c1c80",
             }}
           >
             We only accept PDf format
@@ -141,11 +143,14 @@ const InitialUpload = ({ onFileUpload }: props): JSX.Element => {
           }}
         >
           <Button
-            color="primary"
             variant="contained"
             disabled={uploadedFiles?.length !== 1}
             sx={{
               height: "45px",
+              backgroundColor: "#FFBC01",
+              ":hover": {
+                backgroundColor: "#FFBC01",
+              },
             }}
             onClick={() => {
               if (uploadedFiles !== undefined) onFileUpload(uploadedFiles);
@@ -214,6 +219,6 @@ const UploadZone = styled(Box)({
   justifyContent: "center",
   alignItems: "center",
   gap: "20px",
-  border: "2px dashed #2a272757",
+  border: "2px dashed #FFBC01",
   cursor: "pointer",
 });

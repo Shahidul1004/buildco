@@ -13,6 +13,7 @@ import { scaleInfoType, unitType } from "../utils";
 import { ReactComponent as ScaleIcon } from "../assets/icons/scale.svg";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import CreatePortal from "../reusables/CreatePortal";
 
 type propTypes = {
   selectedPdf: number;
@@ -72,7 +73,7 @@ const ScaleMeasurementModal = ({
   };
 
   return (
-    <>
+    <CreatePortal>
       <OverLay />
       <ModalContainer>
         <Box
@@ -191,7 +192,11 @@ const ScaleMeasurementModal = ({
               variant="outlined"
               onClick={onCancel}
               sx={{
-                padding: "6px",
+                padding: "6px 8px",
+                borderColor: "#FFBC01",
+                ":hover": {
+                  borderColor: "#FFBC01",
+                },
               }}
             >
               Cancel
@@ -200,8 +205,8 @@ const ScaleMeasurementModal = ({
               variant="contained"
               Color="white"
               hovercolor="white"
-              backgroundcolor="primary.main"
-              hoverbackgroudcolor="primary.dark"
+              backgroundcolor="#FFBC01"
+              hoverbackgroudcolor="#ffa700"
               onClick={onClose}
               sx={{
                 padding: "6px 20px",
@@ -212,7 +217,7 @@ const ScaleMeasurementModal = ({
           </Box>
         </Box>
       </ModalContainer>
-    </>
+    </CreatePortal>
   );
 };
 export default ScaleMeasurementModal;

@@ -145,7 +145,7 @@ const AddDimensionModal = ({
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              gap: "10px",
+              gap: "20px",
             }}
           >
             <Box
@@ -177,7 +177,7 @@ const AddDimensionModal = ({
                   }
                 }}
                 sx={{
-                  width: "105px",
+                  width: "135px",
                   "& .MuiOutlinedInput-input": {
                     padding: "5px 10px",
                     height: "25px",
@@ -214,7 +214,7 @@ const AddDimensionModal = ({
                   }
                 }}
                 sx={{
-                  width: "105px",
+                  width: "135px",
                   "& .MuiOutlinedInput-input": {
                     padding: "5px 10px",
                     height: "25px",
@@ -222,7 +222,7 @@ const AddDimensionModal = ({
                 }}
               />
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -257,7 +257,7 @@ const AddDimensionModal = ({
                   },
                 }}
               />
-            </Box>
+            </Box> */}
           </Box>
 
           <Box
@@ -291,23 +291,27 @@ const AddDimensionModal = ({
               variant="outlined"
               onClick={onClose}
               sx={{
-                padding: "6px",
+                padding: "6px 8px",
+                borderColor: "#FFBC01",
+                ":hover": {
+                  borderColor: "#FFBC01",
+                },
               }}
             >
-              Cancel
+              CANCEL
             </CustomButton>
             <CustomButton
               variant="contained"
               Color="white"
               hovercolor="white"
-              backgroundcolor="primary.main"
-              hoverbackgroudcolor="primary.dark"
+              backgroundcolor="#FFBC01"
+              hoverbackgroudcolor="#ffa700"
               onClick={handleUpdate}
               sx={{
                 padding: "6px 20px",
               }}
             >
-              Done
+              DONE
             </CustomButton>
           </Box>
         </Box>

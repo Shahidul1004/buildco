@@ -379,7 +379,11 @@ const CreateGroupModal = ({
               variant="outlined"
               onClick={onClose}
               sx={{
-                padding: "6px",
+                padding: "6px 8px",
+                borderColor: "#FFBC01",
+                ":hover": {
+                  borderColor: "#FFBC01",
+                },
               }}
             >
               Cancel
@@ -388,8 +392,8 @@ const CreateGroupModal = ({
               variant="contained"
               Color="white"
               hovercolor="white"
-              backgroundcolor="primary.main"
-              hoverbackgroudcolor="primary.dark"
+              backgroundcolor="#FFBC01"
+              hoverbackgroudcolor="#ffa700"
               onClick={handleCreate}
               sx={{
                 padding: "6px 20px",

@@ -118,8 +118,8 @@ const Scale = ({
         />
         <Line
           points={scale.map((point) => point / scaleFactor)}
-          stroke="green"
-          strokeWidth={8}
+          stroke="#FFBC01"
+          strokeWidth={3 / scaleFactor}
         ></Line>
       </Layer>
     </>

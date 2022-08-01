@@ -27,6 +27,7 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[][][];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  isGroupOpen: boolean;
 };
 
 const MeasurementSection = ({
@@ -41,11 +42,16 @@ const MeasurementSection = ({
   changeLength,
   count,
   changeCount,
+  isGroupOpen,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
 
   return (
-    <Container navHeight={context.navHeight} sx={{ cursor: "pointer" }}>
+    <Container
+      navHeight={context.navHeight}
+      sx={{ cursor: "pointer" }}
+      isGroupOpen={isGroupOpen}
+    >
       <Box
         sx={{
           overflow: "hidden",
@@ -124,23 +130,26 @@ export default MeasurementSection;
 
 interface CustomBoxProps extends BoxProps {
   navHeight: string;
+  isGroupOpen: boolean;
 }
-const Container = styled(Box)<CustomBoxProps>(({ theme, navHeight }) => ({
-  position: "fixed",
-  top: "50px",
-  right: "5%",
-  width: "510px",
-  backgroundColor: "white",
-  borderRadius: "32px",
-  boxShadow: "0px 3px 4px 0px gray",
-  padding: "75px 0px 100px 0px",
-  paddingLeft: "25px",
-  paddingRight: "25px",
-  boxSizing: "border-box",
-  zIndex: 600,
+const Container = styled(Box)<CustomBoxProps>(
+  ({ theme, navHeight, isGroupOpen }) => ({
+    position: "fixed",
+    top: "50px",
+    right: isGroupOpen ? `calc(50% - 715px)` : `calc(50% - 515px)`,
+    width: "510px",
+    backgroundColor: "white",
+    borderRadius: "32px",
+    boxShadow: "0px 3px 4px 0px gray",
+    padding: "75px 0px 100px 0px",
+    paddingLeft: "25px",
+    paddingRight: "25px",
+    boxSizing: "border-box",
+    zIndex: 600,
 
-  flexDirection: "column",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  cursor: "auto !important",
-}));
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    cursor: "auto !important",
+  })
+);
