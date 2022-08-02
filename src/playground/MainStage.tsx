@@ -5,12 +5,14 @@ import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
   activeGroupType,
   activeToolOptions,
+  annotateType,
   countType,
   groupType,
   lengthType,
   polygonType,
   scaleInfoType,
 } from "../utils";
+import Annotate from "./Annotate";
 import Count from "./Count";
 import Deduct from "./Deduct";
 import Length from "./Length";
@@ -34,6 +36,8 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  annotate: annotateType[];
+  changeAnnotate: React.Dispatch<React.SetStateAction<annotateType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
   undoStack: MutableRefObject<(() => void)[]>;
@@ -56,6 +60,8 @@ const MainStage = ({
   changeLength,
   count,
   changeCount,
+  annotate,
+  changeAnnotate,
   activeGroup,
   group,
   undoStack,
@@ -125,6 +131,7 @@ const MainStage = ({
           activeToolOptions.polygon,
           activeToolOptions.length,
           activeToolOptions.count,
+          activeToolOptions.annotate,
         ].includes(activeTool) && (
           <Polygon
             selectedPdf={selectedPdf}
@@ -142,13 +149,13 @@ const MainStage = ({
             captureStates={captureStates}
           />
         )}
-
         {[
           activeToolOptions.pan,
           activeToolOptions.rectangle,
           activeToolOptions.polygon,
           activeToolOptions.length,
           activeToolOptions.count,
+          activeToolOptions.annotate,
         ].includes(activeTool) && (
           <Length
             selectedPdf={selectedPdf}
@@ -166,7 +173,6 @@ const MainStage = ({
             captureStates={captureStates}
           />
         )}
-
         {[activeToolOptions.select].includes(activeTool) && (
           <Select
             selectedPdf={selectedPdf}
@@ -182,6 +188,8 @@ const MainStage = ({
             changeLength={changeLength}
             count={count}
             changeCount={changeCount}
+            annotate={annotate}
+            changeAnnotate={changeAnnotate}
             undoStack={undoStack}
             redoStack={redoStack}
             captureStates={captureStates}
@@ -210,6 +218,7 @@ const MainStage = ({
           activeToolOptions.polygon,
           activeToolOptions.length,
           activeToolOptions.count,
+          activeToolOptions.annotate,
         ].includes(activeTool) && (
           <Count
             selectedPdf={selectedPdf}
@@ -220,6 +229,30 @@ const MainStage = ({
             activeTool={activeTool}
             count={count}
             changeCount={changeCount}
+            group={group}
+            activeGroup={activeGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
+          />
+        )}
+        {[
+          activeToolOptions.rectangle,
+          activeToolOptions.polygon,
+          activeToolOptions.count,
+          activeToolOptions.length,
+          activeToolOptions.annotate,
+          activeToolOptions.pan,
+        ].includes(activeTool) && (
+          <Annotate
+            selectedPdf={selectedPdf}
+            selectedPage={selectedPage}
+            scaleInfo={scaleInfo}
+            stageRef={stageRef}
+            scaleFactor={scaleFactor}
+            activeTool={activeTool}
+            annotate={annotate}
+            changeAnnotate={changeAnnotate}
             group={group}
             activeGroup={activeGroup}
             undoStack={undoStack}

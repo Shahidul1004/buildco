@@ -2,18 +2,28 @@ import _ from "lodash";
 import Konva from "konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
-import { createRef, MutableRefObject, RefObject, useRef } from "react";
+import {
+  createRef,
+  MutableRefObject,
+  RefObject,
+  useRef,
+  useState,
+} from "react";
 import {
   Circle,
   Group,
+  Label,
   Layer,
   Rect,
   RegularPolygon,
   Shape,
+  Tag,
+  Text,
   Transformer,
 } from "react-konva";
 import {
   activeToolOptions,
+  annotateType,
   countType,
   deductRectType,
   groupType,
@@ -23,6 +33,13 @@ import {
   scaleInfoType,
 } from "../utils";
 import { rgba2hex } from "../reusables/helpers";
+import { Html } from "react-konva-utils";
+import { Box, Typography } from "@mui/material";
+import FontColorButton from "../button/FontColorButton";
+import { RGBColor } from "react-color";
+import FillColorButton from "../button/FillColorButton";
+import FontSizeButton from "../button/FontSizeButton";
+import DeleteButton from "../button/DeleteButton";
 
 type propsType = {
   selectedPdf: number;
@@ -38,6 +55,8 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  annotate: annotateType[];
+  changeAnnotate: React.Dispatch<React.SetStateAction<annotateType[][][]>>;
   undoStack: MutableRefObject<(() => void)[]>;
   redoStack: MutableRefObject<(() => void)[]>;
   captureStates: () => void;
@@ -57,6 +76,8 @@ const Select = ({
   changeLength,
   count,
   changeCount,
+  annotate,
+  changeAnnotate,
   undoStack,
   redoStack,
   captureStates,
@@ -65,6 +86,7 @@ const Select = ({
   const trRef = useRef<Konva.Transformer>(null);
   const polygonRef = useRef(polygon.map(() => createRef<Konva.Shape>()));
   const lengthRef = useRef(length.map(() => createRef<Konva.Line>()));
+  const [editingTextId, setEditingTextId] = useState<string>("");
 
   let deltaX = 0,
     deltaY = 0,
@@ -84,6 +106,34 @@ const Select = ({
       ptY = y;
     }
     return { x: ptX + deltaX, y: ptY + deltaY };
+  };
+
+  const handleAnnotateDragEnd = (
+    event: KonvaEventObject<DragEvent>,
+    id: number
+  ) => {
+    const x = event.target.x();
+    const y = event.target.y();
+    changeAnnotate((prev) => {
+      const prevCopy = _.cloneDeep(prev);
+      const currentList = prevCopy[selectedPdf][selectedPage];
+      const index = currentList.findIndex((anno) => anno.key === id);
+      const prevAnno = currentList[index];
+      currentList.splice(index, 1, {
+        ...prevAnno,
+        points: [x, y],
+      });
+      return prevCopy;
+    });
+  };
+
+  const handleAnnotateDblClick = (
+    event: KonvaEventObject<MouseEvent>,
+    id: number
+  ) => {
+    if (activeTool !== activeToolOptions.select || editingTextId) return;
+    event.target.parent!.hide();
+    setEditingTextId(id.toString());
   };
 
   const CountDragEndHandler = (
@@ -117,6 +167,15 @@ const Select = ({
         if (e.target.attrs.id === "dummy-rect") {
           trRef.current!.nodes([]);
           trRef.current!.getLayer()!.batchDraw();
+        }
+        if (editingTextId) {
+          layerRef.current
+            ?.getLayer()
+            .getChildren()
+            .find((label) => label.attrs.id === editingTextId)
+            ?.show();
+          setEditingTextId("");
+          return;
         }
       }}
     >
@@ -478,6 +537,203 @@ const Select = ({
           )}
         </>
       ))}
+      {annotate.map((anno) => (
+        <Label
+          id={anno.key.toString()}
+          key={anno.key}
+          x={anno.points[0]}
+          y={anno.points[1]}
+          opacity={0.75}
+          draggable={
+            activeTool === activeToolOptions.annotate ||
+            activeTool === activeToolOptions.select
+          }
+          onDragEnd={(e: KonvaEventObject<DragEvent>) => {
+            handleAnnotateDragEnd(e, anno.key);
+            e.target._clearTransform();
+            e.target.clearCache();
+          }}
+          onMouseEnter={() => {
+            if (
+              activeTool === activeToolOptions.annotate ||
+              activeTool === activeToolOptions.select
+            )
+              (layerRef.current?.getStage()?.container())!.style!.cursor =
+                "move";
+          }}
+          onMouseLeave={() => {
+            if (
+              activeTool === activeToolOptions.annotate ||
+              activeTool === activeToolOptions.select
+            )
+              (layerRef.current?.getStage()?.container())!.style!.cursor =
+                "default";
+          }}
+          onDblClick={(event: KonvaEventObject<MouseEvent>) => {
+            if (
+              activeTool === activeToolOptions.annotate ||
+              activeTool === activeToolOptions.select
+            )
+              handleAnnotateDblClick(event, anno.key);
+          }}
+        >
+          <Tag fill={rgba2hex(anno.backgroundColor)} />
+          <Text
+            text={anno.text ? anno.text : "write here"}
+            fill={rgba2hex(anno.fontColor)}
+            fontSize={anno.fontSize}
+          />
+        </Label>
+      ))}
+      {editingTextId && (
+        <Html
+          divProps={{
+            style: {
+              top: `${
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.points[1]! * scaleFactor
+              }px`,
+              left: `${
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.points[0]! * scaleFactor
+              }px`,
+            },
+          }}
+        >
+          <Typography
+            contentEditable
+            suppressContentEditableWarning={true}
+            sx={{
+              letterSpacing: "0px",
+              lineHeight: `${
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.fontSize
+              }px`,
+              backgroundColor: rgba2hex(
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.backgroundColor
+              ),
+              color: rgba2hex(
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.fontColor
+              ),
+              fontSize: `${
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.fontSize
+              }px`,
+            }}
+            onBlur={(e) => {
+              changeAnnotate((prev) => {
+                const prevCopy = _.cloneDeep(prev);
+                const currentList = prevCopy[selectedPdf][selectedPage];
+                const index = currentList.findIndex(
+                  (anno) => anno.key.toString() === editingTextId
+                );
+                const prevAnno = currentList[index];
+                currentList.splice(index, 1, {
+                  ...prevAnno,
+                  text: e.target.innerText,
+                });
+                return prevCopy;
+              });
+            }}
+          >
+            {
+              annotate.find((anno) => anno.key.toString() === editingTextId)
+                ?.text
+            }
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+            }}
+          >
+            <FontColorButton
+              scaleFactor={scaleFactor}
+              fontColor={
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.fontColor!
+              }
+              changeFontColor={(newColor: RGBColor) => {
+                changeAnnotate((prev) => {
+                  const prevCopy = _.cloneDeep(prev);
+                  const currentList = prevCopy[selectedPdf][selectedPage];
+                  const index = currentList.findIndex(
+                    (anno) => anno.key.toString() === editingTextId
+                  );
+                  const prevAnno = currentList[index];
+                  currentList.splice(index, 1, {
+                    ...prevAnno,
+                    fontColor: newColor,
+                  });
+                  return prevCopy;
+                });
+              }}
+            />
+            <FillColorButton
+              scaleFactor={scaleFactor}
+              fillColor={
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.backgroundColor!
+              }
+              changeFillColor={(newColor: RGBColor) => {
+                changeAnnotate((prev) => {
+                  const prevCopy = _.cloneDeep(prev);
+                  const currentList = prevCopy[selectedPdf][selectedPage];
+                  const index = currentList.findIndex(
+                    (anno) => anno.key.toString() === editingTextId
+                  );
+                  const prevAnno = currentList[index];
+                  currentList.splice(index, 1, {
+                    ...prevAnno,
+                    backgroundColor: newColor,
+                  });
+                  return prevCopy;
+                });
+              }}
+            />
+            <FontSizeButton
+              scaleFactor={scaleFactor}
+              fontSize={
+                annotate.find((anno) => anno.key.toString() === editingTextId)
+                  ?.fontSize!
+              }
+              changeFontSize={(newSize: number) => {
+                changeAnnotate((prev) => {
+                  const prevCopy = _.cloneDeep(prev);
+                  const currentList = prevCopy[selectedPdf][selectedPage];
+                  const index = currentList.findIndex(
+                    (anno) => anno.key.toString() === editingTextId
+                  );
+                  const prevAnno = currentList[index];
+                  currentList.splice(index, 1, {
+                    ...prevAnno,
+                    fontSize: newSize,
+                  });
+                  return prevCopy;
+                });
+              }}
+            />
+            <DeleteButton
+              scaleFactor={scaleFactor}
+              changeAnnotate={() => {
+                changeAnnotate((prev) => {
+                  const prevCopy = _.cloneDeep(prev);
+                  const currentList = prevCopy[selectedPdf][selectedPage];
+                  const index = currentList.findIndex(
+                    (anno) => anno.key.toString() === editingTextId
+                  );
+                  currentList.splice(index, 1);
+                  return prevCopy;
+                });
+                setTimeout(() => {
+                  setEditingTextId("");
+                }, 10);
+              }}
+            />
+          </Box>
+        </Html>
+      )}
       <Transformer ref={trRef} />
     </Layer>
   );

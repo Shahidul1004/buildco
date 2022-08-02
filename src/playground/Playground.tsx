@@ -11,6 +11,7 @@ import { Context } from "../Context";
 import {
   activeGroupType,
   activeToolOptions,
+  annotateType,
   countType,
   groupType,
   lengthType,
@@ -34,6 +35,8 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  annotate: annotateType[];
+  changeAnnotate: React.Dispatch<React.SetStateAction<annotateType[][][]>>;
   group: groupType[];
   activeGroup: activeGroupType;
   undoStack: MutableRefObject<(() => void)[]>;
@@ -55,6 +58,8 @@ const Playground = ({
   length,
   changeLength,
   count,
+  annotate,
+  changeAnnotate,
   changeCount,
   activeGroup,
   group,
@@ -122,6 +127,8 @@ const Playground = ({
             changeLength={changeLength}
             count={count}
             changeCount={changeCount}
+            annotate={annotate}
+            changeAnnotate={changeAnnotate}
             group={group}
             activeGroup={activeGroup}
             undoStack={undoStack}

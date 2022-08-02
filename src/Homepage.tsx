@@ -11,6 +11,7 @@ import Playground from "./playground/Playground";
 import {
   activeGroupType,
   activeToolOptions,
+  annotateType,
   countType,
   groupType,
   groupTypeName,
@@ -60,6 +61,7 @@ const Homepage = (): JSX.Element => {
   const [polygon, setPolygon] = useState<polygonType[][][]>([]);
   const [length, setLength] = useState<lengthType[][][]>([]);
   const [count, setCount] = useState<countType[][][]>([]);
+  const [annotate, setAnnotate] = useState<annotateType[][][]>([]);
   const undoStack = useRef<(() => void)[]>([]);
   const redoStack = useRef<(() => void)[]>([]);
 
@@ -80,6 +82,7 @@ const Homepage = (): JSX.Element => {
     const newPolygon: polygonType[][][] = [];
     const newLength: lengthType[][][] = [];
     const newCount: countType[][][] = [];
+    const newAnnotate: annotateType[][][] = [];
     for (const doc of docs) {
       pages.push(
         await pdfjsExtractPages(
@@ -103,6 +106,7 @@ const Homepage = (): JSX.Element => {
       newPolygon.push([...Array(doc.numPages).keys()].map((e) => []));
       newLength.push([...Array(doc.numPages).keys()].map((e) => []));
       newCount.push([...Array(doc.numPages).keys()].map((e) => []));
+      newAnnotate.push([...Array(doc.numPages).keys()].map((e) => []));
     }
     const prevCount = uploadedFiles.current.length;
     uploadedFiles.current.push(...files);
@@ -113,6 +117,7 @@ const Homepage = (): JSX.Element => {
     setPolygon((prev) => [...prev, ...newPolygon]);
     setLength((prev) => [...prev, ...newLength]);
     setCount((prev) => [...prev, ...newCount]);
+    setAnnotate((prev) => [...prev, ...newAnnotate]);
     setScaleInfo((prev) => [...prev, ...newScaleInfo]);
     setZoomLevel((prev) => [...prev, ...newZoomLevel]);
     setSelectedPage((prev) => [
@@ -187,6 +192,8 @@ const Homepage = (): JSX.Element => {
             changeLength={setLength}
             count={count[selectedPdf][selectedPage[selectedPdf]]}
             changeCount={setCount}
+            annotate={annotate[selectedPdf][selectedPage[selectedPdf]]}
+            changeAnnotate={setAnnotate}
             group={group}
             activeGroup={activeGroup}
             undoStack={undoStack}
@@ -232,84 +239,6 @@ const Homepage = (): JSX.Element => {
           )}
         </>
       )}
-      {/* <Box>
-        <Header
-          onFileUpload={fileUploadHandler}
-          fileName={fileName.current}
-          selectedPdf={selectedPdf}
-          changeSelectedPdf={setSelectedPdf}
-          selectedPage={selectedPage[selectedPdf]}
-          pdfOrder={pdfOrder}
-          changePdfOrder={setPdfOrder}
-          currentZoomLevel={
-            selectedPdf === -1
-              ? 50
-              : zoomLevel[selectedPdf][selectedPage[selectedPdf]]
-          }
-          changeZoomLevel={setZoomLevel}
-          activeTool={activeTool}
-          changeActiveTool={setActiveTool}
-        />
-        {selectedPdf !== -1 && (
-          <PreviewSection
-            selectedPdf={selectedPdf}
-            selectedPage={selectedPage[selectedPdf]}
-            changeSelectedPage={setSelectedPage}
-            pages={pdfPages.current[selectedPdf]}
-            changeLoading={setLoading}
-          />
-        )}
-        {selectedPdf !== -1 && (
-          <Playground
-            selectedPdf={selectedPdf}
-            selectedPage={selectedPage[selectedPdf]}
-            page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
-            zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
-            activeTool={activeTool}
-            changeActiveTool={setActiveTool}
-            scaleInfo={scaleInfo}
-            changeScaleInfo={setScaleInfo}
-            polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
-            changePolygon={setPolygon}
-            length={length[selectedPdf][selectedPage[selectedPdf]]}
-            changeLength={setLength}
-            count={count[selectedPdf][selectedPage[selectedPdf]]}
-            changeCount={setCount}
-            group={group}
-            activeGroup={activeGroup}
-          />
-        )}
-      </Box>
-
-      {selectedPdf !== -1 &&
-        (activeTool === activeToolOptions.rectangle ||
-          activeTool === activeToolOptions.polygon ||
-          activeTool === activeToolOptions.length ||
-          activeTool === activeToolOptions.count) && (
-          <GroupSection
-            activeTool={activeTool}
-            group={group}
-            changeGroup={setGroup}
-            activeGroup={activeGroup}
-            changeActiveGroup={setActiveGroup}
-          />
-        )}
-      {selectedPdf !== -1 && (
-        <MeasurementSection
-          selectedPdf={selectedPdf}
-          selectedPage={selectedPage[selectedPdf]}
-          scaleInfo={scaleInfo[selectedPdf][selectedPage[selectedPdf]]}
-          group={group}
-          changeGroup={setGroup}
-          polygon={polygon}
-          changePolygon={setPolygon}
-          length={length}
-          changeLength={setLength}
-          count={count}
-          changeCount={setCount}
-        />
-      )}
-      {loading && <LoadingModal />} */}
     </>
   );
 };

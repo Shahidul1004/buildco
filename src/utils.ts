@@ -47,6 +47,15 @@ export type countType = {
   hover: boolean;
 };
 
+export type annotateType = {
+  key: number;
+  points: number[];
+  text: string;
+  fontColor: RGBColor;
+  fontSize: number;
+  backgroundColor: RGBColor;
+};
+
 export enum groupTypeName {
   shape = "shape",
   length = "length",
