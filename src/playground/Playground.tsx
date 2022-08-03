@@ -154,6 +154,6 @@ const PlaygroundContainer = styled(Box)<CustomBoxProps>(
     left: 0,
     width: "100vw",
     height: "100vh",
-    backgroundColor: theme.color.secondary,
+    backgroundColor: "#234cbc21",
   })
 );

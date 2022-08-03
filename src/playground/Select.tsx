@@ -145,6 +145,7 @@ const Select = ({
 
     undoStack.current.push(captureStates);
     redoStack.current.length = 0;
+    while (undoStack.current.length > 30) undoStack.current.shift();
     changeCount((prev) => {
       const prevCopy = _.cloneDeep(prev);
       const temp = prevCopy[selectedPdf][selectedPage];
@@ -300,6 +301,7 @@ const Select = ({
 
               undoStack.current.push(captureStates);
               redoStack.current.length = 0;
+              while (undoStack.current.length > 30) undoStack.current.shift();
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const polygons = prevCopy[selectedPdf][selectedPage];
@@ -342,6 +344,7 @@ const Select = ({
             onTransformEnd={(e) => {
               undoStack.current.push(captureStates);
               redoStack.current.length = 0;
+              while (undoStack.current.length > 30) undoStack.current.shift();
               const transformedPoints: number[] = [];
               for (let i = 0; i < item.points.length; i += 2) {
                 const { x, y } = e.target.getTransform().point({
@@ -435,6 +438,7 @@ const Select = ({
 
             undoStack.current.push(captureStates);
             redoStack.current.length = 0;
+            while (undoStack.current.length > 30) undoStack.current.shift();
             changeLength((prev) => {
               const prevCopy = _.cloneDeep(prev);
               const temp = prevCopy[selectedPdf][selectedPage];
@@ -455,6 +459,7 @@ const Select = ({
           onTransformEnd={(e) => {
             undoStack.current.push(captureStates);
             redoStack.current.length = 0;
+            while (undoStack.current.length > 30) undoStack.current.shift();
             const transformedPoints: number[] = [];
             for (let i = 0; i < item.points.length; i += 2) {
               const { x, y } = e.target.getTransform().point({

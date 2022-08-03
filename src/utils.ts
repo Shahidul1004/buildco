@@ -28,7 +28,7 @@ export type polygonType = {
   hover: boolean;
   height: number;
   depth: number;
-  pitch: number;
+  // pitch: number;
 };
 
 export type lengthType = {
@@ -80,7 +80,7 @@ export type groupType = {
   icon?: iconType;
   height?: number;
   depth?: number;
-  pitch?: number;
+  // pitch?: number;
 };
 export type activeGroupType = {
   shape: number;

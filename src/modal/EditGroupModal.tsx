@@ -12,7 +12,7 @@ import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CustomButton from "../reusables/Button";
 import { groupType, groupTypeName, iconType, unitType } from "../utils";
 import { RGBColor, SketchPicker } from "react-color";
-import { MouseEventHandler, useRef, useState } from "react";
+import { MouseEventHandler, MutableRefObject, useRef, useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CircleIcon from "@mui/icons-material/Circle";
@@ -25,12 +25,18 @@ type propTypes = {
   onClose: () => void;
   groupId: number;
   group: groupType[];
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 const EditGroupModal = ({
   changeGroup,
   onClose,
   group,
   groupId,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propTypes): JSX.Element => {
   const theme = useTheme();
   const textRef = useRef<any>(null);
@@ -71,6 +77,9 @@ const EditGroupModal = ({
 
   const handleUpdate = () => {
     onClose();
+    undoStack.current.push(captureStates);
+    redoStack.current.length = 0;
+    while (undoStack.current.length > 30) undoStack.current.shift();
     changeGroup((prev) => {
       const prevCopy = _.cloneDeep(prev);
       const index = prevCopy.findIndex((grp) => grp.id === groupId)!;

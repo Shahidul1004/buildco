@@ -25,6 +25,7 @@ import LoadingModal from "./modal/LoadingModal";
 import MeasurementSection from "./measurement/MeasurementSection";
 import InitialUpload from "./fileUpload/InitialUpload";
 import _ from "lodash";
+import EstimateSection from "./estimate/EstimateSection";
 
 const Homepage = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,11 +65,13 @@ const Homepage = (): JSX.Element => {
   const [annotate, setAnnotate] = useState<annotateType[][][]>([]);
   const undoStack = useRef<(() => void)[]>([]);
   const redoStack = useRef<(() => void)[]>([]);
+  const [showEstimate, setShowEstimate] = useState<boolean>(false);
 
   const captureStates = () => {
     setPolygon((prev) => _.cloneDeep(polygon));
     setLength((prev) => _.cloneDeep(length));
     setCount((prev) => _.cloneDeep(count));
+    setGroup((prev) => _.cloneDeep(group));
   };
 
   const fileUploadHandler = async (files: FileList) => {
@@ -136,108 +139,127 @@ const Homepage = (): JSX.Element => {
 
   return (
     <>
-      {pdfOrder.length === 0 && (
-        <InitialUpload onFileUpload={fileUploadHandler} />
-      )}
-      {selectedPdf !== -1 && pdfOrder.length > 0 && (
+      {showEstimate === false ? (
         <>
-          <Header
-            onFileUpload={fileUploadHandler}
-            fileName={fileName.current}
-            selectedPdf={selectedPdf}
-            changeSelectedPdf={setSelectedPdf}
-            selectedPage={selectedPage[selectedPdf]}
-            pdfOrder={pdfOrder}
-            changePdfOrder={setPdfOrder}
-            currentZoomLevel={
-              selectedPdf === -1
-                ? 50
-                : zoomLevel[selectedPdf][selectedPage[selectedPdf]]
-            }
-            changeZoomLevel={setZoomLevel}
-            activeTool={activeTool}
-            changeActiveTool={setActiveTool}
-            showPage={showPage}
-            toggleShowPage={setShowPage}
-            showMeasurements={showMeasurements}
-            toggleShowMeasurements={setShowMeasurements}
-            group={group}
-            changeGroup={setGroup}
-            activeGroup={activeGroup}
-            changeActiveGroup={setActiveGroup}
-            scaleInfo={scaleInfo}
-            polygon={polygon}
-            changePolygon={setPolygon}
-            length={length}
-            changeLength={setLength}
-            count={count}
-            changeCount={setCount}
-            undoStack={undoStack}
-            redoStack={redoStack}
-            captureStates={captureStates}
-          />
-
-          <Playground
-            selectedPdf={selectedPdf}
-            selectedPage={selectedPage[selectedPdf]}
-            page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
-            zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
-            activeTool={activeTool}
-            changeActiveTool={setActiveTool}
-            scaleInfo={scaleInfo}
-            changeScaleInfo={setScaleInfo}
-            polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
-            changePolygon={setPolygon}
-            length={length[selectedPdf][selectedPage[selectedPdf]]}
-            changeLength={setLength}
-            count={count[selectedPdf][selectedPage[selectedPdf]]}
-            changeCount={setCount}
-            annotate={annotate[selectedPdf][selectedPage[selectedPdf]]}
-            changeAnnotate={setAnnotate}
-            group={group}
-            activeGroup={activeGroup}
-            undoStack={undoStack}
-            redoStack={redoStack}
-            captureStates={captureStates}
-          />
-
-          {showPage && (
-            <PreviewSection
-              selectedPdf={selectedPdf}
-              selectedPage={selectedPage[selectedPdf]}
-              changeSelectedPage={setSelectedPage}
-              pages={pdfPages.current[selectedPdf]}
-              changeLoading={setLoading}
-              isGroupOpen={
-                activeTool === activeToolOptions.rectangle ||
-                activeTool === activeToolOptions.polygon ||
-                activeTool === activeToolOptions.length ||
-                activeTool === activeToolOptions.count
-              }
-            />
+          {pdfOrder.length === 0 && (
+            <InitialUpload onFileUpload={fileUploadHandler} />
           )}
-          {showMeasurements && (
-            <MeasurementSection
-              selectedPdf={selectedPdf}
-              selectedPage={selectedPage[selectedPdf]}
-              scaleInfo={scaleInfo[selectedPdf][selectedPage[selectedPdf]]}
-              group={group}
-              changeGroup={setGroup}
-              polygon={polygon}
-              changePolygon={setPolygon}
-              length={length}
-              changeLength={setLength}
-              count={count}
-              changeCount={setCount}
-              isGroupOpen={
-                activeTool === activeToolOptions.rectangle ||
-                activeTool === activeToolOptions.polygon ||
-                activeTool === activeToolOptions.length ||
-                activeTool === activeToolOptions.count
-              }
-            />
+          {selectedPdf !== -1 && pdfOrder.length > 0 && (
+            <>
+              <Header
+                onFileUpload={fileUploadHandler}
+                fileName={fileName.current}
+                selectedPdf={selectedPdf}
+                changeSelectedPdf={setSelectedPdf}
+                selectedPage={selectedPage[selectedPdf]}
+                pdfOrder={pdfOrder}
+                changePdfOrder={setPdfOrder}
+                currentZoomLevel={
+                  selectedPdf === -1
+                    ? 50
+                    : zoomLevel[selectedPdf][selectedPage[selectedPdf]]
+                }
+                changeZoomLevel={setZoomLevel}
+                activeTool={activeTool}
+                changeActiveTool={setActiveTool}
+                showPage={showPage}
+                toggleShowPage={setShowPage}
+                showMeasurements={showMeasurements}
+                toggleShowMeasurements={setShowMeasurements}
+                group={group}
+                changeGroup={setGroup}
+                activeGroup={activeGroup}
+                changeActiveGroup={setActiveGroup}
+                scaleInfo={scaleInfo}
+                polygon={polygon}
+                changePolygon={setPolygon}
+                length={length}
+                changeLength={setLength}
+                count={count}
+                changeCount={setCount}
+                undoStack={undoStack}
+                redoStack={redoStack}
+                captureStates={captureStates}
+              />
+
+              <Playground
+                selectedPdf={selectedPdf}
+                selectedPage={selectedPage[selectedPdf]}
+                page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
+                zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
+                activeTool={activeTool}
+                changeActiveTool={setActiveTool}
+                scaleInfo={scaleInfo}
+                changeScaleInfo={setScaleInfo}
+                polygon={polygon[selectedPdf][selectedPage[selectedPdf]]}
+                changePolygon={setPolygon}
+                length={length[selectedPdf][selectedPage[selectedPdf]]}
+                changeLength={setLength}
+                count={count[selectedPdf][selectedPage[selectedPdf]]}
+                changeCount={setCount}
+                annotate={annotate[selectedPdf][selectedPage[selectedPdf]]}
+                changeAnnotate={setAnnotate}
+                group={group}
+                activeGroup={activeGroup}
+                undoStack={undoStack}
+                redoStack={redoStack}
+                captureStates={captureStates}
+              />
+
+              {showPage && (
+                <PreviewSection
+                  selectedPdf={selectedPdf}
+                  selectedPage={selectedPage[selectedPdf]}
+                  changeSelectedPage={setSelectedPage}
+                  pages={pdfPages.current[selectedPdf]}
+                  changeLoading={setLoading}
+                  isGroupOpen={
+                    activeTool === activeToolOptions.rectangle ||
+                    activeTool === activeToolOptions.polygon ||
+                    activeTool === activeToolOptions.length ||
+                    activeTool === activeToolOptions.count
+                  }
+                />
+              )}
+              {showMeasurements && (
+                <MeasurementSection
+                  selectedPdf={selectedPdf}
+                  selectedPage={selectedPage[selectedPdf]}
+                  scaleInfo={scaleInfo[selectedPdf][selectedPage[selectedPdf]]}
+                  group={group}
+                  changeGroup={setGroup}
+                  polygon={polygon}
+                  changePolygon={setPolygon}
+                  length={length}
+                  changeLength={setLength}
+                  count={count}
+                  changeCount={setCount}
+                  isGroupOpen={
+                    activeTool === activeToolOptions.rectangle ||
+                    activeTool === activeToolOptions.polygon ||
+                    activeTool === activeToolOptions.length ||
+                    activeTool === activeToolOptions.count
+                  }
+                  toggleShowEstimate={setShowEstimate}
+                  undoStack={undoStack}
+                  redoStack={redoStack}
+                  captureStates={captureStates}
+                />
+              )}
+            </>
           )}
         </>
+      ) : (
+        <EstimateSection
+          pdfOrder={pdfOrder}
+          fileName={fileName.current}
+          scaleInfo={scaleInfo}
+          group={group}
+          polygon={polygon}
+          length={length}
+          count={count}
+          toggleShowEstimate={setShowEstimate}
+        />
       )}
     </>
   );

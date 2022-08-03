@@ -116,6 +116,9 @@ const Header = ({
             changeGroup={changeGroup}
             activeGroup={activeGroup}
             changeActiveGroup={changeActiveGroup}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         )}
         <Box

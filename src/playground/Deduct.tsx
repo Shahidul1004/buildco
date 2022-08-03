@@ -275,6 +275,7 @@ const Deduct = ({
 
       undoStack.current.push(captureStates);
       redoStack.current.length = 0;
+      while (undoStack.current.length > 30) undoStack.current.shift();
       changePolygon((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const currentList = prevCopy[selectedPdf][selectedPage];

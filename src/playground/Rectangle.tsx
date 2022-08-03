@@ -87,7 +87,7 @@ const Rectangle = ({
         hover: false,
         height: 0,
         depth: 0,
-        pitch: 0,
+        // pitch: 0,
       };
 
       const { calibrated } = scaleInfo[selectedPdf][selectedPage];
@@ -186,6 +186,7 @@ const Rectangle = ({
 
       undoStack.current.push(captureStates);
       redoStack.current.length = 0;
+      while (undoStack.current.length > 30) undoStack.current.shift();
       changePolygon((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const currentList = prevCopy[selectedPdf][selectedPage];

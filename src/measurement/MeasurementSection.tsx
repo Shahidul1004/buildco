@@ -1,5 +1,5 @@
 import { Box, BoxProps, styled } from "@mui/material";
-import { useContext } from "react";
+import { MutableRefObject, useContext } from "react";
 import { Context } from "../Context";
 import {
   countType,
@@ -14,6 +14,7 @@ import ShapeGroup from "./ShapeGroup";
 import LengthGroup from "./LengthGroup";
 import CountGroup from "./CountGroup";
 import DefaultGroup from "./DefaultGroup";
+import CustomButton from "../reusables/Button";
 
 type propsType = {
   selectedPdf: number;
@@ -28,6 +29,10 @@ type propsType = {
   count: countType[][][];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   isGroupOpen: boolean;
+  toggleShowEstimate: React.Dispatch<React.SetStateAction<boolean>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const MeasurementSection = ({
@@ -43,6 +48,10 @@ const MeasurementSection = ({
   count,
   changeCount,
   isGroupOpen,
+  toggleShowEstimate,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const context = useContext(Context);
 
@@ -74,6 +83,9 @@ const MeasurementSection = ({
                 changeGroup={changeGroup}
                 polygon={polygon[selectedPdf][selectedPage]}
                 changePolygon={changePolygon}
+                undoStack={undoStack}
+                redoStack={redoStack}
+                captureStates={captureStates}
               />
             ) : grp.type === groupTypeName.length ? (
               <LengthGroup
@@ -87,6 +99,9 @@ const MeasurementSection = ({
                 changeGroup={changeGroup}
                 length={length[selectedPdf][selectedPage]}
                 changeLength={changeLength}
+                undoStack={undoStack}
+                redoStack={redoStack}
+                captureStates={captureStates}
               />
             ) : grp.type === groupTypeName.all ? (
               <></>
@@ -102,6 +117,9 @@ const MeasurementSection = ({
                 changeGroup={changeGroup}
                 count={count[selectedPdf][selectedPage]}
                 changeCount={changeCount}
+                undoStack={undoStack}
+                redoStack={redoStack}
+                captureStates={captureStates}
               />
             )}
           </>
@@ -120,7 +138,33 @@ const MeasurementSection = ({
           changeLength={changeLength}
           count={count[selectedPdf][selectedPage]}
           changeCount={changeCount}
+          undoStack={undoStack}
+          redoStack={redoStack}
+          captureStates={captureStates}
         />
+      </Box>
+      <Box
+        sx={{
+          marginTop: "20px",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <CustomButton
+          backgroundcolor="#ffa700"
+          hoverbackgroudcolor="#ff8700"
+          Color="white"
+          hovercolor="white"
+          sx={{
+            borderRadius: "4px",
+            padding: "3px 6px",
+            height: "35px",
+          }}
+          onClick={() => toggleShowEstimate((prev) => !prev)}
+        >
+          Create Estimate
+        </CustomButton>
       </Box>
     </Container>
   );
@@ -141,15 +185,15 @@ const Container = styled(Box)<CustomBoxProps>(
     backgroundColor: "white",
     borderRadius: "32px",
     boxShadow: "0px 3px 4px 0px gray",
-    padding: "75px 0px 100px 0px",
+    padding: "75px 0px 40px 0px",
     paddingLeft: "25px",
     paddingRight: "25px",
     boxSizing: "border-box",
     zIndex: 600,
 
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center !important",
     cursor: "auto !important",
   })
 );

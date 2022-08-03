@@ -32,6 +32,7 @@ const Redo = ({
     if (redoStack.current.length > 0) {
       const top = redoStack.current.pop()!;
       undoStack.current.push(captureStates);
+      while (undoStack.current.length > 30) undoStack.current.shift();
       top();
     }
   };

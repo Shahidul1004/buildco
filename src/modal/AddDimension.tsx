@@ -1,7 +1,7 @@
 import { Box, styled, TextField, Typography, useTheme } from "@mui/material";
 import CustomButton from "../reusables/Button";
 import { groupType, groupTypeName, polygonType } from "../utils";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useState } from "react";
 import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import _ from "lodash";
 
@@ -21,6 +21,9 @@ type propTypes = {
   polygon: polygonType;
   polygonIndex: number;
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 const AddDimensionModal = ({
   onClose,
@@ -36,6 +39,9 @@ const AddDimensionModal = ({
   polygon,
   polygonIndex,
   changePolygon,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propTypes): JSX.Element => {
   const theme = useTheme();
   const [height, setHeight] = useState<number>(0);
@@ -46,21 +52,24 @@ const AddDimensionModal = ({
     if (type === "group") {
       setHeight(group?.height!);
       setDepth(group?.depth!);
-      setPitch(group?.pitch!);
+      // setPitch(group?.pitch!);
     } else {
       setHeight(polygon?.height!);
       setDepth(polygon?.depth!);
-      setPitch(polygon?.pitch!);
+      // setPitch(polygon?.pitch!);
     }
   }, []);
 
   const handleUpdate = () => {
+    undoStack.current.push(captureStates);
+    redoStack.current.length = 0;
+    while (undoStack.current.length > 30) undoStack.current.shift();
     if (type === "group") {
       changePolygon((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const polyList = prevCopy[selectedPdf][selectedPage].map((poly) => {
           if (poly.group === group?.id)
-            return { ...poly, height: height, depth: depth, pitch: pitch };
+            return { ...poly, height: height, depth: depth };
           else {
             return { ...poly };
           }
@@ -74,7 +83,7 @@ const AddDimensionModal = ({
           ...group,
           height: height,
           depth: depth,
-          pitch: pitch,
+          // pitch: pitch,
         });
         return prevCopy;
       });
@@ -86,7 +95,7 @@ const AddDimensionModal = ({
           ...polygon,
           height: height,
           depth: depth,
-          pitch: pitch,
+          // pitch: pitch,
         });
         prevCopy[selectedPdf][selectedPage] = polyList;
         return prevCopy;

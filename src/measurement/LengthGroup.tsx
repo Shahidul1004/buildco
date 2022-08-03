@@ -7,14 +7,19 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { createRef, useEffect, useRef, useState } from "react";
+import {
+  createRef,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { groupType, lengthType, scaleInfoType, unitType } from "../utils";
 import FolderTwoToneIcon from "@mui/icons-material/FolderTwoTone";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { getLength, rgba2hex } from "../reusables/helpers";
 import _ from "lodash";
-import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditGroupModal from "../modal/EditGroupModal";
 
@@ -28,6 +33,9 @@ type propsType = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   length: lengthType[];
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const LengthGroup = ({
@@ -40,6 +48,9 @@ const LengthGroup = ({
   changeGroup,
   length,
   changeLength,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(true);
@@ -167,6 +178,9 @@ const LengthGroup = ({
               setHeaderHeight(headerRef.current?.clientHeight!);
             }}
             onBlur={(e) => {
+              undoStack.current.push(captureStates);
+              redoStack.current.length = 0;
+              while (undoStack.current.length > 30) undoStack.current.shift();
               changeGroup((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const target = prevCopy[groupIndex];
@@ -319,6 +333,10 @@ const LengthGroup = ({
                   });
                 }}
                 onBlur={(e) => {
+                  undoStack.current.push(captureStates);
+                  redoStack.current.length = 0;
+                  while (undoStack.current.length > 30)
+                    undoStack.current.shift();
                   changeLength((prev) => {
                     const prevCopy = _.cloneDeep(prev);
                     const target = prevCopy[selectedPdf][selectedPage][index];
@@ -439,6 +457,9 @@ const LengthGroup = ({
 
         <MenuItem
           onClick={() => {
+            undoStack.current.push(captureStates);
+            redoStack.current.length = 0;
+            while (undoStack.current.length > 30) undoStack.current.shift();
             if (clickRef.current === "groupHeader") {
               changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
@@ -478,6 +499,9 @@ const LengthGroup = ({
           groupId={group.id}
           changeGroup={changeGroup}
           onClose={() => setModalType("")}
+          undoStack={undoStack}
+          redoStack={redoStack}
+          captureStates={captureStates}
         />
       )}
     </Container>

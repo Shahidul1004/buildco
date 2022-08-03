@@ -7,7 +7,13 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { createRef, useEffect, useRef, useState } from "react";
+import {
+  createRef,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   countType,
   groupType,
@@ -46,6 +52,9 @@ type propsType = {
   changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
   count: countType[];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const DefaultGroup = ({
@@ -62,6 +71,9 @@ const DefaultGroup = ({
   changeLength,
   count,
   changeCount,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const [expand, setExpand] = useState<boolean>(true);
   const [polyFilteredIndex, setPolyFilteredIndex] = useState<number[]>([]);
@@ -253,6 +265,10 @@ const DefaultGroup = ({
                   });
                 }}
                 onBlur={(e) => {
+                  undoStack.current.push(captureStates);
+                  redoStack.current.length = 0;
+                  while (undoStack.current.length > 30)
+                    undoStack.current.shift();
                   changePolygon((prev) => {
                     const prevCopy = _.cloneDeep(prev);
                     const target = prevCopy[selectedPdf][selectedPage][index];
@@ -326,8 +342,7 @@ const DefaultGroup = ({
                 fill={
                   polygon[index]?.hover ||
                   polygon[index]?.height ||
-                  polygon[index]?.depth ||
-                  polygon[index]?.pitch
+                  polygon[index]?.depth
                     ? "#FFBC01"
                     : "#c3c3ca"
                 }
@@ -357,8 +372,7 @@ const DefaultGroup = ({
                     ? unitType.ft
                     : unitType.in,
                   polygon[index]?.height,
-                  polygon[index]?.depth,
-                  polygon[index]?.pitch
+                  polygon[index]?.depth
                 )}
               </Typography>
             </Field>
@@ -428,6 +442,10 @@ const DefaultGroup = ({
                   });
                 }}
                 onBlur={(e) => {
+                  undoStack.current.push(captureStates);
+                  redoStack.current.length = 0;
+                  while (undoStack.current.length > 30)
+                    undoStack.current.shift();
                   changeLength((prev) => {
                     const prevCopy = _.cloneDeep(prev);
                     const target = prevCopy[selectedPdf][selectedPage][index];
@@ -646,6 +664,9 @@ const DefaultGroup = ({
           onClick={() => {
             const clickedRowType = clickRef.current.split(" ")[0];
             const clickedRowIndex = clickRef.current.split(" ")[1];
+            undoStack.current.push(captureStates);
+            redoStack.current.length = 0;
+            while (undoStack.current.length > 30) undoStack.current.shift();
             if (clickedRowType === "polygon") {
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
@@ -700,6 +721,9 @@ const DefaultGroup = ({
               (poly) => poly.key === dimensionId.current
             )}
             changePolygon={changePolygon}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         </CreatePortal>
       )}

@@ -30,8 +30,6 @@ const PreviewSection = ({
     }, Math.min(pages.length * 10, 4000));
   }, [selectedPdf]);
 
-  console.log(pages);
-
   return (
     <PreviewContainer navHeight={context.navHeight} isGroupOpen={isGroupOpen}>
       <Box

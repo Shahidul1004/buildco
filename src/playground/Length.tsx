@@ -193,6 +193,7 @@ const Length = ({
 
       undoStack.current.push(captureStates);
       redoStack.current.length = 0;
+      while (undoStack.current.length > 30) undoStack.current.shift();
       changeLength((prev) => {
         const prevCopy = _.cloneDeep(prev);
         const temp = prevCopy[selectedPdf][selectedPage];

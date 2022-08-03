@@ -7,7 +7,13 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { createRef, useEffect, useRef, useState } from "react";
+import {
+  createRef,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { groupType, polygonType, scaleInfoType, unitType } from "../utils";
 import FolderTwoToneIcon from "@mui/icons-material/FolderTwoTone";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -35,6 +41,9 @@ type propsType = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const ShapeGroup = ({
@@ -47,6 +56,9 @@ const ShapeGroup = ({
   changeGroup,
   polygon,
   changePolygon,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
   const [expand, setExpand] = useState<boolean>(true);
@@ -184,6 +196,9 @@ const ShapeGroup = ({
               setHeaderHeight(headerRef.current?.clientHeight!);
             }}
             onBlur={(e) => {
+              undoStack.current.push(captureStates);
+              redoStack.current.length = 0;
+              while (undoStack.current.length > 30) undoStack.current.shift();
               changeGroup((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const target = prevCopy[groupIndex];
@@ -256,11 +271,7 @@ const ShapeGroup = ({
           }}
         >
           <Settings
-            fill={
-              hover || group.height || group.depth || group.pitch
-                ? "#FFBC01"
-                : "#c3c3ca"
-            }
+            fill={hover || group.height || group.depth ? "#FFBC01" : "#c3c3ca"}
           />
         </Field>
         <Field
@@ -289,13 +300,13 @@ const ShapeGroup = ({
                     ? unitType.ft
                     : unitType.in,
                   polygon[index]?.height || group.height,
-                  polygon[index]?.depth || group.depth,
-                  polygon[index]?.pitch || group.pitch
+                  polygon[index]?.depth || group.depth
+                  // polygon[index]?.pitch || group.pitch
                 ).split(" ")[0];
               })
               .reduce((prev, curr) => prev + curr, 0)
               .toFixed(2) +
-              (group.height || group.depth || group.pitch
+              (group.height || group.depth
                 ? scaleInfo.calibrated === false
                   ? " px3"
                   : group.unit === unitType.ft
@@ -377,6 +388,10 @@ const ShapeGroup = ({
                   });
                 }}
                 onBlur={(e) => {
+                  undoStack.current.push(captureStates);
+                  redoStack.current.length = 0;
+                  while (undoStack.current.length > 30)
+                    undoStack.current.shift();
                   changePolygon((prev) => {
                     const prevCopy = _.cloneDeep(prev);
                     const target = prevCopy[selectedPdf][selectedPage][index];
@@ -446,16 +461,14 @@ const ShapeGroup = ({
                 setModalType("addDimension");
               }}
             >
-              {(group.height || group.depth || group.pitch)! > 0 && (
+              {(group.height || group.depth)! > 0 && (
                 <Settings
                   fill={
                     (hover === false && polygon[index]?.hover) ||
                     (polygon[index]?.height &&
                       polygon[index]?.height !== group.height) ||
                     (polygon[index]?.depth &&
-                      polygon[index]?.depth !== group.depth) ||
-                    (polygon[index]?.pitch &&
-                      polygon[index]?.pitch !== group.pitch)
+                      polygon[index]?.depth !== group.depth)
                       ? "#FFBC01"
                       : "#c3c3ca"
                   }
@@ -486,8 +499,8 @@ const ShapeGroup = ({
                     ? unitType.ft
                     : unitType.in,
                   polygon[index]?.height || group.height,
-                  polygon[index]?.depth || group.depth,
-                  polygon[index]?.pitch || group.pitch
+                  polygon[index]?.depth || group.depth
+                  // polygon[index]?.pitch || group.pitch
                 )}
               </Typography>
             </Field>
@@ -535,6 +548,9 @@ const ShapeGroup = ({
 
         <MenuItem
           onClick={() => {
+            undoStack.current.push(captureStates);
+            redoStack.current.length = 0;
+            while (undoStack.current.length > 30) undoStack.current.shift();
             if (clickRef.current === "groupHeader") {
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
@@ -574,6 +590,9 @@ const ShapeGroup = ({
           groupId={group.id}
           changeGroup={changeGroup}
           onClose={() => setModalType("")}
+          undoStack={undoStack}
+          redoStack={redoStack}
+          captureStates={captureStates}
         />
       )}
       {modalType === "addDimension" && (
@@ -594,6 +613,9 @@ const ShapeGroup = ({
               (poly) => poly.key === dimensionId.current
             )}
             changePolygon={changePolygon}
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         </CreatePortal>
       )}

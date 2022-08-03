@@ -240,10 +240,10 @@ const getScaledVolume = (
   scaleInfo: scaleInfoType,
   unit: string,
   height: number | undefined,
-  depth: number | undefined,
-  pitch: number | undefined
+  depth: number | undefined
+  // pitch: number | undefined
 ) => {
-  const dim = height || depth || pitch;
+  const dim = height || depth; //|| pitch;
   if (unit === "px") {
     if (dim) {
       return `${(area * dim).toFixed(2)} px3`;

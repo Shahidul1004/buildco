@@ -11,23 +11,30 @@ import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CustomButton from "../reusables/Button";
 import { groupType, groupTypeName, iconType, unitType } from "../utils";
 import { RGBColor, SketchPicker } from "react-color";
-import { MouseEventHandler, useRef, useState } from "react";
+import { MouseEventHandler, MutableRefObject, useRef, useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CircleIcon from "@mui/icons-material/Circle";
 import ChangeHistoryIcon from "@mui/icons-material/ChangeHistory";
 import CropSquareIcon from "@mui/icons-material/CropSquare";
 import { rgba2hex } from "../reusables/helpers";
+import _ from "lodash";
 
 type propTypes = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   onClose: () => void;
   newGroupType: groupTypeName;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 const CreateGroupModal = ({
   changeGroup,
   onClose,
   newGroupType,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propTypes): JSX.Element => {
   const theme = useTheme();
   const textRef = useRef<any>(null);
@@ -75,8 +82,12 @@ const CreateGroupModal = ({
         pitch: 0,
       };
     }
+
+    undoStack.current.push(captureStates);
+    redoStack.current.length = 0;
+    while (undoStack.current.length > 30) undoStack.current.shift();
     changeGroup((prev) => [
-      ...prev,
+      ..._.cloneDeep(prev),
       {
         id: new Date().getTime(),
         name: textRef.current.value,

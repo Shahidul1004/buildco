@@ -1,5 +1,11 @@
 import { Box, Menu, MenuItem, Typography, useTheme } from "@mui/material";
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import {
+  MouseEventHandler,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import _ from "lodash";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -13,7 +19,6 @@ import {
 } from "../utils";
 import CustomButton from "../reusables/Button";
 import CreateGroupModal from "../modal/CreateGroupModal";
-import DeleteModal from "../modal/DeleteModal";
 import EditGroupModal from "../modal/EditGroupModal";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { rgba2hex } from "../reusables/helpers";
@@ -25,6 +30,9 @@ type propsType = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   activeGroup: activeGroupType;
   changeActiveGroup: React.Dispatch<React.SetStateAction<activeGroupType>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const GroupSection = ({
@@ -33,6 +41,9 @@ const GroupSection = ({
   changeGroup,
   activeGroup,
   changeActiveGroup,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const [filteredGroups, setFilteredGroups] = useState<groupType[]>([]);
   const anchorElOptionId = useRef<any>(null);
@@ -283,7 +294,18 @@ const GroupSection = ({
           <>
             <MenuItem
               onClick={() => {
-                handleOpenModal("delete");
+                undoStack.current.push(captureStates);
+                redoStack.current.length = 0;
+                while (undoStack.current.length > 30) undoStack.current.shift();
+                changeGroup((prev) => {
+                  const prevCopy = _.cloneDeep(prev);
+
+                  const updatedGroup = prevCopy.filter(
+                    (grp) => grp.id.toString() !== anchorElOptionId.current
+                  );
+                  return updatedGroup;
+                });
+
                 handleCloseOption();
               }}
             >
@@ -327,24 +349,11 @@ const GroupSection = ({
                 ? groupTypeName.length
                 : groupTypeName.shape
             }
+            undoStack={undoStack}
+            redoStack={redoStack}
+            captureStates={captureStates}
           />
         </CreatePortal>
-      )}
-      {modalType === "delete" && (
-        <DeleteModal
-          type="Group"
-          onClose={() => setModalType("")}
-          onDelete={() => {
-            changeGroup((prev) => {
-              const prevCopy = _.cloneDeep(prev);
-
-              const updatedGroup = prevCopy.filter(
-                (grp) => grp.id.toString() !== anchorElOptionId.current
-              );
-              return updatedGroup;
-            });
-          }}
-        />
       )}
       {modalType === "edit" && (
         <EditGroupModal
@@ -352,6 +361,9 @@ const GroupSection = ({
           groupId={+anchorElOptionId.current}
           group={group}
           changeGroup={changeGroup}
+          undoStack={undoStack}
+          redoStack={redoStack}
+          captureStates={captureStates}
         />
       )}
     </Box>

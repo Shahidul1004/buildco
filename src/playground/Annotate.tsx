@@ -61,7 +61,7 @@ const Annotate = ({
   const layerRef = useRef<Konva.Layer>(null);
 
   useEffect(() => {
-    if (activeTool === activeToolOptions.length) {
+    if (activeTool === activeToolOptions.annotate) {
       layerRef.current?.moveToTop();
     }
   }, [activeTool]);

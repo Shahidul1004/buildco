@@ -7,7 +7,7 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { countType, groupType, iconType, scaleInfoType } from "../utils";
 
 import { rgba2hex } from "../reusables/helpers";
@@ -28,6 +28,9 @@ type propsType = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   count: countType[];
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
+  undoStack: MutableRefObject<(() => void)[]>;
+  redoStack: MutableRefObject<(() => void)[]>;
+  captureStates: () => void;
 };
 
 const CountGroup = ({
@@ -40,6 +43,9 @@ const CountGroup = ({
   changeGroup,
   count,
   changeCount,
+  undoStack,
+  redoStack,
+  captureStates,
 }: propsType): JSX.Element => {
   const [hover, setHover] = useState<boolean>(false);
   const [filteredIndex, setFilteredIndex] = useState<number[]>([]);
@@ -142,6 +148,9 @@ const CountGroup = ({
               setHeaderHeight(headerRef.current?.clientHeight!);
             }}
             onBlur={(e) => {
+              undoStack.current.push(captureStates);
+              redoStack.current.length = 0;
+              while (undoStack.current.length > 30) undoStack.current.shift();
               changeGroup((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const target = prevCopy[groupIndex];
@@ -228,6 +237,9 @@ const CountGroup = ({
 
         <MenuItem
           onClick={() => {
+            undoStack.current.push(captureStates);
+            redoStack.current.length = 0;
+            while (undoStack.current.length > 30) undoStack.current.shift();
             if (clickRef.current === "groupHeader") {
               changeCount((prev) => {
                 const prevCopy = _.cloneDeep(prev);
@@ -267,6 +279,9 @@ const CountGroup = ({
           groupId={group.id}
           changeGroup={changeGroup}
           onClose={() => setModalType("")}
+          undoStack={undoStack}
+          redoStack={redoStack}
+          captureStates={captureStates}
         />
       )}
     </Container>
