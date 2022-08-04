@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Header from "./header/Header";
 import {
   getFileName,
+  Pdf2Image,
   PdfjsDocument,
   pdfjsExtractPages,
 } from "./reusables/helpers";
@@ -21,18 +22,20 @@ import {
   scaleInfoType,
   unitType,
 } from "./utils";
-import LoadingModal from "./modal/LoadingModal";
 import MeasurementSection from "./measurement/MeasurementSection";
 import InitialUpload from "./fileUpload/InitialUpload";
 import _ from "lodash";
 import EstimateSection from "./estimate/EstimateSection";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 const Homepage = (): JSX.Element => {
+  const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const uploadedFiles = useRef<File[]>([]);
   const fileName = useRef<string[]>([]);
   const pdfDocs = useRef<pdfjsLib.PDFDocumentProxy[]>([]);
   const pdfPages = useRef<pdfjsLib.PDFPageProxy[][]>([]);
+  const previewPages = useRef<HTMLImageElement[][]>([]);
   const [pdfOrder, setPdfOrder] = useState<number[]>([]);
   const [selectedPdf, setSelectedPdf] = useState<number>(-1);
   const [selectedPage, setSelectedPage] = useState<number[]>([]);
@@ -76,10 +79,10 @@ const Homepage = (): JSX.Element => {
 
   const fileUploadHandler = async (files: FileList) => {
     setLoading(true);
-    setShowPage(false);
     const names = await getFileName(files);
     const docs = await PdfjsDocument(files);
-    const pages: pdfjsLib.PDFPageProxy[][] = [];
+    const newPages: pdfjsLib.PDFPageProxy[][] = [];
+    const newPreviewPages: HTMLImageElement[][] = [];
     const newZoomLevel: number[][] = [];
     const newScaleInfo: scaleInfoType[][] = [];
     const newPolygon: polygonType[][][] = [];
@@ -87,12 +90,13 @@ const Homepage = (): JSX.Element => {
     const newCount: countType[][][] = [];
     const newAnnotate: annotateType[][][] = [];
     for (const doc of docs) {
-      pages.push(
-        await pdfjsExtractPages(
-          doc,
-          [...Array(doc.numPages).keys()].map((e) => e + 1)
-        )
+      const extractedPages = await pdfjsExtractPages(
+        doc,
+        [...Array(doc.numPages).keys()].map((e) => e + 1)
       );
+      newPages.push(extractedPages);
+      newPreviewPages.push(await Pdf2Image(hiddenCanvasRef, extractedPages));
+
       newZoomLevel.push([...Array(doc.numPages).keys()].map((e) => 50));
       newScaleInfo.push(
         [...Array(doc.numPages).keys()].map((e) => {
@@ -115,7 +119,8 @@ const Homepage = (): JSX.Element => {
     uploadedFiles.current.push(...files);
     fileName.current.push(...names);
     pdfDocs.current.push(...docs);
-    pdfPages.current.push(...pages);
+    pdfPages.current.push(...newPages);
+    previewPages.current.push(...newPreviewPages);
 
     setPolygon((prev) => [...prev, ...newPolygon]);
     setLength((prev) => [...prev, ...newLength]);
@@ -187,6 +192,7 @@ const Homepage = (): JSX.Element => {
                 selectedPage={selectedPage[selectedPdf]}
                 page={pdfPages.current[selectedPdf][selectedPage[selectedPdf]]}
                 zoomLevel={zoomLevel[selectedPdf][selectedPage[selectedPdf]]}
+                toggleLoading={setLoading}
                 activeTool={activeTool}
                 changeActiveTool={setActiveTool}
                 scaleInfo={scaleInfo}
@@ -212,6 +218,7 @@ const Homepage = (): JSX.Element => {
                   selectedPage={selectedPage[selectedPdf]}
                   changeSelectedPage={setSelectedPage}
                   pages={pdfPages.current[selectedPdf]}
+                  previewPages={previewPages.current[selectedPdf]}
                   changeLoading={setLoading}
                   isGroupOpen={
                     activeTool === activeToolOptions.rectangle ||
@@ -261,6 +268,13 @@ const Homepage = (): JSX.Element => {
           toggleShowEstimate={setShowEstimate}
         />
       )}
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <canvas style={{ display: "none" }} ref={hiddenCanvasRef} />
     </>
   );
 };

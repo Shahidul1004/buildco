@@ -29,6 +29,7 @@ type propsType = {
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
   scaleInfo: scaleInfoType[][];
   changeScaleInfo: React.Dispatch<React.SetStateAction<scaleInfoType[][]>>;
+  toggleLoading: React.Dispatch<React.SetStateAction<boolean>>;
   polygon: polygonType[];
   changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
   length: lengthType[];
@@ -53,6 +54,7 @@ const Playground = ({
   changeActiveTool,
   scaleInfo,
   changeScaleInfo,
+  toggleLoading,
   polygon,
   changePolygon,
   length,
@@ -73,6 +75,7 @@ const Playground = ({
 
   useEffect(() => {
     const createBlob = async () => {
+      toggleLoading(true);
       const canvas = hiddenCanvasRef.current!;
       const ctx = canvas.getContext("2d")!;
 
@@ -102,6 +105,7 @@ const Playground = ({
         const img = new window.Image();
         img.src = URL.createObjectURL(blob[0]);
         img.onload = () => {
+          toggleLoading(false);
           setBlob(img);
         };
       });

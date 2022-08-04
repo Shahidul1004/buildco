@@ -9,6 +9,7 @@ type propTypes = {
   selectedPage: number;
   changeSelectedPage: Dispatch<SetStateAction<number[]>>;
   pages: pdfjsLib.PDFPageProxy[];
+  previewPages: HTMLImageElement[];
   changeLoading: Dispatch<SetStateAction<boolean>>;
   isGroupOpen: boolean;
 };
@@ -18,17 +19,11 @@ const PreviewSection = ({
   selectedPage,
   changeSelectedPage,
   pages,
+  previewPages,
   changeLoading,
   isGroupOpen,
 }: propTypes): JSX.Element => {
   const context = useContext(Context);
-
-  useEffect(() => {
-    changeLoading(true);
-    setTimeout(() => {
-      changeLoading(false);
-    }, Math.min(pages.length * 10, 4000));
-  }, [selectedPdf]);
 
   return (
     <PreviewContainer navHeight={context.navHeight} isGroupOpen={isGroupOpen}>
@@ -41,6 +36,7 @@ const PreviewSection = ({
       >
         {pages.map((page, order: number) => (
           <Box
+            key={order}
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -51,9 +47,14 @@ const PreviewSection = ({
             }}
           >
             <PreviewPdf
-              height={200}
-              width={200}
+              height={page.getViewport({ scale: 1 }).height}
+              width={page.getViewport({ scale: 1 }).width}
+              ratio={Math.min(
+                200 / page.getViewport({ scale: 1 }).height,
+                200 / page.getViewport({ scale: 1 }).width
+              )}
               page={page}
+              previewPage={previewPages[order]}
               pageNumber={order}
               isSelectedPage={selectedPage === order}
               selectedPdf={selectedPdf}

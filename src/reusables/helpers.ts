@@ -140,42 +140,6 @@ const pdfjsExtractPages = async (
 //   return imageBuffers;
 // };
 
-// const createImageURL = async (images) => {
-//   const promises = [];
-//   const imageUrls = [];
-//   for (const image of images) {
-//     const reader = new FileReader();
-//     reader.readAsDataURL(image);
-//     const promise = new Promise((resolve, reject) => {
-//       reader.onloadend = (e) => resolve(e.target.result);
-//     });
-//     promises.push(promise);
-//   }
-//   await Promise.all(promises).then((results) => {
-//     imageUrls.push(...results);
-//   });
-//   return imageUrls;
-// };
-
-// const getRGBColorCode = (color) => {
-//   if (color === "black") return [0, 0, 0];
-//   if (color === "green") return [0, 0.5, 0];
-//   if (color === "blue") return [0, 0, 1];
-//   if (color === "red") return [1, 0, 0];
-//   if (color === "orange") return [1, 0.5, 0];
-//   if (color === "yellow") return [1, 1, 0];
-//   if (color === "white") return [1, 1, 1];
-// };
-
-// const getURLforCustomFont = (font) => {
-//   if (font === "Roboto_400_normal")
-//     return "https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Mu4mxK.woff2";
-//   if (font === "Courier Prime_400_normal")
-//     return "https://fonts.gstatic.com/s/courierprime/v5/u-450q2lgwslOqpF_6gQ8kELawFpWg.woff2";
-//   if (font === "Montserrat_400_normal")
-//     return "https://fonts.gstatic.com/s/montserrat/v23/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw9aXpsog.woff2";
-// };
-
 const getPairedPoint = (point: number[]) => {
   const paired = [];
   for (let idx = 0; idx < point.length; idx += 2) {
@@ -301,6 +265,50 @@ const getScaledArea = (
   }
 };
 
+const Pdf2Image = async (
+  hiddenCanvasRef: React.RefObject<HTMLCanvasElement>,
+  pages: pdfjsLib.PDFPageProxy[]
+) => {
+  const canvas = hiddenCanvasRef.current!;
+  const ctx = canvas.getContext("2d")!;
+
+  const promises: Promise<string>[] = [];
+  for (const page of pages) {
+    const viewport = page.getViewport({ scale: 0.5 });
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    await page
+      .render({
+        canvasContext: ctx,
+        viewport: viewport,
+      })
+      .promise.then(() => {
+        const promise = new Promise<string>((resolve, reject) => {
+          resolve(canvas.toDataURL("image/png", 0.1));
+        });
+        promises.push(promise);
+      });
+  }
+
+  const bufferPromises: Promise<HTMLImageElement>[] = [];
+
+  await Promise.all(promises).then(async (blobs) => {
+    for (const blob of blobs) {
+      const img = new window.Image();
+      img.src = blob;
+      const bufferPromise = new Promise<HTMLImageElement>((res, rej) => {
+        img.onload = () => res(img);
+      });
+      bufferPromises.push(bufferPromise);
+    }
+  });
+  const imageBuffers: HTMLImageElement[] = [];
+  await Promise.all(bufferPromises).then((buffers) => {
+    imageBuffers.push(...buffers);
+  });
+  return imageBuffers;
+};
+
 export {
   // readFileAsync,
   getFileName,
@@ -320,4 +328,5 @@ export {
   getLength,
   getScaledVolume,
   getScaledArea,
+  Pdf2Image,
 };
