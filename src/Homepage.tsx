@@ -51,7 +51,7 @@ const Homepage = (): JSX.Element => {
       id: 1,
       name: "Indivisual Measurement",
       type: groupTypeName.all,
-      color: { r: 50, g: 50, b: 50, a: 1 },
+      color: { r: 255, g: 188, b: 1, a: 1 },
       unit: unitType.ft,
       icon: iconType.circle,
     },

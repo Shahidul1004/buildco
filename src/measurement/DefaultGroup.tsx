@@ -25,6 +25,8 @@ import {
 import FolderTwoToneIcon from "@mui/icons-material/FolderTwoTone";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import CircleIcon from "@mui/icons-material/Circle";
+
 import {
   getLength,
   getScaledArea,
@@ -236,7 +238,7 @@ const DefaultGroup = ({
             >
               <Box
                 sx={{
-                  height: "100%",
+                  height: "20px",
                   width: "5px",
                   backgroundColor: rgba2hex(group.color),
                   marginRight: "5px",
@@ -413,7 +415,7 @@ const DefaultGroup = ({
             >
               <Box
                 sx={{
-                  height: "100%",
+                  height: "20px",
                   width: "5px",
                   backgroundColor: rgba2hex(group.color),
                   marginRight: "5px",
@@ -571,17 +573,13 @@ const DefaultGroup = ({
           <Field
             sx={{
               padding: "3px",
-              paddingLeft: "10px",
+              paddingLeft: "4px",
               width: "180px",
             }}
           >
-            <Box
-              sx={{
-                height: "100%",
-                width: "5px",
-                backgroundColor: rgba2hex(group.color),
-                marginRight: "5px",
-              }}
+            <CircleIcon
+              fontSize="small"
+              sx={{ color: rgba2hex(group.color) }}
             />
             <Box
               sx={{

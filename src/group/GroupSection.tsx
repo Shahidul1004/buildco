@@ -162,10 +162,11 @@ const GroupSection = ({
           alignitems: "center",
           justifyContent: "space-between",
           cursor: "pointer",
-          backgroundColor: "#f4f4f4",
+          backgroundColor: "#e4e7ed",
           padding: "2px 6px",
+          borderRadius: "4px",
           ":hover": {
-            backgroundColor: "#e4e7ed",
+            backgroundColor: "#c9ccd1",
           },
         }}
       >
@@ -291,7 +292,7 @@ const GroupSection = ({
         }}
       >
         {anchorElOption?.id !== "1" && (
-          <>
+          <Box>
             <MenuItem
               onClick={() => {
                 undoStack.current.push(captureStates);
@@ -319,7 +320,7 @@ const GroupSection = ({
             >
               Edit
             </MenuItem>
-          </>
+          </Box>
         )}
       </Menu>
 

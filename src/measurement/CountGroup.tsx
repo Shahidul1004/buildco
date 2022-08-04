@@ -127,11 +127,11 @@ const CountGroup = ({
             }}
           >
             {group.icon === iconType.circle ? (
-              <CircleIcon />
+              <CircleIcon fontSize="small" />
             ) : group.icon === iconType.triangle ? (
-              <ChangeHistoryTwoToneIcon />
+              <ChangeHistoryTwoToneIcon fontSize="small" />
             ) : (
-              <CropSquareTwoTone />
+              <CropSquareTwoTone fontSize="small" />
             )}
           </Box>
           <Box
@@ -144,6 +144,7 @@ const CountGroup = ({
               },
             }}
             contentEditable
+            suppressContentEditableWarning={true}
             onKeyDown={(e) => {
               setHeaderHeight(headerRef.current?.clientHeight!);
             }}

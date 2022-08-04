@@ -50,7 +50,7 @@ const EstimateDefaultGroup = ({
           >
             <CircleIcon
               fontSize="small"
-              sx={{ color: rgba2hex({ r: 255, g: 255, b: 0, a: 0.5 }) }}
+              sx={{ color: rgba2hex({ r: 255, g: 188, b: 1, a: 0.5 }) }}
             />
             <Box sx={{ paddingLeft: "20px" }}>{poly.name}</Box>
           </Field>
@@ -110,7 +110,7 @@ const EstimateDefaultGroup = ({
           >
             <CircleIcon
               fontSize="small"
-              sx={{ color: rgba2hex({ r: 255, g: 255, b: 0, a: 0.5 }) }}
+              sx={{ color: rgba2hex({ r: 255, g: 188, b: 1, a: 0.5 }) }}
             />
             <Box sx={{ paddingLeft: "20px" }}>{len.name}</Box>
           </Field>
@@ -161,7 +161,7 @@ const EstimateDefaultGroup = ({
           >
             <CircleIcon
               fontSize="small"
-              sx={{ color: rgba2hex({ r: 255, g: 255, b: 0, a: 0.5 }) }}
+              sx={{ color: rgba2hex({ r: 255, g: 188, b: 1, a: 0.5 }) }}
             />
             <Box sx={{ paddingLeft: "20px" }}>Count</Box>
           </Field>

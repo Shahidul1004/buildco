@@ -174,6 +174,7 @@ const LengthGroup = ({
               },
             }}
             contentEditable
+            suppressContentEditableWarning={true}
             onKeyDown={(e) => {
               setHeaderHeight(headerRef.current?.clientHeight!);
             }}
@@ -305,7 +306,7 @@ const LengthGroup = ({
             >
               <Box
                 sx={{
-                  height: "100%",
+                  height: "20px",
                   width: "5px",
                   backgroundColor: rgba2hex(group.color),
                   marginRight: "5px",
@@ -321,6 +322,7 @@ const LengthGroup = ({
                   },
                 }}
                 contentEditable
+                suppressContentEditableWarning={true}
                 onKeyDown={(e) => {
                   setRowsHeight((prev) => {
                     const copy = [...prev];

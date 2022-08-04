@@ -187,6 +187,7 @@ const Select = ({
       />
       {polygon.map((item, index) => (
         <Group
+          key={item.key}
           clipFunc={(ctx) => {
             ctx.beginPath();
             const { x, y } = getTransformedPoint(

@@ -43,9 +43,9 @@ const CreateGroupModal = ({
   const [anchorElIcon, setAnchorElIcon] = useState<null | HTMLElement>(null);
   const openIcon = Boolean(anchorElIcon);
   const [color, setColor] = useState<RGBColor>({
-    r: 50,
-    g: 50,
-    b: 50,
+    r: 255,
+    g: 188,
+    b: 1,
     a: 1,
   });
   const [unit, setUnit] = useState<unitType>(unitType.ft);
