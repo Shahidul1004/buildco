@@ -22,8 +22,8 @@ import { MouseEventHandler, MutableRefObject, useRef, useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CircleIcon from "@mui/icons-material/Circle";
-import ChangeHistoryIcon from "@mui/icons-material/ChangeHistory";
-import CropSquareIcon from "@mui/icons-material/CropSquare";
+import { ReactComponent as TriangleIcon } from "../assets/icons/triangle.svg";
+import SquareIcon from "@mui/icons-material/Square";
 import { rgba2hex } from "../reusables/helpers";
 import _ from "lodash";
 
@@ -398,26 +398,19 @@ const CreateGroupModal = ({
                       },
                     }}
                   >
-                    <Typography
-                      noWrap
-                      fontWeight="400"
-                      lineHeight="1.5"
-                      letterSpacing="0.00938em"
-                      fontSize="14px"
-                      sx={{
-                        maxWidth: "200px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {icon === iconType.circle ? (
-                        <CircleIcon sx={{ color: rgba2hex(color) }} />
-                      ) : icon === iconType.triangle ? (
-                        <ChangeHistoryIcon sx={{ color: rgba2hex(color) }} />
-                      ) : (
-                        <CropSquareIcon sx={{ color: rgba2hex(color) }} />
-                      )}
-                    </Typography>
+                    {icon === iconType.circle ? (
+                      <CircleIcon sx={{ color: rgba2hex(color) }} />
+                    ) : icon === iconType.triangle ? (
+                      <TriangleIcon
+                        fill={rgba2hex(color)}
+                        style={{
+                          width: "22px",
+                          height: "22px",
+                        }}
+                      />
+                    ) : (
+                      <SquareIcon sx={{ color: rgba2hex(color) }} />
+                    )}
                     {openIcon ? (
                       <KeyboardArrowDownIcon />
                     ) : (
@@ -452,7 +445,7 @@ const CreateGroupModal = ({
                             fontSize: "14px",
                           }}
                         >
-                          <Typography
+                          <Box
                             onClick={() => {
                               handleCloseIcon();
                               setIcon(
@@ -463,25 +456,21 @@ const CreateGroupModal = ({
                                   : iconType.square
                               );
                             }}
-                            noWrap
-                            sx={{
-                              maxWidth: "400px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              flexGrow: 1,
-                              fontSize: "15px",
-                            }}
                           >
                             {icn === iconType.circle ? (
                               <CircleIcon sx={{ color: rgba2hex(color) }} />
                             ) : icn === iconType.triangle ? (
-                              <ChangeHistoryIcon
-                                sx={{ color: rgba2hex(color) }}
+                              <TriangleIcon
+                                fill={rgba2hex(color)}
+                                style={{
+                                  width: "22px",
+                                  height: "22px",
+                                }}
                               />
                             ) : (
-                              <CropSquareIcon sx={{ color: rgba2hex(color) }} />
+                              <SquareIcon sx={{ color: rgba2hex(color) }} />
                             )}
-                          </Typography>
+                          </Box>
                         </MenuItem>
                       )
                     )}

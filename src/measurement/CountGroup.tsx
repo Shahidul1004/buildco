@@ -15,8 +15,8 @@ import _ from "lodash";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditGroupModal from "../modal/EditGroupModal";
 import CircleIcon from "@mui/icons-material/Circle";
-import ChangeHistoryTwoToneIcon from "@mui/icons-material/ChangeHistoryTwoTone";
-import CropSquareTwoTone from "@mui/icons-material/CropSquareTwoTone";
+import { ReactComponent as TriangleIcon } from "../assets/icons/triangle.svg";
+import SquareIcon from "@mui/icons-material/Square";
 
 type propsType = {
   selectedPdf: number;
@@ -129,9 +129,15 @@ const CountGroup = ({
             {group.icon === iconType.circle ? (
               <CircleIcon fontSize="small" />
             ) : group.icon === iconType.triangle ? (
-              <ChangeHistoryTwoToneIcon fontSize="small" />
+              <TriangleIcon
+                fill={rgba2hex(group.color)}
+                style={{
+                  width: "18px",
+                  height: "18px",
+                }}
+              />
             ) : (
-              <CropSquareTwoTone fontSize="small" />
+              <SquareIcon fontSize="small" />
             )}
           </Box>
           <Box

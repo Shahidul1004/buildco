@@ -2,7 +2,7 @@ import { Box, styled } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import CircleIcon from "@mui/icons-material/Circle";
-import ChangeHistoryIcon from "@mui/icons-material/ChangeHistory";
+import { ReactComponent as TriangleIcon } from "../assets/icons/triangle.svg";
 import SquareIcon from "@mui/icons-material/Square";
 
 import {
@@ -161,9 +161,12 @@ const EstimatePerGroup = ({
             sx={{ color: rgba2hex({ ...group.color, a: 0.5 }) }}
           />
         ) : group.icon === iconType.triangle ? (
-          <ChangeHistoryIcon
-            fontSize="small"
-            sx={{ color: rgba2hex({ ...group.color, a: 0.5 }) }}
+          <TriangleIcon
+            fill={rgba2hex({ ...group.color, a: 0.5 })}
+            style={{
+              width: "22px",
+              height: "22px",
+            }}
           />
         ) : (
           <SquareIcon
