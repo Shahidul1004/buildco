@@ -8,9 +8,16 @@ import {
   useTheme,
 } from "@mui/material";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CustomButton from "../reusables/Button";
-import { groupType, groupTypeName, iconType, unitType } from "../utils";
-import { RGBColor, SketchPicker } from "react-color";
+import {
+  groupType,
+  groupTypeName,
+  iconType,
+  rgbaColors,
+  unitType,
+} from "../utils";
+import { RGBColor, ChromePicker } from "react-color";
 import { MouseEventHandler, MutableRefObject, useRef, useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -42,6 +49,8 @@ const CreateGroupModal = ({
   const openUnit = Boolean(anchorElUnit);
   const [anchorElIcon, setAnchorElIcon] = useState<null | HTMLElement>(null);
   const openIcon = Boolean(anchorElIcon);
+  const [anchorElColor, setAnchorElColor] = useState<null | HTMLElement>(null);
+  const openColor = Boolean(anchorElColor);
   const [color, setColor] = useState<RGBColor>({
     r: 255,
     g: 188,
@@ -70,6 +79,17 @@ const CreateGroupModal = ({
   };
   const handleCloseIcon = () => {
     setAnchorElIcon(null);
+  };
+
+  const handleToggleColor: MouseEventHandler<HTMLDivElement> = (event) => {
+    if (anchorElColor) {
+      setAnchorElColor(null);
+    } else {
+      setAnchorElColor(event?.currentTarget);
+    }
+  };
+  const handleCloseColor = () => {
+    setAnchorElColor(null);
   };
 
   const handleCreate = () => {
@@ -156,13 +176,99 @@ const CreateGroupModal = ({
               }}
             >
               <Typography fontSize={14}>Color</Typography>
-              <SketchPicker
-                color={color}
-                onChange={(color) => {
-                  setColor(color.rgb);
+              <Box
+                sx={{
+                  width: "190px",
+                  display: "flex",
+                  flexFlow: "row wrap",
+                  jusifyContent: "flex-start",
+                  alignItems: "center",
+                  gap: "7px",
                 }}
-                width="170px"
-              />
+              >
+                {rgbaColors.map((rgba, index) => (
+                  <Box
+                    sx={{
+                      height: "22px",
+                      width: "22px",
+                      borderRadius: "4px",
+                      border:
+                        color.r === rgba.r &&
+                        color.g === rgba.g &&
+                        color.b === rgba.b
+                          ? `2px solid ${rgba2hex(rgba)}`
+                          : "2px solid transparent",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setColor(rgba)}
+                  >
+                    <Box
+                      key={index}
+                      sx={{
+                        height: "18px",
+                        width: "18px",
+                        backgroundColor: rgba2hex(rgba),
+                        borderRadius: "2px",
+                      }}
+                    />
+                  </Box>
+                ))}
+                <Box
+                  sx={{
+                    height: "30px",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleToggleColor}
+                >
+                  <ArrowDropDownIcon sx={{ height: "30px", width: "30px" }} />
+                </Box>
+
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorElColor}
+                  open={openColor}
+                  onClose={handleCloseColor}
+                  MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                  }}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  sx={{
+                    paddingTop: "0px",
+                    padding: "0px",
+                    cursor: "default",
+                    "& .MuiPaper-root": {
+                      minWidth: "50px",
+                      padding: "0px",
+
+                      ul: {
+                        padding: "0px",
+                      },
+                    },
+                  }}
+                >
+                  <ChromePicker
+                    color={color}
+                    onChange={(color) => setColor(color.rgb)}
+                    styles={{
+                      default: {
+                        picker: {
+                          width: "170px",
+                        },
+                      },
+                    }}
+                  />
+                </Menu>
+              </Box>
             </Box>
             <Box
               sx={{
@@ -385,7 +491,7 @@ const CreateGroupModal = ({
             </Box>
           </Box>
 
-          <Box sx={{ marginTop: "25px", display: "flex", gap: "10px" }}>
+          <Box sx={{ marginTop: "150px", display: "flex", gap: "10px" }}>
             <CustomButton
               variant="outlined"
               onClick={onClose}

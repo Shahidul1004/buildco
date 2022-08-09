@@ -92,3 +92,13 @@ export type deductRectType = {
   points: number[];
   key: number;
 };
+
+export const rgbaColors = [
+  { r: 255, g: 188, b: 1, a: 1 },
+  { r: 208, g: 2, b: 27, a: 1 },
+  { r: 245, g: 166, b: 35, a: 1 },
+  { r: 139, g: 87, b: 42, a: 1 },
+  { r: 126, g: 211, b: 33, a: 1 },
+  { r: 144, g: 19, b: 254, a: 1 },
+  { r: 155, g: 155, b: 155, a: 1 },
+];

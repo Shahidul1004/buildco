@@ -17,7 +17,6 @@
     "jsx": "react-jsx",
     "downlevelIteration": true,
     "noImplicitAny": false
-    // "typeRoots": ["./typings", "./node_modules/@types/"]
   },
   "include": ["src"]
 }
