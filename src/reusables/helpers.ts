@@ -30,7 +30,7 @@ const getFileName = async (
   files: File | FileList
 ): Promise<string | string[]> => {
   if (files instanceof File) return files.name;
-  const names = [];
+  const names: string[] = [];
   for (const file of files) {
     names.push(file.name);
   }
@@ -141,7 +141,7 @@ const pdfjsExtractPages = async (
 // };
 
 const getPairedPoint = (point: number[]) => {
-  const paired = [];
+  const paired: any = [];
   for (let idx = 0; idx < point.length; idx += 2) {
     paired.push([point[idx], point[idx + 1]]);
   }

@@ -15,7 +15,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "noImplicitAny": false
+    // "typeRoots": ["./typings", "./node_modules/@types/"]
   },
   "include": ["src"]
 }

@@ -9,6 +9,8 @@ import {
   scaleInfoType,
 } from "../utils";
 import EstimatePerPdf from "./EstimatePerPdf";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
 type propsType = {
   pdfOrder: number[];
@@ -31,71 +33,116 @@ const EstimateSection = ({
   count,
   toggleShowEstimate,
 }: propsType): JSX.Element => {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   return (
-    <Box
-      sx={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        gap: "20px",
-      }}
-    >
+    <>
       <Box
         sx={{
-          marginTop: "30px",
-          width: "1087px",
+          width: "100vw",
+          height: "100vh",
           display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          gap: "20px",
         }}
       >
-        <CustomButton
-          backgroundcolor="#ffa700"
-          hoverbackgroudcolor="#ff8700"
-          Color="white"
-          hovercolor="white"
+        <Box
           sx={{
-            borderRadius: "4px",
-            padding: "3px 6px",
-            height: "35px",
+            marginTop: "30px",
+            width: "1087px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
-          onClick={() => toggleShowEstimate((prev) => !prev)}
         >
+          <CustomButton
+            backgroundcolor="#ffa700"
+            hoverbackgroudcolor="#ff8700"
+            Color="white"
+            hovercolor="white"
+            sx={{
+              borderRadius: "4px",
+              padding: "3px 6px",
+              height: "35px",
+            }}
+            onClick={() => toggleShowEstimate((prev) => !prev)}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+            >
+              <ReplyIcon />
+              Back to Measure
+            </Box>
+          </CustomButton>
+          <Typography
+            sx={{
+              color: "#222222",
+              fontSize: "24px",
+              fontWeight: "500",
+            }}
+          >
+            All Measurements
+          </Typography>
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
-              gap: "5px",
+              gap: "20px",
             }}
           >
-            <ReplyIcon />
-            Back to Measure
+            <CustomButton
+              backgroundcolor="#ffa700"
+              hoverbackgroudcolor="#ff8700"
+              Color="white"
+              hovercolor="white"
+              sx={{
+                borderRadius: "4px",
+                padding: "3px 6px",
+                height: "35px",
+              }}
+              onClick={useReactToPrint({
+                content: () => pdfRef.current,
+              })}
+            >
+              Export
+            </CustomButton>
+            <CustomButton
+              backgroundcolor="#ffa700"
+              hoverbackgroudcolor="#ff8700"
+              Color="white"
+              hovercolor="white"
+              sx={{
+                borderRadius: "4px",
+                padding: "3px 6px",
+                height: "35px",
+              }}
+              onClick={() => toggleShowEstimate((prev) => !prev)}
+            >
+              Caculate Cost
+            </CustomButton>
           </Box>
-        </CustomButton>
-        <Typography
-          sx={{
-            marginLeft: "315px",
-            color: "#222222",
-            fontSize: "24px",
-            fontWeight: "500",
-          }}
-        >
-          All Measurements
-        </Typography>
+        </Box>
+        <Box ref={pdfRef}>
+          <Typography sx={{ visibility: "hidden" }}>sjkldjfld fdf</Typography>
+          {pdfOrder.map((order) => (
+            <EstimatePerPdf
+              key={order}
+              scaleInfo={scaleInfo[order]}
+              fileName={fileName[order]}
+              group={group}
+              polygon={polygon[order]}
+              length={length[order]}
+              count={count[order]}
+            />
+          ))}
+        </Box>
       </Box>
-      {pdfOrder.map((order) => (
-        <EstimatePerPdf
-          key={order}
-          scaleInfo={scaleInfo[order]}
-          fileName={fileName[order]}
-          group={group}
-          polygon={polygon[order]}
-          length={length[order]}
-          count={count[order]}
-        />
-      ))}
-    </Box>
+    </>
   );
 };
 

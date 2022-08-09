@@ -43,7 +43,7 @@ const EstimatePerGroup = ({
   const [volume, setVolume] = useState<number>(0);
 
   useEffect(() => {
-    let newPolyArea = [];
+    let newPolyArea: number[] = [];
     if (group.type === groupTypeName.count) {
       setUnit("Count");
       area.current = count.length;
