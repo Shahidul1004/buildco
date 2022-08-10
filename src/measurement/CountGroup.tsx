@@ -83,215 +83,220 @@ const CountGroup = ({
   }, [group, count]);
 
   return (
-    <Container>
-      <GroupHeader
-        onMouseEnter={() => {
-          changeCount((prev) => {
-            const prevCopy = _.cloneDeep(prev);
-            const countList = prevCopy[selectedPdf][selectedPage];
-            for (const filterIndex of filteredIndex) {
-              countList[filterIndex].hover = true;
-            }
-            prevCopy[selectedPdf][selectedPage] = countList;
-            return prevCopy;
-          });
-          setHover(true);
-        }}
-        onMouseLeave={() => {
-          changeCount((prev) => {
-            const prevCopy = _.cloneDeep(prev);
-            const countList = prevCopy[selectedPdf][selectedPage];
-            for (const filterIndex of filteredIndex) {
-              countList[filterIndex].hover = false;
-            }
-            prevCopy[selectedPdf][selectedPage] = countList;
-            return prevCopy;
-          });
-          setHover(false);
-        }}
-      >
-        <Field
-          ref={headerRef}
-          sx={{
-            padding: "3px",
-            width: "180px",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              cursor: "pointer",
-              backgroundColor: "#f4f4f4",
-              padding: "5px 0px",
-              color: rgba2hex(group.color),
-            }}
-          >
-            {group.icon === iconType.circle ? (
-              <CircleIcon fontSize="small" />
-            ) : group.icon === iconType.triangle ? (
-              <TriangleIcon
-                fill={rgba2hex(group.color)}
-                style={{
-                  width: "18px",
-                  height: "18px",
-                }}
-              />
-            ) : (
-              <SquareIcon fontSize="small" />
-            )}
-          </Box>
-          <Box
-            sx={{
-              width: "130px",
-              fontSize: "12px",
-              padding: "6px 3px",
-              "&:hover": {
-                backgroundColor: "#f4f4f4",
-              },
-            }}
-            contentEditable
-            suppressContentEditableWarning={true}
-            onKeyDown={(e) => {
-              setHeaderHeight(headerRef.current?.clientHeight!);
-            }}
-            onBlur={(e) => {
-              undoStack.current.push(captureStates);
-              redoStack.current.length = 0;
-              while (undoStack.current.length > 30) undoStack.current.shift();
-              changeGroup((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                const target = prevCopy[groupIndex];
-                prevCopy.splice(groupIndex, 1, {
-                  ...target,
-                  name: e.target.innerText,
-                });
-                return prevCopy;
-              });
-            }}
-          >
-            {group.name}
-          </Box>
-        </Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            width: "90px",
-          }}
-        >
-          <Typography
-            fontSize={12}
-            sx={{
-              height: "100%",
-              paddingLeft: "5px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {`count ${groupSize.current}`}
-          </Typography>
-        </Field>
-        <Field
-          sx={{
-            padding: "0px 10px",
-            width: "40px",
-          }}
-        ></Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            width: "90px",
-          }}
-        >
-          <Typography
-            fontSize={12}
-            sx={{
-              height: "100%",
-              paddingLeft: "5px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {`count ${groupSize.current}`}
-          </Typography>
-        </Field>
-        <Field sx={{ width: "60px", justifyContent: "center" }}>
-          <IconButton id="groupHeader" onClick={handleToggleOption}>
-            <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
-          </IconButton>
-        </Field>
-      </GroupHeader>
-
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorElOption}
-        open={openOption}
-        onClose={handleCloseOption}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-        sx={{ zIndex: 20000 }}
-      >
-        {clickRef.current === "groupHeader" && (
-          <MenuItem
-            onClick={() => {
-              handleCloseOption();
-              setModalType("edit");
-            }}
-          >
-            Edit
-          </MenuItem>
-        )}
-
-        <MenuItem
-          onClick={() => {
-            undoStack.current.push(captureStates);
-            redoStack.current.length = 0;
-            while (undoStack.current.length > 30) undoStack.current.shift();
-            if (clickRef.current === "groupHeader") {
-              changeCount((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                for (let i = 0; i < prevCopy.length; i++) {
-                  for (let j = 0; j < prevCopy[i].length; j++) {
-                    prevCopy[i][j] = prevCopy[i][j].filter(
-                      (cnt) => cnt.group !== group.id
-                    );
-                  }
-                }
-                return prevCopy;
-              });
-              changeGroup((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                prevCopy.splice(groupIndex, 1);
-                return prevCopy;
-              });
-            } else {
+    <>
+      {filteredIndex.length > 0 && (
+        <Container>
+          <GroupHeader
+            onMouseEnter={() => {
               changeCount((prev) => {
                 const prevCopy = _.cloneDeep(prev);
                 const countList = prevCopy[selectedPdf][selectedPage];
-                countList.splice(+clickRef.current, 1);
+                for (const filterIndex of filteredIndex) {
+                  countList[filterIndex].hover = true;
+                }
                 prevCopy[selectedPdf][selectedPage] = countList;
                 return prevCopy;
               });
-              setFilteredIndex([]);
-            }
-            handleCloseOption();
-          }}
-        >
-          Delete
-        </MenuItem>
-      </Menu>
-      {modalType === "edit" && (
-        <EditGroupModal
-          group={groups}
-          groupId={group.id}
-          changeGroup={changeGroup}
-          onClose={() => setModalType("")}
-          undoStack={undoStack}
-          redoStack={redoStack}
-          captureStates={captureStates}
-        />
+              setHover(true);
+            }}
+            onMouseLeave={() => {
+              changeCount((prev) => {
+                const prevCopy = _.cloneDeep(prev);
+                const countList = prevCopy[selectedPdf][selectedPage];
+                for (const filterIndex of filteredIndex) {
+                  countList[filterIndex].hover = false;
+                }
+                prevCopy[selectedPdf][selectedPage] = countList;
+                return prevCopy;
+              });
+              setHover(false);
+            }}
+          >
+            <Field
+              ref={headerRef}
+              sx={{
+                padding: "3px",
+                width: "180px",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  cursor: "pointer",
+                  backgroundColor: "#f4f4f4",
+                  padding: "5px 0px",
+                  color: rgba2hex(group.color),
+                }}
+              >
+                {group.icon === iconType.circle ? (
+                  <CircleIcon fontSize="small" />
+                ) : group.icon === iconType.triangle ? (
+                  <TriangleIcon
+                    fill={rgba2hex(group.color)}
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                    }}
+                  />
+                ) : (
+                  <SquareIcon fontSize="small" />
+                )}
+              </Box>
+              <Box
+                sx={{
+                  width: "130px",
+                  fontSize: "12px",
+                  padding: "6px 3px",
+                  "&:hover": {
+                    backgroundColor: "#f4f4f4",
+                  },
+                }}
+                contentEditable
+                suppressContentEditableWarning={true}
+                onKeyDown={(e) => {
+                  setHeaderHeight(headerRef.current?.clientHeight!);
+                }}
+                onBlur={(e) => {
+                  undoStack.current.push(captureStates);
+                  redoStack.current.length = 0;
+                  while (undoStack.current.length > 30)
+                    undoStack.current.shift();
+                  changeGroup((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    const target = prevCopy[groupIndex];
+                    prevCopy.splice(groupIndex, 1, {
+                      ...target,
+                      name: e.target.innerText,
+                    });
+                    return prevCopy;
+                  });
+                }}
+              >
+                {group.name}
+              </Box>
+            </Field>
+            <Field
+              sx={{
+                height: `${headerHeight}px`,
+                width: "90px",
+              }}
+            >
+              <Typography
+                fontSize={12}
+                sx={{
+                  height: "100%",
+                  paddingLeft: "5px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {`count ${groupSize.current}`}
+              </Typography>
+            </Field>
+            <Field
+              sx={{
+                padding: "0px 10px",
+                width: "40px",
+              }}
+            ></Field>
+            <Field
+              sx={{
+                height: `${headerHeight}px`,
+                width: "90px",
+              }}
+            >
+              <Typography
+                fontSize={12}
+                sx={{
+                  height: "100%",
+                  paddingLeft: "5px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {`count ${groupSize.current}`}
+              </Typography>
+            </Field>
+            <Field sx={{ width: "60px", justifyContent: "center" }}>
+              <IconButton id="groupHeader" onClick={handleToggleOption}>
+                <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
+              </IconButton>
+            </Field>
+          </GroupHeader>
+
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorElOption}
+            open={openOption}
+            onClose={handleCloseOption}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+            sx={{ zIndex: 20000 }}
+          >
+            {clickRef.current === "groupHeader" && (
+              <MenuItem
+                onClick={() => {
+                  handleCloseOption();
+                  setModalType("edit");
+                }}
+              >
+                Edit
+              </MenuItem>
+            )}
+
+            <MenuItem
+              onClick={() => {
+                undoStack.current.push(captureStates);
+                redoStack.current.length = 0;
+                while (undoStack.current.length > 30) undoStack.current.shift();
+                if (clickRef.current === "groupHeader") {
+                  changeCount((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    for (let i = 0; i < prevCopy.length; i++) {
+                      for (let j = 0; j < prevCopy[i].length; j++) {
+                        prevCopy[i][j] = prevCopy[i][j].filter(
+                          (cnt) => cnt.group !== group.id
+                        );
+                      }
+                    }
+                    return prevCopy;
+                  });
+                  changeGroup((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy.splice(groupIndex, 1);
+                    return prevCopy;
+                  });
+                } else {
+                  changeCount((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    const countList = prevCopy[selectedPdf][selectedPage];
+                    countList.splice(+clickRef.current, 1);
+                    prevCopy[selectedPdf][selectedPage] = countList;
+                    return prevCopy;
+                  });
+                  setFilteredIndex([]);
+                }
+                handleCloseOption();
+              }}
+            >
+              Delete
+            </MenuItem>
+          </Menu>
+          {modalType === "edit" && (
+            <EditGroupModal
+              group={groups}
+              groupId={group.id}
+              changeGroup={changeGroup}
+              onClose={() => setModalType("")}
+              undoStack={undoStack}
+              redoStack={redoStack}
+              captureStates={captureStates}
+            />
+          )}
+        </Container>
       )}
-    </Container>
+    </>
   );
 };
 

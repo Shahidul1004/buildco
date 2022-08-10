@@ -34,6 +34,7 @@ const EstimateSection = ({
   toggleShowEstimate,
 }: propsType): JSX.Element => {
   const pdfRef = useRef<HTMLDivElement>(null);
+  const hiddenText = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -107,6 +108,12 @@ const EstimateSection = ({
               }}
               onClick={useReactToPrint({
                 content: () => pdfRef.current,
+                onBeforeGetContent: () => {
+                  hiddenText.current!.style.display = "block";
+                },
+                onAfterPrint: () => {
+                  hiddenText.current!.style.display = "none";
+                },
               })}
             >
               Export
@@ -128,7 +135,28 @@ const EstimateSection = ({
           </Box>
         </Box>
         <Box ref={pdfRef}>
-          <Typography sx={{ visibility: "hidden" }}>sjkldjfld fdf</Typography>
+          <Box
+            sx={{
+              marginTop: "10px",
+              marginBottom: "20px",
+              width: "1087px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              ref={hiddenText}
+              sx={{
+                color: "#FFBC01",
+                fontSize: "24px",
+                fontWeight: "500",
+                display: "none",
+              }}
+            >
+              All Measurements
+            </Typography>
+          </Box>
           {pdfOrder.map((order) => (
             <EstimatePerPdf
               key={order}

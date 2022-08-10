@@ -105,255 +105,103 @@ const LengthGroup = ({
   }, [group, length]);
 
   return (
-    <Container>
-      <GroupHeader
-        onMouseEnter={() => {
-          changeLength((prev) => {
-            const prevCopy = _.cloneDeep(prev);
-            const lenList = prevCopy[selectedPdf][selectedPage];
-            for (const filterIndex of filteredIndex) {
-              lenList[filterIndex].hover = true;
-            }
-            prevCopy[selectedPdf][selectedPage] = lenList;
-            return prevCopy;
-          });
-          setHover(true);
-        }}
-        onMouseLeave={() => {
-          changeLength((prev) => {
-            const prevCopy = _.cloneDeep(prev);
-            const lenList = prevCopy[selectedPdf][selectedPage];
-            for (const filterIndex of filteredIndex) {
-              lenList[filterIndex].hover = false;
-            }
-            prevCopy[selectedPdf][selectedPage] = lenList;
-            return prevCopy;
-          });
-          setHover(false);
-        }}
-      >
-        <Field
-          ref={headerRef}
-          sx={{
-            padding: "3px",
-            width: "180px",
-          }}
-        >
-          <Box
-            onClick={() => setExpand((prev) => !prev)}
-            sx={{
-              display: "flex",
-              cursor: "pointer",
-              backgroundColor: "#f4f4f4",
-              padding: "5px 0px",
-            }}
-          >
-            <FolderTwoToneIcon
-              fontSize="small"
-              sx={{ color: rgba2hex(group.color) }}
-            />
-            {!expand ? (
-              <ArrowRightIcon
-                fontSize="small"
-                sx={{ color: rgba2hex(group.color) }}
-              />
-            ) : (
-              <ArrowDropDownIcon
-                fontSize="small"
-                sx={{ color: rgba2hex(group.color) }}
-              />
-            )}
-          </Box>
-          <Box
-            sx={{
-              width: "130px",
-              fontSize: "12px",
-              padding: "6px 3px",
-              "&:hover": {
-                backgroundColor: "#f4f4f4",
-              },
-            }}
-            contentEditable
-            suppressContentEditableWarning={true}
-            onKeyDown={(e) => {
-              setHeaderHeight(headerRef.current?.clientHeight!);
-            }}
-            onBlur={(e) => {
-              undoStack.current.push(captureStates);
-              redoStack.current.length = 0;
-              while (undoStack.current.length > 30) undoStack.current.shift();
-              changeGroup((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                const target = prevCopy[groupIndex];
-                prevCopy.splice(groupIndex, 1, {
-                  ...target,
-                  name: e.target.innerText,
-                });
-                return prevCopy;
-              });
-            }}
-          >
-            {group.name}
-          </Box>
-        </Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            width: "90px",
-          }}
-        >
-          <Typography
-            fontSize={12}
-            sx={{
-              height: "100%",
-              paddingLeft: "5px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {scaleInfo.calibrated === false
-              ? `${totalLength.current.toFixed(2)} px`
-              : group.unit === unitType.ft
-              ? `${(
-                  (totalLength.current * scaleInfo.L) /
-                  Math.sqrt(
-                    scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
-                  )
-                ).toFixed(2)} ft`
-              : `${(
-                  (totalLength.current * scaleInfo.L * 12) /
-                  Math.sqrt(
-                    1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
-                  )
-                ).toFixed(2)} in`}
-          </Typography>
-        </Field>
-        <Field
-          sx={{
-            padding: "0px 10px",
-            width: "40px",
-            // cursor: "pointer",
-            // ":hover": {
-            //   backgroundColor: "#f4f4f4",
-            // },
-          }}
-        >
-          {/* <Settings fill={hover ? "#FFBC01" : "#c3c3ca"} /> */}
-        </Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            width: "90px",
-          }}
-        >
-          <Typography
-            fontSize={12}
-            sx={{
-              height: "100%",
-              paddingLeft: "5px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {scaleInfo.calibrated === false
-              ? `${totalLength.current.toFixed(2)} px`
-              : group.unit === unitType.ft
-              ? `${(
-                  (totalLength.current * scaleInfo.L) /
-                  Math.sqrt(
-                    scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
-                  )
-                ).toFixed(2)} ft`
-              : `${(
-                  (totalLength.current * scaleInfo.L * 12) /
-                  Math.sqrt(
-                    1.0 * scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
-                  )
-                ).toFixed(2)} in`}
-          </Typography>
-        </Field>
-        <Field sx={{ width: "60px", justifyContent: "center" }}>
-          <IconButton id="groupHeader" onClick={handleToggleOption}>
-            <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
-          </IconButton>
-        </Field>
-      </GroupHeader>
-      {expand &&
-        filteredIndex.map((index, idx) => (
-          <Row
+    <>
+      {filteredIndex.length > 0 && (
+        <Container>
+          <GroupHeader
             onMouseEnter={() => {
               changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
-                prevCopy[selectedPdf][selectedPage][index].hover = true;
+                const lenList = prevCopy[selectedPdf][selectedPage];
+                for (const filterIndex of filteredIndex) {
+                  lenList[filterIndex].hover = true;
+                }
+                prevCopy[selectedPdf][selectedPage] = lenList;
                 return prevCopy;
               });
+              setHover(true);
             }}
             onMouseLeave={() => {
               changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);
-                prevCopy[selectedPdf][selectedPage][index].hover = false;
+                const lenList = prevCopy[selectedPdf][selectedPage];
+                for (const filterIndex of filteredIndex) {
+                  lenList[filterIndex].hover = false;
+                }
+                prevCopy[selectedPdf][selectedPage] = lenList;
                 return prevCopy;
               });
+              setHover(false);
             }}
           >
             <Field
-              ref={rowRefs.current[idx]!}
+              ref={headerRef}
               sx={{
                 padding: "3px",
-                paddingLeft: "10px",
                 width: "180px",
               }}
             >
               <Box
+                onClick={() => setExpand((prev) => !prev)}
                 sx={{
-                  height: "20px",
-                  width: "5px",
-                  backgroundColor: rgba2hex(group.color),
-                  marginRight: "5px",
+                  display: "flex",
+                  cursor: "pointer",
+                  backgroundColor: "#f4f4f4",
+                  padding: "5px 0px",
                 }}
-              />
+              >
+                <FolderTwoToneIcon
+                  fontSize="small"
+                  sx={{ color: rgba2hex(group.color) }}
+                />
+                {!expand ? (
+                  <ArrowRightIcon
+                    fontSize="small"
+                    sx={{ color: rgba2hex(group.color) }}
+                  />
+                ) : (
+                  <ArrowDropDownIcon
+                    fontSize="small"
+                    sx={{ color: rgba2hex(group.color) }}
+                  />
+                )}
+              </Box>
               <Box
                 sx={{
-                  width: "150px",
+                  width: "130px",
                   fontSize: "12px",
                   padding: "6px 3px",
-                  ":hover": {
+                  "&:hover": {
                     backgroundColor: "#f4f4f4",
                   },
                 }}
                 contentEditable
                 suppressContentEditableWarning={true}
                 onKeyDown={(e) => {
-                  setRowsHeight((prev) => {
-                    const copy = [...prev];
-                    copy.splice(
-                      idx,
-                      1,
-                      rowRefs.current[idx].current.clientHeight
-                    );
-                    return copy;
-                  });
+                  setHeaderHeight(headerRef.current?.clientHeight!);
                 }}
                 onBlur={(e) => {
                   undoStack.current.push(captureStates);
                   redoStack.current.length = 0;
                   while (undoStack.current.length > 30)
                     undoStack.current.shift();
-                  changeLength((prev) => {
+                  changeGroup((prev) => {
                     const prevCopy = _.cloneDeep(prev);
-                    const target = prevCopy[selectedPdf][selectedPage][index];
-                    target.name = e.target.innerText;
-                    prevCopy[selectedPdf][selectedPage][index] = target;
+                    const target = prevCopy[groupIndex];
+                    prevCopy.splice(groupIndex, 1, {
+                      ...target,
+                      name: e.target.innerText,
+                    });
                     return prevCopy;
                   });
                 }}
               >
-                {length[index]?.name}
+                {group.name}
               </Box>
             </Field>
             <Field
               sx={{
-                height: `${rowsHeight[idx]}px`,
+                height: `${headerHeight}px`,
                 width: "90px",
               }}
             >
@@ -367,18 +215,19 @@ const LengthGroup = ({
                 }}
               >
                 {scaleInfo.calibrated === false
-                  ? `${indivisualLengths.current[idx].toFixed(2)} px`
+                  ? `${totalLength.current.toFixed(2)} px`
                   : group.unit === unitType.ft
                   ? `${(
-                      (indivisualLengths.current[idx] * scaleInfo.L) /
+                      (totalLength.current * scaleInfo.L) /
                       Math.sqrt(
                         scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
                       )
                     ).toFixed(2)} ft`
                   : `${(
-                      (indivisualLengths.current[idx] * scaleInfo.L * 12) /
+                      (totalLength.current * scaleInfo.L * 12) /
                       Math.sqrt(
-                        scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                        1.0 * scaleInfo.x * scaleInfo.x +
+                          scaleInfo.y * scaleInfo.y
                       )
                     ).toFixed(2)} in`}
               </Typography>
@@ -387,11 +236,17 @@ const LengthGroup = ({
               sx={{
                 padding: "0px 10px",
                 width: "40px",
+                // cursor: "pointer",
+                // ":hover": {
+                //   backgroundColor: "#f4f4f4",
+                // },
               }}
-            />
+            >
+              {/* <Settings fill={hover ? "#FFBC01" : "#c3c3ca"} /> */}
+            </Field>
             <Field
               sx={{
-                height: `${rowsHeight[idx]}px`,
+                height: `${headerHeight}px`,
                 width: "90px",
               }}
             >
@@ -405,108 +260,265 @@ const LengthGroup = ({
                 }}
               >
                 {scaleInfo.calibrated === false
-                  ? `${indivisualLengths.current[idx].toFixed(2)} px`
+                  ? `${totalLength.current.toFixed(2)} px`
                   : group.unit === unitType.ft
                   ? `${(
-                      (indivisualLengths.current[idx] * scaleInfo.L) /
+                      (totalLength.current * scaleInfo.L) /
                       Math.sqrt(
                         scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
                       )
                     ).toFixed(2)} ft`
                   : `${(
-                      (indivisualLengths.current[idx] * scaleInfo.L * 12) /
+                      (totalLength.current * scaleInfo.L * 12) /
                       Math.sqrt(
-                        scaleInfo.x * scaleInfo.x + scaleInfo.y * scaleInfo.y
+                        1.0 * scaleInfo.x * scaleInfo.x +
+                          scaleInfo.y * scaleInfo.y
                       )
                     ).toFixed(2)} in`}
               </Typography>
             </Field>
             <Field sx={{ width: "60px", justifyContent: "center" }}>
-              <IconButton id={`${index}`} onClick={handleToggleOption}>
-                <MoreHorizIcon
-                  sx={{
-                    color:
-                      hover === false && length[index]?.hover
-                        ? "#FFBC01"
-                        : "inherit",
-                  }}
-                />
+              <IconButton id="groupHeader" onClick={handleToggleOption}>
+                <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
               </IconButton>
             </Field>
-          </Row>
-        ))}
+          </GroupHeader>
+          {expand &&
+            filteredIndex.map((index, idx) => (
+              <Row
+                onMouseEnter={() => {
+                  changeLength((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy[selectedPdf][selectedPage][index].hover = true;
+                    return prevCopy;
+                  });
+                }}
+                onMouseLeave={() => {
+                  changeLength((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy[selectedPdf][selectedPage][index].hover = false;
+                    return prevCopy;
+                  });
+                }}
+              >
+                <Field
+                  ref={rowRefs.current[idx]!}
+                  sx={{
+                    padding: "3px",
+                    paddingLeft: "10px",
+                    width: "180px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      height: "20px",
+                      width: "5px",
+                      backgroundColor: rgba2hex(group.color),
+                      marginRight: "5px",
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      width: "150px",
+                      fontSize: "12px",
+                      padding: "6px 3px",
+                      ":hover": {
+                        backgroundColor: "#f4f4f4",
+                      },
+                    }}
+                    contentEditable
+                    suppressContentEditableWarning={true}
+                    onKeyDown={(e) => {
+                      setRowsHeight((prev) => {
+                        const copy = [...prev];
+                        copy.splice(
+                          idx,
+                          1,
+                          rowRefs.current[idx].current.clientHeight
+                        );
+                        return copy;
+                      });
+                    }}
+                    onBlur={(e) => {
+                      undoStack.current.push(captureStates);
+                      redoStack.current.length = 0;
+                      while (undoStack.current.length > 30)
+                        undoStack.current.shift();
+                      changeLength((prev) => {
+                        const prevCopy = _.cloneDeep(prev);
+                        const target =
+                          prevCopy[selectedPdf][selectedPage][index];
+                        target.name = e.target.innerText;
+                        prevCopy[selectedPdf][selectedPage][index] = target;
+                        return prevCopy;
+                      });
+                    }}
+                  >
+                    {length[index]?.name}
+                  </Box>
+                </Field>
+                <Field
+                  sx={{
+                    height: `${rowsHeight[idx]}px`,
+                    width: "90px",
+                  }}
+                >
+                  <Typography
+                    fontSize={12}
+                    sx={{
+                      height: "100%",
+                      paddingLeft: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {scaleInfo.calibrated === false
+                      ? `${indivisualLengths.current[idx].toFixed(2)} px`
+                      : group.unit === unitType.ft
+                      ? `${(
+                          (indivisualLengths.current[idx] * scaleInfo.L) /
+                          Math.sqrt(
+                            scaleInfo.x * scaleInfo.x +
+                              scaleInfo.y * scaleInfo.y
+                          )
+                        ).toFixed(2)} ft`
+                      : `${(
+                          (indivisualLengths.current[idx] * scaleInfo.L * 12) /
+                          Math.sqrt(
+                            scaleInfo.x * scaleInfo.x +
+                              scaleInfo.y * scaleInfo.y
+                          )
+                        ).toFixed(2)} in`}
+                  </Typography>
+                </Field>
+                <Field
+                  sx={{
+                    padding: "0px 10px",
+                    width: "40px",
+                  }}
+                />
+                <Field
+                  sx={{
+                    height: `${rowsHeight[idx]}px`,
+                    width: "90px",
+                  }}
+                >
+                  <Typography
+                    fontSize={12}
+                    sx={{
+                      height: "100%",
+                      paddingLeft: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {scaleInfo.calibrated === false
+                      ? `${indivisualLengths.current[idx].toFixed(2)} px`
+                      : group.unit === unitType.ft
+                      ? `${(
+                          (indivisualLengths.current[idx] * scaleInfo.L) /
+                          Math.sqrt(
+                            scaleInfo.x * scaleInfo.x +
+                              scaleInfo.y * scaleInfo.y
+                          )
+                        ).toFixed(2)} ft`
+                      : `${(
+                          (indivisualLengths.current[idx] * scaleInfo.L * 12) /
+                          Math.sqrt(
+                            scaleInfo.x * scaleInfo.x +
+                              scaleInfo.y * scaleInfo.y
+                          )
+                        ).toFixed(2)} in`}
+                  </Typography>
+                </Field>
+                <Field sx={{ width: "60px", justifyContent: "center" }}>
+                  <IconButton id={`${index}`} onClick={handleToggleOption}>
+                    <MoreHorizIcon
+                      sx={{
+                        color:
+                          hover === false && length[index]?.hover
+                            ? "#FFBC01"
+                            : "inherit",
+                      }}
+                    />
+                  </IconButton>
+                </Field>
+              </Row>
+            ))}
 
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorElOption}
-        open={openOption}
-        onClose={handleCloseOption}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-        sx={{ zIndex: 20000 }}
-      >
-        {clickRef.current === "groupHeader" && (
-          <MenuItem
-            onClick={() => {
-              handleCloseOption();
-              setModalType("edit");
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorElOption}
+            open={openOption}
+            onClose={handleCloseOption}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
             }}
+            sx={{ zIndex: 20000 }}
           >
-            Edit
-          </MenuItem>
-        )}
+            {clickRef.current === "groupHeader" && (
+              <MenuItem
+                onClick={() => {
+                  handleCloseOption();
+                  setModalType("edit");
+                }}
+              >
+                Edit
+              </MenuItem>
+            )}
 
-        <MenuItem
-          onClick={() => {
-            undoStack.current.push(captureStates);
-            redoStack.current.length = 0;
-            while (undoStack.current.length > 30) undoStack.current.shift();
-            if (clickRef.current === "groupHeader") {
-              changeLength((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                for (let i = 0; i < prevCopy.length; i++) {
-                  for (let j = 0; j < prevCopy[i].length; j++) {
-                    prevCopy[i][j] = prevCopy[i][j].filter(
-                      (len) => len.group !== group.id
-                    );
-                  }
+            <MenuItem
+              onClick={() => {
+                undoStack.current.push(captureStates);
+                redoStack.current.length = 0;
+                while (undoStack.current.length > 30) undoStack.current.shift();
+                if (clickRef.current === "groupHeader") {
+                  changeLength((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    for (let i = 0; i < prevCopy.length; i++) {
+                      for (let j = 0; j < prevCopy[i].length; j++) {
+                        prevCopy[i][j] = prevCopy[i][j].filter(
+                          (len) => len.group !== group.id
+                        );
+                      }
+                    }
+                    return prevCopy;
+                  });
+                  changeGroup((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy.splice(groupIndex, 1);
+                    return prevCopy;
+                  });
+                } else {
+                  changeLength((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    const lenList = prevCopy[selectedPdf][selectedPage];
+                    lenList.splice(+clickRef.current, 1);
+                    prevCopy[selectedPdf][selectedPage] = lenList;
+                    return prevCopy;
+                  });
+                  setFilteredIndex([]);
                 }
-                return prevCopy;
-              });
-              changeGroup((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                prevCopy.splice(groupIndex, 1);
-                return prevCopy;
-              });
-            } else {
-              changeLength((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                const lenList = prevCopy[selectedPdf][selectedPage];
-                lenList.splice(+clickRef.current, 1);
-                prevCopy[selectedPdf][selectedPage] = lenList;
-                return prevCopy;
-              });
-              setFilteredIndex([]);
-            }
-            handleCloseOption();
-          }}
-        >
-          Delete
-        </MenuItem>
-      </Menu>
-      {modalType === "edit" && (
-        <EditGroupModal
-          group={groups}
-          groupId={group.id}
-          changeGroup={changeGroup}
-          onClose={() => setModalType("")}
-          undoStack={undoStack}
-          redoStack={redoStack}
-          captureStates={captureStates}
-        />
+                handleCloseOption();
+              }}
+            >
+              Delete
+            </MenuItem>
+          </Menu>
+          {modalType === "edit" && (
+            <EditGroupModal
+              group={groups}
+              groupId={group.id}
+              changeGroup={changeGroup}
+              onClose={() => setModalType("")}
+              undoStack={undoStack}
+              redoStack={redoStack}
+              captureStates={captureStates}
+            />
+          )}
+        </Container>
       )}
-    </Container>
+    </>
   );
 };
 

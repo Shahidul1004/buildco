@@ -122,291 +122,103 @@ const ShapeGroup = ({
   }, [group, polygon]);
 
   return (
-    <Container>
-      <GroupHeader
-        onMouseEnter={() => {
-          changePolygon((prev) => {
-            const prevCopy = _.cloneDeep(prev);
-            const polyList = prevCopy[selectedPdf][selectedPage];
-            for (const filterIndex of filteredIndex) {
-              polyList[filterIndex].hover = true;
-            }
-            prevCopy[selectedPdf][selectedPage] = polyList;
-            return prevCopy;
-          });
-          setHover(true);
-        }}
-        onMouseLeave={() => {
-          changePolygon((prev) => {
-            const prevCopy = _.cloneDeep(prev);
-            const polyList = prevCopy[selectedPdf][selectedPage];
-            for (const filterIndex of filteredIndex) {
-              polyList[filterIndex].hover = false;
-            }
-            prevCopy[selectedPdf][selectedPage] = polyList;
-            return prevCopy;
-          });
-          setHover(false);
-        }}
-      >
-        <Field
-          ref={headerRef}
-          sx={{
-            padding: "3px",
-            width: "180px",
-          }}
-        >
-          <Box
-            onClick={() => setExpand((prev) => !prev)}
-            sx={{
-              display: "flex",
-              cursor: "pointer",
-              backgroundColor: "#f4f4f4",
-              padding: "5px 0px",
-            }}
-          >
-            <FolderTwoToneIcon
-              fontSize="small"
-              sx={{ color: rgba2hex(group.color) }}
-            />
-            {!expand ? (
-              <ArrowRightIcon
-                fontSize="small"
-                sx={{ color: rgba2hex(group.color) }}
-              />
-            ) : (
-              <ArrowDropDownIcon
-                fontSize="small"
-                sx={{ color: rgba2hex(group.color) }}
-              />
-            )}
-          </Box>
-          <Box
-            sx={{
-              width: "130px",
-              fontSize: "12px",
-              padding: "6px 3px",
-              "&:hover": {
-                backgroundColor: "#f4f4f4",
-              },
-            }}
-            contentEditable
-            suppressContentEditableWarning={true}
-            onKeyDown={(e) => {
-              setHeaderHeight(headerRef.current?.clientHeight!);
-            }}
-            onBlur={(e) => {
-              undoStack.current.push(captureStates);
-              redoStack.current.length = 0;
-              while (undoStack.current.length > 30) undoStack.current.shift();
-              changeGroup((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                const target = prevCopy[groupIndex];
-                prevCopy.splice(groupIndex, 1, {
-                  ...target,
-                  name: e.target.innerText,
-                });
-                return prevCopy;
-              });
-            }}
-          >
-            {group.name}
-          </Box>
-        </Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            width: "90px",
-          }}
-        >
-          <Typography
-            fontSize={12}
-            sx={{
-              height: "100%",
-              paddingLeft: "5px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {getScaledArea(
-              totalArea.current,
-              scaleInfo,
-              scaleInfo.calibrated === false
-                ? "px"
-                : group.unit === unitType.ft
-                ? unitType.ft
-                : unitType.in
-            )}
-          </Typography>
-        </Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            padding: "0px 10px",
-            width: "40px",
-            cursor: "pointer",
-            ":hover": {
-              backgroundColor: "#f4f4f4",
-            },
-          }}
-          onClick={() => {
-            dimensionId.current = group.id;
-            dimensionType.current = "group";
-            dimensionArea.current = getScaledArea(
-              totalArea.current,
-              scaleInfo,
-              scaleInfo.calibrated === false
-                ? "px"
-                : group.unit === unitType.ft
-                ? unitType.ft
-                : unitType.in
-            );
-            dimensionAreaUnit.current =
-              scaleInfo.calibrated === false
-                ? "px"
-                : group.unit === unitType.ft
-                ? unitType.ft
-                : unitType.in;
-            setModalType("addDimension");
-          }}
-        >
-          <Settings
-            fill={hover || group.height || group.depth ? "#FFBC01" : "#c3c3ca"}
-          />
-        </Field>
-        <Field
-          sx={{
-            height: `${headerHeight}px`,
-            width: "90px",
-          }}
-        >
-          <Typography
-            fontSize={12}
-            sx={{
-              height: "100%",
-              paddingLeft: "5px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {filteredIndex
-              .map((index, idx) => {
-                return +getScaledVolume(
-                  polygonAreas.current[idx],
-                  scaleInfo,
-                  scaleInfo.calibrated === false
-                    ? "px"
-                    : group.unit === unitType.ft
-                    ? unitType.ft
-                    : unitType.in,
-                  polygon[index]?.height || group.height,
-                  polygon[index]?.depth || group.depth
-                  // polygon[index]?.pitch || group.pitch
-                ).split(" ")[0];
-              })
-              .reduce((prev, curr) => prev + curr, 0)
-              .toFixed(2) +
-              (group.height || group.depth
-                ? scaleInfo.calibrated === false
-                  ? " px3"
-                  : group.unit === unitType.ft
-                  ? " ft3"
-                  : " in3"
-                : scaleInfo.calibrated === false
-                ? " px2"
-                : group.unit === unitType.ft
-                ? " ft2"
-                : " in2")}
-          </Typography>
-        </Field>
-        <Field
-          sx={{
-            width: "60px",
-            justifyContent: "center",
-            height: `${headerHeight}px`,
-          }}
-        >
-          <IconButton id="groupHeader" onClick={handleToggleOption}>
-            <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
-          </IconButton>
-        </Field>
-      </GroupHeader>
-      {expand &&
-        filteredIndex.map((index, idx) => (
-          <Row
+    <>
+      {filteredIndex.length > 0 && (
+        <Container>
+          <GroupHeader
             onMouseEnter={() => {
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
-                prevCopy[selectedPdf][selectedPage][index].hover = true;
+                const polyList = prevCopy[selectedPdf][selectedPage];
+                for (const filterIndex of filteredIndex) {
+                  polyList[filterIndex].hover = true;
+                }
+                prevCopy[selectedPdf][selectedPage] = polyList;
                 return prevCopy;
               });
+              setHover(true);
             }}
             onMouseLeave={() => {
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
-                prevCopy[selectedPdf][selectedPage][index].hover = false;
+                const polyList = prevCopy[selectedPdf][selectedPage];
+                for (const filterIndex of filteredIndex) {
+                  polyList[filterIndex].hover = false;
+                }
+                prevCopy[selectedPdf][selectedPage] = polyList;
                 return prevCopy;
               });
+              setHover(false);
             }}
           >
             <Field
-              ref={rowRefs.current[idx]!}
+              ref={headerRef}
               sx={{
                 padding: "3px",
-                paddingLeft: "10px",
                 width: "180px",
               }}
             >
               <Box
+                onClick={() => setExpand((prev) => !prev)}
                 sx={{
-                  height: "20px",
-                  width: "5px",
-                  backgroundColor: rgba2hex(group.color),
-                  marginRight: "5px",
+                  display: "flex",
+                  cursor: "pointer",
+                  backgroundColor: "#f4f4f4",
+                  padding: "5px 0px",
                 }}
-              />
+              >
+                <FolderTwoToneIcon
+                  fontSize="small"
+                  sx={{ color: rgba2hex(group.color) }}
+                />
+                {!expand ? (
+                  <ArrowRightIcon
+                    fontSize="small"
+                    sx={{ color: rgba2hex(group.color) }}
+                  />
+                ) : (
+                  <ArrowDropDownIcon
+                    fontSize="small"
+                    sx={{ color: rgba2hex(group.color) }}
+                  />
+                )}
+              </Box>
               <Box
                 sx={{
-                  width: "150px",
+                  width: "130px",
                   fontSize: "12px",
                   padding: "6px 3px",
-                  ":hover": {
+                  "&:hover": {
                     backgroundColor: "#f4f4f4",
                   },
                 }}
                 contentEditable
                 suppressContentEditableWarning={true}
                 onKeyDown={(e) => {
-                  setRowsHeight((prev) => {
-                    const copy = [...prev];
-                    copy.splice(
-                      idx,
-                      1,
-                      rowRefs.current[idx].current.clientHeight
-                    );
-                    return copy;
-                  });
+                  setHeaderHeight(headerRef.current?.clientHeight!);
                 }}
                 onBlur={(e) => {
                   undoStack.current.push(captureStates);
                   redoStack.current.length = 0;
                   while (undoStack.current.length > 30)
                     undoStack.current.shift();
-                  changePolygon((prev) => {
+                  changeGroup((prev) => {
                     const prevCopy = _.cloneDeep(prev);
-                    const target = prevCopy[selectedPdf][selectedPage][index];
-                    target.name = e.target.innerText;
-                    prevCopy[selectedPdf][selectedPage][index] = target;
+                    const target = prevCopy[groupIndex];
+                    prevCopy.splice(groupIndex, 1, {
+                      ...target,
+                      name: e.target.innerText,
+                    });
                     return prevCopy;
                   });
                 }}
               >
-                {polygon[index]?.name}
+                {group.name}
               </Box>
             </Field>
             <Field
               sx={{
-                height: `${rowsHeight[idx]}px`,
+                height: `${headerHeight}px`,
                 width: "90px",
               }}
             >
@@ -420,7 +232,7 @@ const ShapeGroup = ({
                 }}
               >
                 {getScaledArea(
-                  polygonAreas.current[idx],
+                  totalArea.current,
                   scaleInfo,
                   scaleInfo.calibrated === false
                     ? "px"
@@ -432,7 +244,7 @@ const ShapeGroup = ({
             </Field>
             <Field
               sx={{
-                height: `${rowsHeight[idx]}px`,
+                height: `${headerHeight}px`,
                 padding: "0px 10px",
                 width: "40px",
                 cursor: "pointer",
@@ -441,10 +253,10 @@ const ShapeGroup = ({
                 },
               }}
               onClick={() => {
-                dimensionId.current = polygon[index].key;
-                dimensionType.current = "polygon";
+                dimensionId.current = group.id;
+                dimensionType.current = "group";
                 dimensionArea.current = getScaledArea(
-                  polygonAreas.current[idx],
+                  totalArea.current,
                   scaleInfo,
                   scaleInfo.calibrated === false
                     ? "px"
@@ -461,23 +273,15 @@ const ShapeGroup = ({
                 setModalType("addDimension");
               }}
             >
-              {(group.height || group.depth)! > 0 && (
-                <Settings
-                  fill={
-                    (hover === false && polygon[index]?.hover) ||
-                    (polygon[index]?.height &&
-                      polygon[index]?.height !== group.height) ||
-                    (polygon[index]?.depth &&
-                      polygon[index]?.depth !== group.depth)
-                      ? "#FFBC01"
-                      : "#c3c3ca"
-                  }
-                />
-              )}
+              <Settings
+                fill={
+                  hover || group.height || group.depth ? "#FFBC01" : "#c3c3ca"
+                }
+              />
             </Field>
             <Field
               sx={{
-                height: `${rowsHeight[idx]}px`,
+                height: `${headerHeight}px`,
                 width: "90px",
               }}
             >
@@ -490,136 +294,342 @@ const ShapeGroup = ({
                   alignItems: "center",
                 }}
               >
-                {getScaledVolume(
-                  polygonAreas.current[idx],
-                  scaleInfo,
-                  scaleInfo.calibrated === false
-                    ? "px"
+                {filteredIndex
+                  .map((index, idx) => {
+                    return +getScaledVolume(
+                      polygonAreas.current[idx],
+                      scaleInfo,
+                      scaleInfo.calibrated === false
+                        ? "px"
+                        : group.unit === unitType.ft
+                        ? unitType.ft
+                        : unitType.in,
+                      polygon[index]?.height || group.height,
+                      polygon[index]?.depth || group.depth
+                      // polygon[index]?.pitch || group.pitch
+                    ).split(" ")[0];
+                  })
+                  .reduce((prev, curr) => prev + curr, 0)
+                  .toFixed(2) +
+                  (group.height || group.depth
+                    ? scaleInfo.calibrated === false
+                      ? " px3"
+                      : group.unit === unitType.ft
+                      ? " ft3"
+                      : " in3"
+                    : scaleInfo.calibrated === false
+                    ? " px2"
                     : group.unit === unitType.ft
-                    ? unitType.ft
-                    : unitType.in,
-                  polygon[index]?.height || group.height,
-                  polygon[index]?.depth || group.depth
-                  // polygon[index]?.pitch || group.pitch
-                )}
+                    ? " ft2"
+                    : " in2")}
               </Typography>
             </Field>
             <Field
               sx={{
                 width: "60px",
                 justifyContent: "center",
-                height: `${rowsHeight[idx]}px`,
+                height: `${headerHeight}px`,
               }}
             >
-              <IconButton id={`${index}`} onClick={handleToggleOption}>
-                <MoreHorizIcon
-                  sx={{
-                    color:
-                      hover === false && polygon[index]?.hover
-                        ? "#FFBC01"
-                        : "inherit",
-                  }}
-                />
+              <IconButton id="groupHeader" onClick={handleToggleOption}>
+                <MoreHorizIcon sx={{ color: hover ? "#FFBC01" : "inherit" }} />
               </IconButton>
             </Field>
-          </Row>
-        ))}
-
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorElOption}
-        open={openOption}
-        onClose={handleCloseOption}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-        sx={{ zIndex: 20000 }}
-      >
-        {clickRef.current === "groupHeader" && (
-          <MenuItem
-            onClick={() => {
-              handleCloseOption();
-              setModalType("edit");
-            }}
-          >
-            Edit
-          </MenuItem>
-        )}
-
-        <MenuItem
-          onClick={() => {
-            undoStack.current.push(captureStates);
-            redoStack.current.length = 0;
-            while (undoStack.current.length > 30) undoStack.current.shift();
-            if (clickRef.current === "groupHeader") {
-              changePolygon((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                for (let i = 0; i < prevCopy.length; i++) {
-                  for (let j = 0; j < prevCopy[i].length; j++) {
-                    prevCopy[i][j] = prevCopy[i][j].filter(
-                      (poly) => poly.group !== group.id
+          </GroupHeader>
+          {expand &&
+            filteredIndex.map((index, idx) => (
+              <Row
+                onMouseEnter={() => {
+                  changePolygon((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy[selectedPdf][selectedPage][index].hover = true;
+                    return prevCopy;
+                  });
+                }}
+                onMouseLeave={() => {
+                  changePolygon((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy[selectedPdf][selectedPage][index].hover = false;
+                    return prevCopy;
+                  });
+                }}
+              >
+                <Field
+                  ref={rowRefs.current[idx]!}
+                  sx={{
+                    padding: "3px",
+                    paddingLeft: "10px",
+                    width: "180px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      height: "20px",
+                      width: "5px",
+                      backgroundColor: rgba2hex(group.color),
+                      marginRight: "5px",
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      width: "150px",
+                      fontSize: "12px",
+                      padding: "6px 3px",
+                      ":hover": {
+                        backgroundColor: "#f4f4f4",
+                      },
+                    }}
+                    contentEditable
+                    suppressContentEditableWarning={true}
+                    onKeyDown={(e) => {
+                      setRowsHeight((prev) => {
+                        const copy = [...prev];
+                        copy.splice(
+                          idx,
+                          1,
+                          rowRefs.current[idx].current.clientHeight
+                        );
+                        return copy;
+                      });
+                    }}
+                    onBlur={(e) => {
+                      undoStack.current.push(captureStates);
+                      redoStack.current.length = 0;
+                      while (undoStack.current.length > 30)
+                        undoStack.current.shift();
+                      changePolygon((prev) => {
+                        const prevCopy = _.cloneDeep(prev);
+                        const target =
+                          prevCopy[selectedPdf][selectedPage][index];
+                        target.name = e.target.innerText;
+                        prevCopy[selectedPdf][selectedPage][index] = target;
+                        return prevCopy;
+                      });
+                    }}
+                  >
+                    {polygon[index]?.name}
+                  </Box>
+                </Field>
+                <Field
+                  sx={{
+                    height: `${rowsHeight[idx]}px`,
+                    width: "90px",
+                  }}
+                >
+                  <Typography
+                    fontSize={12}
+                    sx={{
+                      height: "100%",
+                      paddingLeft: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {getScaledArea(
+                      polygonAreas.current[idx],
+                      scaleInfo,
+                      scaleInfo.calibrated === false
+                        ? "px"
+                        : group.unit === unitType.ft
+                        ? unitType.ft
+                        : unitType.in
+                    )}
+                  </Typography>
+                </Field>
+                <Field
+                  sx={{
+                    height: `${rowsHeight[idx]}px`,
+                    padding: "0px 10px",
+                    width: "40px",
+                    cursor: "pointer",
+                    ":hover": {
+                      backgroundColor: "#f4f4f4",
+                    },
+                  }}
+                  onClick={() => {
+                    dimensionId.current = polygon[index].key;
+                    dimensionType.current = "polygon";
+                    dimensionArea.current = getScaledArea(
+                      polygonAreas.current[idx],
+                      scaleInfo,
+                      scaleInfo.calibrated === false
+                        ? "px"
+                        : group.unit === unitType.ft
+                        ? unitType.ft
+                        : unitType.in
                     );
-                  }
-                }
-                return prevCopy;
-              });
-              changeGroup((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                prevCopy.splice(groupIndex, 1);
-                return prevCopy;
-              });
-            } else {
-              changePolygon((prev) => {
-                const prevCopy = _.cloneDeep(prev);
-                const polyList = prevCopy[selectedPdf][selectedPage];
-                polyList.splice(+clickRef.current, 1);
-                prevCopy[selectedPdf][selectedPage] = polyList;
-                return prevCopy;
-              });
-              setFilteredIndex([]);
-            }
-            handleCloseOption();
-          }}
-        >
-          Delete
-        </MenuItem>
-      </Menu>
-      {modalType === "edit" && (
-        <EditGroupModal
-          group={groups}
-          groupId={group.id}
-          changeGroup={changeGroup}
-          onClose={() => setModalType("")}
-          undoStack={undoStack}
-          redoStack={redoStack}
-          captureStates={captureStates}
-        />
-      )}
-      {modalType === "addDimension" && (
-        <CreatePortal>
-          <AddDimensionModal
-            onClose={() => setModalType("")}
-            type={dimensionType.current}
-            id={dimensionId.current}
-            area={dimensionArea.current}
-            unit={dimensionAreaUnit.current}
-            selectedPdf={selectedPdf}
-            selectedPage={selectedPage}
-            group={group}
-            groupIndex={groupIndex}
-            changeGroup={changeGroup}
-            polygon={polygon.find((poly) => poly.key === dimensionId.current)!}
-            polygonIndex={polygon.findIndex(
-              (poly) => poly.key === dimensionId.current
+                    dimensionAreaUnit.current =
+                      scaleInfo.calibrated === false
+                        ? "px"
+                        : group.unit === unitType.ft
+                        ? unitType.ft
+                        : unitType.in;
+                    setModalType("addDimension");
+                  }}
+                >
+                  {(group.height || group.depth)! > 0 && (
+                    <Settings
+                      fill={
+                        (hover === false && polygon[index]?.hover) ||
+                        (polygon[index]?.height &&
+                          polygon[index]?.height !== group.height) ||
+                        (polygon[index]?.depth &&
+                          polygon[index]?.depth !== group.depth)
+                          ? "#FFBC01"
+                          : "#c3c3ca"
+                      }
+                    />
+                  )}
+                </Field>
+                <Field
+                  sx={{
+                    height: `${rowsHeight[idx]}px`,
+                    width: "90px",
+                  }}
+                >
+                  <Typography
+                    fontSize={12}
+                    sx={{
+                      height: "100%",
+                      paddingLeft: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {getScaledVolume(
+                      polygonAreas.current[idx],
+                      scaleInfo,
+                      scaleInfo.calibrated === false
+                        ? "px"
+                        : group.unit === unitType.ft
+                        ? unitType.ft
+                        : unitType.in,
+                      polygon[index]?.height || group.height,
+                      polygon[index]?.depth || group.depth
+                      // polygon[index]?.pitch || group.pitch
+                    )}
+                  </Typography>
+                </Field>
+                <Field
+                  sx={{
+                    width: "60px",
+                    justifyContent: "center",
+                    height: `${rowsHeight[idx]}px`,
+                  }}
+                >
+                  <IconButton id={`${index}`} onClick={handleToggleOption}>
+                    <MoreHorizIcon
+                      sx={{
+                        color:
+                          hover === false && polygon[index]?.hover
+                            ? "#FFBC01"
+                            : "inherit",
+                      }}
+                    />
+                  </IconButton>
+                </Field>
+              </Row>
+            ))}
+
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorElOption}
+            open={openOption}
+            onClose={handleCloseOption}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+            sx={{ zIndex: 20000 }}
+          >
+            {clickRef.current === "groupHeader" && (
+              <MenuItem
+                onClick={() => {
+                  handleCloseOption();
+                  setModalType("edit");
+                }}
+              >
+                Edit
+              </MenuItem>
             )}
-            changePolygon={changePolygon}
-            undoStack={undoStack}
-            redoStack={redoStack}
-            captureStates={captureStates}
-          />
-        </CreatePortal>
+
+            <MenuItem
+              onClick={() => {
+                undoStack.current.push(captureStates);
+                redoStack.current.length = 0;
+                while (undoStack.current.length > 30) undoStack.current.shift();
+                if (clickRef.current === "groupHeader") {
+                  changePolygon((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    for (let i = 0; i < prevCopy.length; i++) {
+                      for (let j = 0; j < prevCopy[i].length; j++) {
+                        prevCopy[i][j] = prevCopy[i][j].filter(
+                          (poly) => poly.group !== group.id
+                        );
+                      }
+                    }
+                    return prevCopy;
+                  });
+                  changeGroup((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    prevCopy.splice(groupIndex, 1);
+                    return prevCopy;
+                  });
+                } else {
+                  changePolygon((prev) => {
+                    const prevCopy = _.cloneDeep(prev);
+                    const polyList = prevCopy[selectedPdf][selectedPage];
+                    polyList.splice(+clickRef.current, 1);
+                    prevCopy[selectedPdf][selectedPage] = polyList;
+                    return prevCopy;
+                  });
+                  setFilteredIndex([]);
+                }
+                handleCloseOption();
+              }}
+            >
+              Delete
+            </MenuItem>
+          </Menu>
+          {modalType === "edit" && (
+            <EditGroupModal
+              group={groups}
+              groupId={group.id}
+              changeGroup={changeGroup}
+              onClose={() => setModalType("")}
+              undoStack={undoStack}
+              redoStack={redoStack}
+              captureStates={captureStates}
+            />
+          )}
+          {modalType === "addDimension" && (
+            <CreatePortal>
+              <AddDimensionModal
+                onClose={() => setModalType("")}
+                type={dimensionType.current}
+                id={dimensionId.current}
+                area={dimensionArea.current}
+                unit={dimensionAreaUnit.current}
+                selectedPdf={selectedPdf}
+                selectedPage={selectedPage}
+                group={group}
+                groupIndex={groupIndex}
+                changeGroup={changeGroup}
+                polygon={
+                  polygon.find((poly) => poly.key === dimensionId.current)!
+                }
+                polygonIndex={polygon.findIndex(
+                  (poly) => poly.key === dimensionId.current
+                )}
+                changePolygon={changePolygon}
+                undoStack={undoStack}
+                redoStack={redoStack}
+                captureStates={captureStates}
+              />
+            </CreatePortal>
+          )}
+        </Container>
       )}
-    </Container>
+    </>
   );
 };
 
