@@ -21,6 +21,7 @@ type propsType = {
   length: lengthType[][][];
   count: countType[][][];
   toggleShowEstimate: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleShowCost: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const EstimateSection = ({
@@ -32,6 +33,7 @@ const EstimateSection = ({
   length,
   count,
   toggleShowEstimate,
+  toggleShowCost,
 }: propsType): JSX.Element => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const hiddenText = useRef<HTMLDivElement>(null);
@@ -68,7 +70,10 @@ const EstimateSection = ({
               padding: "3px 6px",
               height: "35px",
             }}
-            onClick={() => toggleShowEstimate((prev) => !prev)}
+            onClick={() => {
+              toggleShowCost(false);
+              toggleShowEstimate(false);
+            }}
           >
             <Box
               sx={{
@@ -128,9 +133,12 @@ const EstimateSection = ({
                 padding: "3px 6px",
                 height: "35px",
               }}
-              onClick={() => toggleShowEstimate((prev) => !prev)}
+              onClick={() => {
+                toggleShowEstimate(false);
+                toggleShowCost(true);
+              }}
             >
-              Caculate Cost
+              Calculate Cost
             </CustomButton>
           </Box>
         </Box>

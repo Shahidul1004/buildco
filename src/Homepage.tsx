@@ -27,6 +27,7 @@ import InitialUpload from "./fileUpload/InitialUpload";
 import _ from "lodash";
 import EstimateSection from "./estimate/EstimateSection";
 import { Backdrop, CircularProgress } from "@mui/material";
+import CostSection from "./cost/CostSection";
 
 const Homepage = (): JSX.Element => {
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -69,6 +70,7 @@ const Homepage = (): JSX.Element => {
   const undoStack = useRef<(() => void)[]>([]);
   const redoStack = useRef<(() => void)[]>([]);
   const [showEstimate, setShowEstimate] = useState<boolean>(false);
+  const [showCost, setShowCost] = useState<boolean>(false);
 
   const captureStates = () => {
     setPolygon((prev) => _.cloneDeep(polygon));
@@ -144,7 +146,28 @@ const Homepage = (): JSX.Element => {
 
   return (
     <>
-      {showEstimate === false ? (
+      {showEstimate ? (
+        <EstimateSection
+          pdfOrder={pdfOrder}
+          fileName={fileName.current}
+          scaleInfo={scaleInfo}
+          group={group}
+          polygon={polygon}
+          length={length}
+          count={count}
+          toggleShowEstimate={setShowEstimate}
+          toggleShowCost={setShowCost}
+        />
+      ) : showCost ? (
+        <CostSection
+          scaleInfo={scaleInfo}
+          group={group}
+          polygon={polygon}
+          count={count}
+          toggleShowEstimate={setShowEstimate}
+          toggleShowCost={setShowCost}
+        />
+      ) : (
         <>
           {pdfOrder.length === 0 && (
             <InitialUpload onFileUpload={fileUploadHandler} />
@@ -248,6 +271,7 @@ const Homepage = (): JSX.Element => {
                     activeTool === activeToolOptions.count
                   }
                   toggleShowEstimate={setShowEstimate}
+                  toggleShowCost={setShowCost}
                   undoStack={undoStack}
                   redoStack={redoStack}
                   captureStates={captureStates}
@@ -256,17 +280,6 @@ const Homepage = (): JSX.Element => {
             </>
           )}
         </>
-      ) : (
-        <EstimateSection
-          pdfOrder={pdfOrder}
-          fileName={fileName.current}
-          scaleInfo={scaleInfo}
-          group={group}
-          polygon={polygon}
-          length={length}
-          count={count}
-          toggleShowEstimate={setShowEstimate}
-        />
       )}
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}

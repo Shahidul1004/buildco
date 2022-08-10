@@ -93,6 +93,24 @@ export type deductRectType = {
   key: number;
 };
 
+export type costGroupType = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  material: number;
+  labor: number;
+  markup: number;
+  room: number;
+  tax: number;
+};
+
+export enum taxType {
+  "None",
+  "Material",
+  "Labor",
+  "Both",
+}
 export const rgbaColors = [
   { r: 255, g: 188, b: 1, a: 1 },
   { r: 208, g: 2, b: 27, a: 1 },

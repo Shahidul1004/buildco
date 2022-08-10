@@ -30,6 +30,7 @@ type propsType = {
   changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   isGroupOpen: boolean;
   toggleShowEstimate: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleShowCost: React.Dispatch<React.SetStateAction<boolean>>;
   undoStack: MutableRefObject<(() => void)[]>;
   redoStack: MutableRefObject<(() => void)[]>;
   captureStates: () => void;
@@ -49,6 +50,7 @@ const MeasurementSection = ({
   changeCount,
   isGroupOpen,
   toggleShowEstimate,
+  toggleShowCost,
   undoStack,
   redoStack,
   captureStates,
@@ -161,7 +163,10 @@ const MeasurementSection = ({
             padding: "3px 6px",
             height: "35px",
           }}
-          onClick={() => toggleShowEstimate((prev) => !prev)}
+          onClick={() => {
+            toggleShowCost(false);
+            toggleShowEstimate(true);
+          }}
         >
           Create Estimate
         </CustomButton>
