@@ -253,7 +253,6 @@ const CostSection = ({
   }, [costGroup, taxRate]);
 
   const onCostGroupChange = (index: number, field: string, value: number) => {
-    console.log(index, field, value);
     if (field === "tax") index = rowIndexForTax.current;
 
     setCostGroup((prev) => {
@@ -268,371 +267,338 @@ const CostSection = ({
   };
 
   return (
-    <Box
-      sx={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <ToolBar>
-        <LogoIcon style={{ width: "80px", paddingRight: "10px" }} />
-        <CustomButton
-          backgroundcolor="#ffa700"
-          hoverbackgroudcolor="#ff8700"
-          Color="white"
-          hovercolor="white"
-          sx={{
-            marginLeft: "25px",
-            borderRadius: "4px",
-            padding: "3px 6px",
-            height: "30px",
-          }}
-          onClick={() => {
-            toggleShowCost(false);
-            toggleShowEstimate(false);
-          }}
-        >
-          <Box
+    <>
+      <Box
+        sx={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <ToolBar>
+          <LogoIcon style={{ width: "80px", paddingRight: "10px" }} />
+          <CustomButton
+            backgroundcolor="#ffa700"
+            hoverbackgroudcolor="#ff8700"
+            Color="white"
+            hovercolor="white"
             sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              fontSize: "14px",
-            }}
-          >
-            <ReplyIcon fontSize="small" />
-            Back to Measure
-          </Box>
-        </CustomButton>
-        <Typography
-          sx={{
-            marginLeft: "140px",
-            color: "#222222",
-            fontSize: "23px",
-            fontWeight: "500",
-          }}
-        >
-          Estimates
-        </Typography>
-        <CustomButton
-          backgroundcolor="#ffa700"
-          hoverbackgroudcolor="#ff8700"
-          Color="white"
-          hovercolor="white"
-          sx={{
-            position: "absolute",
-            right: "30px",
-            borderRadius: "4px",
-            padding: "3px 6px",
-            height: "30px",
-            fontSize: "14px",
-          }}
-          onClick={useReactToPrint({
-            content: () => pdfRef.current,
-            onBeforeGetContent: () => {
-              hiddenText.current!.style.display = "block";
-            },
-            onAfterPrint: () => {
-              hiddenText.current!.style.display = "none";
-            },
-          })}
-        >
-          Export as PDF
-        </CustomButton>
-      </ToolBar>
-
-      <TableSection>
-        <Box
-          ref={pdfRef}
-          sx={{
-            margin: "30px 30px",
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-
-            alignItems: "flex-start",
-          }}
-        >
-          <Box
-            sx={{
-              width: "1055px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Typography
-              ref={hiddenText}
-              sx={{
-                marginTop: "-5px",
-                marginBottom: "15px",
-                color: "#FFBC01",
-                fontSize: "24px",
-                fontWeight: "500",
-                display: "none",
-              }}
-            >
-              Estimates
-            </Typography>
-          </Box>
-          <Row
-            sx={{
-              color: "#666",
-              fontSize: "16px",
-              fontWeight: "500",
-              borderBottom: "1px solid rgb(204, 204, 204)",
-            }}
-          >
-            <Field sx={{ width: "200px", border: "none" }}>Item</Field>
-            <Field sx={{ width: "110px", border: "none" }}>Quantity</Field>
-            <Field sx={{ width: "65px", border: "none" }}>Unit</Field>
-            <Field sx={{ width: "110px", border: "none" }}>Material</Field>
-            <Field sx={{ width: "110px", border: "none" }}>Labor</Field>
-            <Field sx={{ width: "110px", border: "none" }}>Markup</Field>
-            <Field sx={{ width: "110px", border: "none" }}>Room</Field>
-            <Field sx={{ width: "100px", border: "none" }}>Tax</Field>
-            <Field sx={{ width: "140px", border: "none" }}>Total</Field>
-          </Row>
-          <Row
-            sx={{
-              color: "rgb(34, 34, 34)",
-              fontSize: "16px",
-              fontWeight: "500",
-              backgroundColor: "#fafafa",
-              overflowWrap: "break-word",
-            }}
-          >
-            <Field
-              sx={{ width: "200px", cursor: "pointer" }}
-              onClick={() => setExpand((prev) => !prev)}
-            >
-              {expand ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </Field>
-            <Field sx={{ width: "110px" }} />
-            <Field sx={{ width: "65px" }} />
-            <Field sx={{ width: "110px" }}>
-              <Box
-                sx={{
-                  width: "100%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  overflowWrap: "break-word",
-                }}
-              >
-                ${totalMaterial.toFixed(2)}
-              </Box>
-            </Field>
-            <Field sx={{ width: "110px" }}>
-              <Box
-                sx={{
-                  width: "100%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  overflowWrap: "break-word",
-                }}
-              >
-                ${totalLabor.toFixed(2)}
-              </Box>
-            </Field>
-            <Field sx={{ width: "110px" }}>
-              <Box
-                sx={{
-                  width: "100%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  overflowWrap: "break-word",
-                }}
-              >
-                ${totalMarkup.toFixed(2)}
-              </Box>
-            </Field>
-            <Field sx={{ width: "110px" }} />
-            <Field sx={{ width: "100px" }} />
-            <Field sx={{ width: "140px", border: "none" }}>
-              <Box
-                sx={{
-                  width: "100%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  overflowWrap: "break-word",
-                }}
-              >
-                ${(totalMaterial + totalLabor + totalMarkup).toFixed(2)}
-              </Box>
-            </Field>
-          </Row>
-          <Box
-            sx={{
-              overflow: "hidden",
-              overflowY: "auto",
-            }}
-          >
-            {expand &&
-              costGroup.map((grp, index) => (
-                <Row
-                  key={grp.id}
-                  sx={{
-                    color: "#666",
-                    fontSize: "16px",
-                    fontWeight: "400",
-                    borderBottom: "1px solid rgb(204, 204, 204)",
-                  }}
-                >
-                  <Field
-                    sx={{
-                      width: "200px",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {grp.name}
-                    </Box>
-                  </Field>
-                  <Field sx={{ width: "110px" }}>{grp.quantity}</Field>
-                  <Field sx={{ width: "65px" }}>{grp.unit}</Field>
-                  <Field sx={{ width: "110px" }}>
-                    <CustomTextField
-                      type="number"
-                      value={grp.material}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment
-                            position="start"
-                            sx={{ margin: "0px" }}
-                          >
-                            $
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0.0;
-                        if (value >= 0) {
-                          onCostGroupChange(index, "material", value);
-                        }
-                      }}
-                    />
-                  </Field>
-                  <Field sx={{ width: "110px" }}>
-                    <CustomTextField
-                      type="number"
-                      value={grp.labor}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment
-                            position="start"
-                            sx={{ margin: "0px" }}
-                          >
-                            $
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0.0;
-                        if (value >= 0)
-                          onCostGroupChange(index, "labor", value);
-                      }}
-                    />
-                  </Field>
-                  <Field sx={{ width: "110px" }}>
-                    <CustomTextField
-                      type="number"
-                      value={grp.markup}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment
-                            position="start"
-                            sx={{ margin: "0px" }}
-                          >
-                            $
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0.0;
-                        if (value >= 0)
-                          onCostGroupChange(index, "markup", value);
-                      }}
-                    />
-                  </Field>
-                  <Field sx={{ width: "110px" }}>
-                    <CustomTextField placeholder="Add Room" />
-                  </Field>
-                  <Field sx={{ width: "100px" }}>
-                    <CustomTextField
-                      id={`${index}`}
-                      className={`${index}`}
-                      value={taxType[grp.tax]}
-                      onClick={handleToggleTax}
-                    />
-                    <Menu
-                      id="basic-menu"
-                      anchorEl={anchorElTax}
-                      open={openTax}
-                      onClose={handleCloseTax}
-                      MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                      }}
-                    >
-                      {[0, 1, 2, 3].map((val) => (
-                        <MenuItem
-                          key={val}
-                          onClick={() => {
-                            handleCloseTax();
-                            onCostGroupChange(index, "tax", val);
-                            console.log("index", index);
-                          }}
-                        >
-                          {taxType[val]}
-                        </MenuItem>
-                      ))}
-                    </Menu>
-                  </Field>
-                  <Field sx={{ width: "140px", border: "none" }}>
-                    $
-                    {(
-                      grp.quantity *
-                      (grp.material + grp.labor + grp.markup)
-                    ).toFixed(2)}
-                  </Field>
-                </Row>
-              ))}
-          </Box>
-
-          <Box
-            sx={{
-              position: "relative",
-              bottom: "0px",
-              marginTop: "20px",
-              alignSelf: "flex-end",
-              width: "400px",
-              paddingTop: "20px",
+              marginLeft: "25px",
               borderRadius: "4px",
-              border: "1px solid rgb(204, 204, 204)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
+              padding: "3px 6px",
+              height: "30px",
+            }}
+            onClick={() => {
+              toggleShowCost(false);
+              toggleShowEstimate(false);
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                padding: "0px 20px",
+                alignItems: "center",
+                gap: "5px",
+                fontSize: "14px",
               }}
             >
-              <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Subtotal</Box>
-              <Box>${(totalMaterial + totalLabor).toFixed(2)}</Box>
+              <ReplyIcon fontSize="small" />
+              Back to Measure
             </Box>
-            {totalMarkup > 0 && (
+          </CustomButton>
+          <Typography
+            sx={{
+              marginLeft: "140px",
+              color: "#222222",
+              fontSize: "23px",
+              fontWeight: "500",
+            }}
+          >
+            Estimates
+          </Typography>
+          <CustomButton
+            backgroundcolor="#ffa700"
+            hoverbackgroudcolor="#ff8700"
+            Color="white"
+            hovercolor="white"
+            sx={{
+              position: "absolute",
+              right: "30px",
+              borderRadius: "4px",
+              padding: "3px 6px",
+              height: "30px",
+              fontSize: "14px",
+            }}
+            onClick={useReactToPrint({
+              content: () => pdfRef.current,
+              onBeforeGetContent: () => {
+                hiddenText.current!.style.display = "block";
+              },
+              onAfterPrint: () => {
+                hiddenText.current!.style.display = "none";
+              },
+            })}
+          >
+            Export as PDF
+          </CustomButton>
+        </ToolBar>
+
+        <TableSection>
+          <Box
+            ref={pdfRef}
+            sx={{
+              margin: "30px 30px",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+
+              alignItems: "flex-start",
+            }}
+          >
+            <Box
+              sx={{
+                width: "1055px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                ref={hiddenText}
+                sx={{
+                  marginTop: "-5px",
+                  marginBottom: "15px",
+                  color: "#FFBC01",
+                  fontSize: "24px",
+                  fontWeight: "500",
+                  display: "none",
+                }}
+              >
+                Estimates
+              </Typography>
+            </Box>
+            <Row
+              sx={{
+                color: "#666",
+                fontSize: "16px",
+                fontWeight: "500",
+                borderBottom: "1px solid rgb(204, 204, 204)",
+              }}
+            >
+              <Field sx={{ width: "200px", border: "none" }}>Item</Field>
+              <Field sx={{ width: "110px", border: "none" }}>Quantity</Field>
+              <Field sx={{ width: "65px", border: "none" }}>Unit</Field>
+              <Field sx={{ width: "110px", border: "none" }}>Material</Field>
+              <Field sx={{ width: "110px", border: "none" }}>Labor</Field>
+              <Field sx={{ width: "110px", border: "none" }}>Markup</Field>
+              <Field sx={{ width: "110px", border: "none" }}>Room</Field>
+              <Field sx={{ width: "100px", border: "none" }}>Tax</Field>
+              <Field sx={{ width: "140px", border: "none" }}>Total</Field>
+            </Row>
+            <Row
+              sx={{
+                color: "rgb(34, 34, 34)",
+                fontSize: "16px",
+                fontWeight: "500",
+                backgroundColor: "#fafafa",
+                overflowWrap: "break-word",
+              }}
+            >
+              <Field
+                sx={{ width: "200px", cursor: "pointer" }}
+                onClick={() => setExpand((prev) => !prev)}
+              >
+                {expand ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </Field>
+              <Field sx={{ width: "110px" }} />
+              <Field sx={{ width: "65px" }} />
+              <Field sx={{ width: "110px" }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    overflowWrap: "break-word",
+                  }}
+                >
+                  ${totalMaterial.toFixed(2)}
+                </Box>
+              </Field>
+              <Field sx={{ width: "110px" }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    overflowWrap: "break-word",
+                  }}
+                >
+                  ${totalLabor.toFixed(2)}
+                </Box>
+              </Field>
+              <Field sx={{ width: "110px" }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    overflowWrap: "break-word",
+                  }}
+                >
+                  ${totalMarkup.toFixed(2)}
+                </Box>
+              </Field>
+              <Field sx={{ width: "110px" }} />
+              <Field sx={{ width: "100px" }} />
+              <Field sx={{ width: "140px", border: "none" }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    overflowWrap: "break-word",
+                  }}
+                >
+                  ${(totalMaterial + totalLabor + totalMarkup).toFixed(2)}
+                </Box>
+              </Field>
+            </Row>
+            <Box
+              sx={{
+                overflow: "hidden",
+                overflowY: "auto",
+              }}
+            >
+              {expand &&
+                costGroup.map((grp, index) => (
+                  <Row
+                    key={grp.id}
+                    sx={{
+                      color: "#666",
+                      fontSize: "16px",
+                      fontWeight: "400",
+                      borderBottom: "1px solid rgb(204, 204, 204)",
+                    }}
+                  >
+                    <Field
+                      sx={{
+                        width: "200px",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {grp.name}
+                      </Box>
+                    </Field>
+                    <Field sx={{ width: "110px" }}>{grp.quantity}</Field>
+                    <Field sx={{ width: "65px" }}>{grp.unit}</Field>
+                    <Field sx={{ width: "110px" }}>
+                      <CustomTextField
+                        type="number"
+                        value={grp.material}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment
+                              position="start"
+                              sx={{ margin: "0px" }}
+                            >
+                              $
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0.0;
+                          if (value >= 0) {
+                            onCostGroupChange(index, "material", value);
+                          }
+                        }}
+                      />
+                    </Field>
+                    <Field sx={{ width: "110px" }}>
+                      <CustomTextField
+                        type="number"
+                        value={grp.labor}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment
+                              position="start"
+                              sx={{ margin: "0px" }}
+                            >
+                              $
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0.0;
+                          if (value >= 0)
+                            onCostGroupChange(index, "labor", value);
+                        }}
+                      />
+                    </Field>
+                    <Field sx={{ width: "110px" }}>
+                      <CustomTextField
+                        type="number"
+                        value={grp.markup}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment
+                              position="start"
+                              sx={{ margin: "0px" }}
+                            >
+                              $
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0.0;
+                          if (value >= 0)
+                            onCostGroupChange(index, "markup", value);
+                        }}
+                      />
+                    </Field>
+                    <Field sx={{ width: "110px" }}>
+                      <CustomTextField placeholder="Add Room" />
+                    </Field>
+                    <Field sx={{ width: "100px" }}>
+                      <CustomTextField
+                        id={`${index}`}
+                        className={`${index}`}
+                        value={taxType[grp.tax]}
+                        onClick={handleToggleTax}
+                      />
+                    </Field>
+                    <Field sx={{ width: "140px", border: "none" }}>
+                      $
+                      {(
+                        grp.quantity *
+                        (grp.material + grp.labor + grp.markup)
+                      ).toFixed(2)}
+                    </Field>
+                  </Row>
+                ))}
+            </Box>
+
+            <Box
+              sx={{
+                position: "relative",
+                bottom: "0px",
+                marginTop: "20px",
+                alignSelf: "flex-end",
+                width: "400px",
+                paddingTop: "20px",
+                borderRadius: "4px",
+                border: "1px solid rgb(204, 204, 204)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -641,71 +607,108 @@ const CostSection = ({
                   padding: "0px 20px",
                 }}
               >
-                <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Markup</Box>
-                <Box>${totalMarkup.toFixed(2)}</Box>
+                <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Subtotal</Box>
+                <Box>${(totalMaterial + totalLabor).toFixed(2)}</Box>
               </Box>
-            )}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 20px",
-              }}
-            >
+              {totalMarkup > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    padding: "0px 20px",
+                  }}
+                >
+                  <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Markup</Box>
+                  <Box>${totalMarkup.toFixed(2)}</Box>
+                </Box>
+              )}
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  padding: "0px 20px",
                 }}
               >
-                <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Tax </Box>
-                <Typography fontSize="14px">{`  (%)`}</Typography>
-                <CustomTextField
+                <Box
                   sx={{
-                    width: "80px",
-                    "& .MuiOutlinedInput-input": {
-                      padding: "5px 10px 5px 0px",
-                      height: "18px",
-                      color: "#666",
-                    },
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
-                  type="number"
-                  value={taxRate}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value) || 0.0;
-                    if (value >= 0) setTaxRate(value);
-                  }}
-                />
+                >
+                  <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Tax </Box>
+                  <Typography fontSize="14px">{`  (%)`}</Typography>
+                  <CustomTextField
+                    sx={{
+                      width: "80px",
+                      "& .MuiOutlinedInput-input": {
+                        padding: "5px 10px 5px 0px",
+                        height: "18px",
+                        color: "#666",
+                      },
+                    }}
+                    type="number"
+                    value={taxRate}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value) || 0.0;
+                      if (value >= 0) setTaxRate(value);
+                    }}
+                  />
+                </Box>
+                <Box>${totalTax.toFixed(2)}</Box>
               </Box>
-              <Box>${totalTax.toFixed(2)}</Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                backgroundColor: "rgb(243, 248, 252)",
-                padding: "20px",
-                borderBottomLeftRadius: "4px",
-                borderBottomRightRadius: "4px",
-              }}
-            >
-              <Box sx={{ fontWeight: "500", fontSize: "20px" }}>Total</Box>
-              <Box>
-                $
-                {(totalMaterial + totalLabor + totalMarkup + totalTax).toFixed(
-                  2
-                )}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  backgroundColor: "rgb(243, 248, 252)",
+                  padding: "20px",
+                  borderBottomLeftRadius: "4px",
+                  borderBottomRightRadius: "4px",
+                }}
+              >
+                <Box sx={{ fontWeight: "500", fontSize: "20px" }}>Total</Box>
+                <Box>
+                  $
+                  {(
+                    totalMaterial +
+                    totalLabor +
+                    totalMarkup +
+                    totalTax
+                  ).toFixed(2)}
+                </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-      </TableSection>
-    </Box>
+        </TableSection>
+      </Box>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorElTax}
+        open={openTax}
+        onClose={handleCloseTax}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        {[0, 1, 2, 3].map((val) => (
+          <MenuItem
+            key={val}
+            onClick={() => {
+              handleCloseTax();
+              onCostGroupChange(1, "tax", val);
+            }}
+          >
+            {taxType[val]}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 };
 

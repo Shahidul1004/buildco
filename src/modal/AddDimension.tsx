@@ -293,7 +293,11 @@ const AddDimensionModal = ({
             >
               total
             </Typography>
-            <Typography>volume</Typography>
+            <Typography>
+              {height || depth
+                ? parseFloat(area) * (height + depth)
+                : parseFloat(area)}
+            </Typography>
           </Box>
 
           <Box sx={{ marginTop: "25px", display: "flex", gap: "10px" }}>

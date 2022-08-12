@@ -4,8 +4,8 @@ import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
 const Title = (): JSX.Element => {
   return (
     <Container>
-      <TitleField sx={{ width: "180px" }}>Name</TitleField>
-      <TitleField sx={{ width: "89px" }}>Result</TitleField>
+      <TitleField sx={{ width: "180.5px" }}>Name</TitleField>
+      <TitleField sx={{ width: "90.5px" }}>Result</TitleField>
       <TitleField
         sx={{
           padding: "0px 10px",
