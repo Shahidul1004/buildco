@@ -107,7 +107,7 @@ const EstimateSection = ({
             onClick={useReactToPrint({
               content: () => pdfRef.current,
               onBeforeGetContent: () => {
-                hiddenText.current!.style.display = "block";
+                hiddenText.current!.style.display = "flex";
               },
               onAfterPrint: () => {
                 hiddenText.current!.style.display = "none";
@@ -128,21 +128,21 @@ const EstimateSection = ({
             }}
           >
             <Box
+              ref={hiddenText}
               sx={{
                 width: "1025px",
-                display: "flex",
-                justifyContent: "center",
+                marginBottom: "15px",
+                justifyContent: "space-between",
                 alignItems: "center",
+                display: "none",
               }}
             >
+              <LogoIcon style={{ width: "150px" }} />
               <Typography
-                ref={hiddenText}
                 sx={{
-                  marginTop: "-10px",
                   color: "#FFBC01",
                   fontSize: "24px",
                   fontWeight: "500",
-                  display: "none",
                 }}
               >
                 All Measurements

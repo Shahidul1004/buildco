@@ -333,7 +333,7 @@ const CostSection = ({
             onClick={useReactToPrint({
               content: () => pdfRef.current,
               onBeforeGetContent: () => {
-                hiddenText.current!.style.display = "block";
+                hiddenText.current!.style.display = "flex";
               },
               onAfterPrint: () => {
                 hiddenText.current!.style.display = "none";
@@ -357,22 +357,21 @@ const CostSection = ({
             }}
           >
             <Box
+              ref={hiddenText}
               sx={{
+                marginBottom: "15px",
                 width: "1055px",
-                display: "flex",
-                justifyContent: "center",
+                display: "none",
+                justifyContent: "space-between",
                 alignItems: "center",
               }}
             >
+              <LogoIcon style={{ width: "150px" }} />
               <Typography
-                ref={hiddenText}
                 sx={{
-                  marginTop: "-5px",
-                  marginBottom: "15px",
                   color: "#FFBC01",
                   fontSize: "24px",
                   fontWeight: "500",
-                  display: "none",
                 }}
               >
                 Estimates
