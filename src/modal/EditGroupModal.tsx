@@ -193,6 +193,7 @@ const EditGroupModal = ({
               >
                 {rgbaColors.map((rgba, index) => (
                   <Box
+                    key={index}
                     sx={{
                       height: "22px",
                       width: "22px",
@@ -211,7 +212,6 @@ const EditGroupModal = ({
                     onClick={() => setColor(rgba)}
                   >
                     <Box
-                      key={index}
                       sx={{
                         height: "18px",
                         width: "18px",
@@ -488,7 +488,7 @@ const EditGroupModal = ({
             </Box>
           </Box>
 
-          <Box sx={{ marginTop: "150px", display: "flex", gap: "10px" }}>
+          <Box sx={{ marginTop: "50px", display: "flex", gap: "10px" }}>
             <CustomButton
               variant="outlined"
               onClick={onClose}

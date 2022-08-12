@@ -281,6 +281,7 @@ const Polygon = ({
       />
       {polygonsToDraw.map((item, index) => (
         <Group
+          key={item.key}
           clipFunc={(ctx) => {
             ctx.beginPath();
 
@@ -305,7 +306,6 @@ const Polygon = ({
           }}
         >
           <Shape
-            key={item.key}
             fill={
               item.hover
                 ? "pink"

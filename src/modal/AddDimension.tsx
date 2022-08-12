@@ -165,6 +165,7 @@ const AddDimensionModal = ({
             >
               <Typography>height/width</Typography>
               <TextField
+                type="number"
                 value={height}
                 disabled={
                   (group.type !== groupTypeName.all &&
@@ -174,8 +175,7 @@ const AddDimensionModal = ({
                   pitch > 0
                 }
                 onChange={(e) => {
-                  const value = +e.target.value;
-
+                  const value = parseFloat(e.target.value) || 0.0;
                   if (
                     (type === "group" || group.type === groupTypeName.all) &&
                     value >= 0
@@ -203,6 +203,7 @@ const AddDimensionModal = ({
             >
               <Typography>depth</Typography>
               <TextField
+                type="number"
                 value={depth}
                 disabled={
                   (group.type !== groupTypeName.all &&
@@ -212,7 +213,7 @@ const AddDimensionModal = ({
                   pitch > 0
                 }
                 onChange={(e) => {
-                  const value = +e.target.value;
+                  const value = parseFloat(e.target.value) || 0.0;
                   if (
                     (type === "group" || group.type === groupTypeName.all) &&
                     value >= 0

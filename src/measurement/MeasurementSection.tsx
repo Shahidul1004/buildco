@@ -72,7 +72,7 @@ const MeasurementSection = ({
       >
         <Title />
         {group.map((grp, index) => (
-          <>
+          <div key={grp.id}>
             {grp.type === groupTypeName.shape ? (
               <ShapeGroup
                 selectedPdf={selectedPdf}
@@ -124,7 +124,7 @@ const MeasurementSection = ({
                 captureStates={captureStates}
               />
             )}
-          </>
+          </div>
         ))}
         <DefaultGroup
           selectedPdf={selectedPdf}

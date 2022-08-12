@@ -46,13 +46,22 @@ const EstimateDefaultGroup = ({
             sx={{
               justifyContent: "flex-start",
               width: "390px",
+              paddingLeft: "0px",
             }}
           >
             <CircleIcon
               fontSize="small"
               sx={{ color: rgba2hex({ r: 255, g: 188, b: 1, a: 0.5 }) }}
             />
-            <Box sx={{ paddingLeft: "20px" }}>{poly.name}</Box>
+            <Box
+              sx={{
+                paddingLeft: "20px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {poly.name}
+            </Box>
           </Field>
           <Field
             sx={{
@@ -106,13 +115,22 @@ const EstimateDefaultGroup = ({
             sx={{
               justifyContent: "flex-start",
               width: "390px",
+              paddingLeft: "0px",
             }}
           >
             <CircleIcon
               fontSize="small"
               sx={{ color: rgba2hex({ r: 255, g: 188, b: 1, a: 0.5 }) }}
             />
-            <Box sx={{ paddingLeft: "20px" }}>{len.name}</Box>
+            <Box
+              sx={{
+                paddingLeft: "20px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {len.name}
+            </Box>
           </Field>
           <Field
             sx={{
@@ -157,13 +175,22 @@ const EstimateDefaultGroup = ({
             sx={{
               justifyContent: "flex-start",
               width: "390px",
+              paddingLeft: "0px",
             }}
           >
             <CircleIcon
               fontSize="small"
               sx={{ color: rgba2hex({ r: 255, g: 188, b: 1, a: 0.5 }) }}
             />
-            <Box sx={{ paddingLeft: "20px" }}>Count</Box>
+            <Box
+              sx={{
+                paddingLeft: "20px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              Count
+            </Box>
           </Field>
           <Field
             sx={{
@@ -188,12 +215,17 @@ const Row = styled(Box)({
   display: "flex",
   flexDirection: "row",
   justifyContent: "flex-start",
-  alignItems: "flex-start",
+  alignItems: "center",
 });
 
 const Field = styled(Box)({
   display: "flex",
   justifyContent: "flex-end",
   alignItems: "center",
-  height: "30px",
+  minHeight: "30px",
+  paddingLeft: "10px",
+  overflow: "hidden",
+  boxSizing: "border-box",
+  textOverflow: "ellipsis",
+  overflowWrap: "break-word",
 });

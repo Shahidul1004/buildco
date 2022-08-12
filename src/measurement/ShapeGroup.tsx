@@ -339,6 +339,7 @@ const ShapeGroup = ({
           {expand &&
             filteredIndex.map((index, idx) => (
               <Row
+                key={idx}
                 onMouseEnter={() => {
                   changePolygon((prev) => {
                     const prevCopy = _.cloneDeep(prev);

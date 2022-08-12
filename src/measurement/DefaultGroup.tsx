@@ -213,6 +213,7 @@ const DefaultGroup = ({
       {expand &&
         polyFilteredIndex.map((index, idx) => (
           <Row
+            key={idx}
             onMouseEnter={() => {
               changePolygon((prev) => {
                 const prevCopy = _.cloneDeep(prev);
@@ -390,6 +391,7 @@ const DefaultGroup = ({
       {expand &&
         lengthFilteredIndex.map((index, idx) => (
           <Row
+            key={idx}
             onMouseEnter={() => {
               changeLength((prev) => {
                 const prevCopy = _.cloneDeep(prev);

@@ -351,6 +351,7 @@ const CostSection = ({
             fontSize: "16px",
             fontWeight: "500",
             backgroundColor: "#fafafa",
+            overflowWrap: "break-word",
           }}
         >
           <Field
@@ -361,13 +362,55 @@ const CostSection = ({
           </Field>
           <Field sx={{ width: "120px" }} />
           <Field sx={{ width: "80px" }} />
-          <Field sx={{ width: "120px" }}>${totalMaterial.toFixed(2)}</Field>
-          <Field sx={{ width: "120px" }}>${totalLabor.toFixed(2)}</Field>
-          <Field sx={{ width: "120px" }}>${totalMarkup.toFixed(2)}</Field>
+          <Field sx={{ width: "120px" }}>
+            <Box
+              sx={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                overflowWrap: "break-word",
+              }}
+            >
+              ${totalMaterial.toFixed(2)}
+            </Box>
+          </Field>
+          <Field sx={{ width: "120px" }}>
+            <Box
+              sx={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                overflowWrap: "break-word",
+              }}
+            >
+              ${totalLabor.toFixed(2)}
+            </Box>
+          </Field>
+          <Field sx={{ width: "120px" }}>
+            <Box
+              sx={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                overflowWrap: "break-word",
+              }}
+            >
+              ${totalMarkup.toFixed(2)}
+            </Box>
+          </Field>
           <Field sx={{ width: "120px" }} />
           <Field sx={{ width: "100px" }} />
           <Field sx={{ width: "150px", border: "none" }}>
-            ${(totalMaterial + totalLabor + totalMarkup).toFixed(2)}
+            <Box
+              sx={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                overflowWrap: "break-word",
+              }}
+            >
+              ${(totalMaterial + totalLabor + totalMarkup).toFixed(2)}
+            </Box>
           </Field>
         </Row>
         {expand &&
@@ -381,11 +424,26 @@ const CostSection = ({
                 borderBottom: "1px solid rgb(204, 204, 204)",
               }}
             >
-              <Field sx={{ width: "250px" }}>{grp.name}</Field>
+              <Field
+                sx={{
+                  width: "250px",
+                }}
+              >
+                <Box
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {grp.name}
+                </Box>
+              </Field>
               <Field sx={{ width: "120px" }}>{grp.quantity}</Field>
               <Field sx={{ width: "80px" }}>{grp.unit}</Field>
               <Field sx={{ width: "120px" }}>
                 <CustomTextField
+                  type="number"
                   value={grp.material}
                   InputProps={{
                     startAdornment: (
@@ -395,13 +453,16 @@ const CostSection = ({
                     ),
                   }}
                   onChange={(e) => {
-                    if (+e.target.value >= 0)
-                      onCostGroupChange(index, "material", +e.target.value);
+                    const value = parseFloat(e.target.value) || 0.0;
+                    if (value >= 0) {
+                      onCostGroupChange(index, "material", value);
+                    }
                   }}
                 />
               </Field>
               <Field sx={{ width: "120px" }}>
                 <CustomTextField
+                  type="number"
                   value={grp.labor}
                   InputProps={{
                     startAdornment: (
@@ -411,13 +472,14 @@ const CostSection = ({
                     ),
                   }}
                   onChange={(e) => {
-                    if (+e.target.value >= 0)
-                      onCostGroupChange(index, "labor", +e.target.value);
+                    const value = parseFloat(e.target.value) || 0.0;
+                    if (value >= 0) onCostGroupChange(index, "labor", value);
                   }}
                 />
               </Field>
               <Field sx={{ width: "120px" }}>
                 <CustomTextField
+                  type="number"
                   value={grp.markup}
                   InputProps={{
                     startAdornment: (
@@ -427,8 +489,8 @@ const CostSection = ({
                     ),
                   }}
                   onChange={(e) => {
-                    if (+e.target.value >= 0)
-                      onCostGroupChange(index, "markup", +e.target.value);
+                    const value = parseFloat(e.target.value) || 0.0;
+                    if (value >= 0) onCostGroupChange(index, "markup", value);
                   }}
                 />
               </Field>
@@ -453,6 +515,7 @@ const CostSection = ({
                 >
                   {[0, 1, 2, 3].map((val) => (
                     <MenuItem
+                      key={val}
                       onClick={() => {
                         handleCloseTax();
                         onCostGroupChange(index, "tax", val);
@@ -497,7 +560,7 @@ const CostSection = ({
             }}
           >
             <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Subtotal</Box>
-            <Box>${totalMaterial + totalLabor}</Box>
+            <Box>${(totalMaterial + totalLabor).toFixed(2)}</Box>
           </Box>
           {totalMarkup > 0 && (
             <Box
@@ -509,7 +572,7 @@ const CostSection = ({
               }}
             >
               <Box sx={{ fontWeight: "500", fontSize: "17px" }}>Markup</Box>
-              <Box>${totalMarkup}</Box>
+              <Box>${totalMarkup.toFixed(2)}</Box>
             </Box>
           )}
           <Box
@@ -540,9 +603,11 @@ const CostSection = ({
                     color: "#666",
                   },
                 }}
+                type="number"
                 value={taxRate}
                 onChange={(e) => {
-                  if (+e.target.value >= 0) setTaxRate(+e.target.value);
+                  const value = parseFloat(e.target.value) || 0.0;
+                  if (value >= 0) setTaxRate(value);
                 }}
               />
             </Box>
@@ -560,7 +625,10 @@ const CostSection = ({
             }}
           >
             <Box sx={{ fontWeight: "500", fontSize: "20px" }}>Total</Box>
-            <Box>${totalMaterial + totalLabor + totalMarkup + totalTax}</Box>
+            <Box>
+              $
+              {(totalMaterial + totalLabor + totalMarkup + totalTax).toFixed(2)}
+            </Box>
           </Box>
         </Box>
       </TableSection>
@@ -598,6 +666,7 @@ const Field = styled(Box)({
   height: "50px",
   boxSizing: "border-box",
   borderRight: "1px solid #e6e6e6",
+  overflow: "hidden",
 });
 
 const CustomTextField = styled(TextField)({

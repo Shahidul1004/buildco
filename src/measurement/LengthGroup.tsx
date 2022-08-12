@@ -286,6 +286,7 @@ const LengthGroup = ({
           {expand &&
             filteredIndex.map((index, idx) => (
               <Row
+                key={idx}
                 onMouseEnter={() => {
                   changeLength((prev) => {
                     const prevCopy = _.cloneDeep(prev);

@@ -485,64 +485,71 @@ const Select = ({
           }}
         />
       ))}
-      {count.map((cnt, index) => (
-        <>
-          {cnt.type === iconType.circle ? (
-            <Circle
-              key={cnt.key}
-              x={cnt.points[0]}
-              y={cnt.points[1]}
-              radius={10}
-              fill={
-                cnt.hover
-                  ? "pink"
-                  : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
-              }
-              stroke="black"
-              strokeWidth={1 / scaleFactor}
-              opacity={0.5}
-              draggable
-              onDragEnd={(e) => CountDragEndHandler(e, index)}
-            />
-          ) : cnt.type === iconType.triangle ? (
-            <RegularPolygon
-              key={cnt.key}
-              sides={3}
-              x={cnt.points[0]}
-              y={cnt.points[1]}
-              radius={10}
-              fill={
-                cnt.hover
-                  ? "pink"
-                  : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
-              }
-              stroke="black"
-              strokeWidth={1 / scaleFactor}
-              opacity={0.5}
-              draggable
-              onDragEnd={(e) => CountDragEndHandler(e, index)}
-            />
-          ) : (
-            <RegularPolygon
-              key={cnt.key}
-              sides={4}
-              x={cnt.points[0]}
-              y={cnt.points[1]}
-              radius={10}
-              fill={
-                cnt.hover
-                  ? "pink"
-                  : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
-              }
-              stroke="black"
-              strokeWidth={1 / scaleFactor}
-              opacity={0.5}
-              draggable
-              onDragEnd={(e) => CountDragEndHandler(e, index)}
-            />
-          )}
-        </>
-      ))}
+
+      {count
+        .filter((cnt) => cnt.type === iconType.circle)
+        .map((cnt, index) => (
+          <Circle
+            key={cnt.key}
+            x={cnt.points[0]}
+            y={cnt.points[1]}
+            radius={10}
+            fill={
+              cnt.hover
+                ? "pink"
+                : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
+            }
+            stroke="black"
+            strokeWidth={1 / scaleFactor}
+            opacity={0.5}
+            draggable
+            onDragEnd={(e) => CountDragEndHandler(e, index)}
+          />
+        ))}
+
+      {count
+        .filter((cnt) => cnt.type === iconType.triangle)
+        .map((cnt, index) => (
+          <RegularPolygon
+            key={cnt.key}
+            sides={3}
+            x={cnt.points[0]}
+            y={cnt.points[1]}
+            radius={10}
+            fill={
+              cnt.hover
+                ? "pink"
+                : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
+            }
+            stroke="black"
+            strokeWidth={1 / scaleFactor}
+            opacity={0.5}
+            draggable
+            onDragEnd={(e) => CountDragEndHandler(e, index)}
+          />
+        ))}
+
+      {count
+        .filter((cnt) => cnt.type === iconType.square)
+        .map((cnt, index) => (
+          <RegularPolygon
+            key={cnt.key}
+            sides={4}
+            x={cnt.points[0]}
+            y={cnt.points[1]}
+            radius={10}
+            fill={
+              cnt.hover
+                ? "pink"
+                : rgba2hex(group.find((grp) => grp.id === cnt.group)?.color)
+            }
+            stroke="black"
+            strokeWidth={1 / scaleFactor}
+            opacity={0.5}
+            draggable
+            onDragEnd={(e) => CountDragEndHandler(e, index)}
+          />
+        ))}
       {annotate.map((anno) => (
         <Label
           id={anno.key.toString()}

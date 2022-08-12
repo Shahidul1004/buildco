@@ -147,6 +147,7 @@ const EstimatePerGroup = ({
         sx={{
           justifyContent: "flex-start",
           width: "390px",
+          paddingLeft: "0px",
         }}
       >
         {group.type === groupTypeName.shape ||
@@ -174,7 +175,15 @@ const EstimatePerGroup = ({
             sx={{ color: rgba2hex({ ...group.color, a: 0.5 }) }}
           />
         )}
-        <Box sx={{ paddingLeft: "20px" }}>{group.name}</Box>
+        <Box
+          sx={{
+            paddingLeft: "20px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {group.name}
+        </Box>
       </Field>
       <Field
         sx={{
@@ -201,12 +210,17 @@ const Row = styled(Box)({
   display: "flex",
   flexDirection: "row",
   justifyContent: "flex-start",
-  alignItems: "flex-start",
+  alignItems: "center",
 });
 
 const Field = styled(Box)({
   display: "flex",
   justifyContent: "flex-end",
   alignItems: "center",
-  height: "30px",
+  minHeight: "30px",
+  paddingLeft: "10px",
+  overflow: "hidden",
+  boxSizing: "border-box",
+  textOverflow: "ellipsis",
+  overflowWrap: "break-word",
 });
