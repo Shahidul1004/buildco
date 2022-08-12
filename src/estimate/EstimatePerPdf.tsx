@@ -61,8 +61,8 @@ const EstimatePerPdf = ({
 export default EstimatePerPdf;
 
 const Container = styled(Box)({
-  border: "1px solid #cccccc",
-  borderRadius: "4px",
-  padding: "30px",
+  padding: "20px 10px 20px 0px",
   width: "1025px",
+  overflow: "hidden",
+  overflowY: "auto",
 });

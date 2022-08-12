@@ -166,6 +166,7 @@ const Homepage = (): JSX.Element => {
           count={count}
           toggleShowEstimate={setShowEstimate}
           toggleShowCost={setShowCost}
+          toggleLoading={setLoading}
         />
       ) : (
         <>
