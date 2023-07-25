@@ -55,14 +55,8 @@ const MeasurementSection = ({
   redoStack,
   captureStates,
 }: propsType): JSX.Element => {
-  const context = useContext(Context);
-
   return (
-    <Container
-      navHeight={context.navHeight}
-      sx={{ cursor: "pointer" }}
-      isGroupOpen={isGroupOpen}
-    >
+    <Container sx={{ cursor: "pointer" }} isGroupOpen={isGroupOpen}>
       <Box
         sx={{
           overflow: "hidden",
@@ -156,7 +150,7 @@ const MeasurementSection = ({
         <CustomButton
           backgroundcolor="#ffa700"
           hoverbackgroudcolor="#ff8700"
-          Color="white"
+          buttoncolor="white"
           hovercolor="white"
           sx={{
             borderRadius: "4px",
@@ -178,27 +172,24 @@ const MeasurementSection = ({
 export default MeasurementSection;
 
 interface CustomBoxProps extends BoxProps {
-  navHeight: string;
   isGroupOpen: boolean;
 }
-const Container = styled(Box)<CustomBoxProps>(
-  ({ theme, navHeight, isGroupOpen }) => ({
-    position: "fixed",
-    top: "50px",
-    right: isGroupOpen ? `calc(50% - 715px)` : `calc(50% - 515px)`,
-    width: "510px",
-    backgroundColor: "white",
-    borderRadius: "32px",
-    boxShadow: "0px 3px 4px 0px gray",
-    padding: "75px 0px 40px 0px",
-    paddingLeft: "25px",
-    paddingRight: "25px",
-    boxSizing: "border-box",
-    zIndex: 600,
+const Container = styled(Box)<CustomBoxProps>(({ isGroupOpen }) => ({
+  position: "fixed",
+  top: "50px",
+  right: isGroupOpen ? `calc(50% - 715px)` : `calc(50% - 515px)`,
+  width: "510px",
+  backgroundColor: "white",
+  borderRadius: "32px",
+  boxShadow: "0px 3px 4px 0px gray",
+  padding: "75px 0px 40px 0px",
+  paddingLeft: "25px",
+  paddingRight: "25px",
+  boxSizing: "border-box",
+  zIndex: 600,
 
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center !important",
-    cursor: "auto !important",
-  })
-);
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  alignItems: "center !important",
+  cursor: "auto !important",
+}));

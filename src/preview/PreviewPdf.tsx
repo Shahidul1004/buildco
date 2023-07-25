@@ -1,9 +1,7 @@
 import { Box, Skeleton } from "@mui/material";
-import * as pdfjsLib from "pdfjs-dist";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 type propTypes = {
-  page: pdfjsLib.PDFPageProxy;
   previewPage: HTMLImageElement;
   height: number;
   width: number;
@@ -15,7 +13,6 @@ type propTypes = {
 };
 
 const PreviewPdf = ({
-  page,
   previewPage,
   height,
   width,
@@ -28,20 +25,14 @@ const PreviewPdf = ({
   const cnvRef = useRef<HTMLCanvasElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      const canvas = cnvRef.current;
-      const ctx = canvas!.getContext("2d") as CanvasRenderingContext2D;
+    const canvas = cnvRef.current;
+    const ctx = canvas!.getContext("2d") as CanvasRenderingContext2D;
 
-      canvas!.height = previewPage.height;
-      canvas!.width = previewPage.width;
-      ctx.drawImage(previewPage, 0, 0);
-    }, pageNumber * 250);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [page]);
+    canvas!.height = previewPage.height;
+    canvas!.width = previewPage.width;
+    ctx.drawImage(previewPage, 0, 0);
+    setIsLoading(false);
+  }, [previewPage]);
 
   return (
     <Box

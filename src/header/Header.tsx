@@ -7,30 +7,16 @@ import { ReactComponent as LogoIcon } from "../assets/icons/logo.svg";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ToolsContainer from "../tools/ToolsContainer";
-import {
-  activeGroupType,
-  activeToolOptions,
-  countType,
-  groupType,
-  lengthType,
-  polygonType,
-  scaleInfoType,
-} from "../utils";
+import { activeGroupType, activeToolOptions, groupType } from "../utils";
 import GroupSection from "../group/GroupSection";
 
 type props = {
-  onFileUpload: (files: FileList) => void;
-  fileName: string[];
-  pdfOrder: number[];
-  changePdfOrder: React.Dispatch<React.SetStateAction<number[]>>;
   selectedPdf: number;
-  changeSelectedPdf: React.Dispatch<React.SetStateAction<number>>;
   selectedPage: number;
   currentZoomLevel: number;
   changeZoomLevel: React.Dispatch<React.SetStateAction<number[][]>>;
   activeTool: activeToolOptions;
   changeActiveTool: React.Dispatch<React.SetStateAction<activeToolOptions>>;
-  scaleInfo: scaleInfoType[][];
   showPage: boolean;
   toggleShowPage: React.Dispatch<React.SetStateAction<boolean>>;
   showMeasurements: boolean;
@@ -39,24 +25,13 @@ type props = {
   changeGroup: React.Dispatch<React.SetStateAction<groupType[]>>;
   activeGroup: activeGroupType;
   changeActiveGroup: React.Dispatch<React.SetStateAction<activeGroupType>>;
-  polygon: polygonType[][][];
-  changePolygon: React.Dispatch<React.SetStateAction<polygonType[][][]>>;
-  length: lengthType[][][];
-  changeLength: React.Dispatch<React.SetStateAction<lengthType[][][]>>;
-  count: countType[][][];
-  changeCount: React.Dispatch<React.SetStateAction<countType[][][]>>;
   undoStack: MutableRefObject<(() => void)[]>;
   redoStack: MutableRefObject<(() => void)[]>;
   captureStates: () => void;
 };
 
 const Header = ({
-  onFileUpload,
-  fileName,
-  pdfOrder,
-  changePdfOrder,
   selectedPdf,
-  changeSelectedPdf,
   selectedPage,
   currentZoomLevel,
   changeZoomLevel,
@@ -66,17 +41,10 @@ const Header = ({
   toggleShowPage,
   showMeasurements,
   toggleShowMeasurements,
-  scaleInfo,
   group,
   changeGroup,
   activeGroup,
   changeActiveGroup,
-  polygon,
-  changePolygon,
-  length,
-  changeLength,
-  count,
-  changeCount,
   undoStack,
   redoStack,
   captureStates,

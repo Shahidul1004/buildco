@@ -108,6 +108,22 @@ const Select = ({
     return { x: ptX + deltaX, y: ptY + deltaY };
   };
 
+  const getTransformerRect = (polyPoints: number[]) => {
+    const Xs = polyPoints.filter((num, indx) => indx % 2 === 0);
+    const Ys = polyPoints.filter((num, indx) => indx % 2 === 1);
+    const Xmin = Math.min(...Xs);
+    const Xmax = Math.max(...Xs);
+    const Ymin = Math.min(...Ys);
+    const Ymax = Math.max(...Ys);
+
+    return {
+      x: Xmin,
+      y: Ymin,
+      width: Xmax - Xmin,
+      height: Ymax - Ymin,
+    };
+  };
+
   const handleAnnotateDragEnd = (
     event: KonvaEventObject<DragEvent>,
     id: number
@@ -270,21 +286,8 @@ const Select = ({
               temp.opacity(0.25);
             }}
             onClick={() => {
-              polygonRef.current[index].current!.getSelfRect = function () {
-                const Xs = item.points.filter((num, indx) => indx % 2 === 0);
-                const Ys = item.points.filter((num, indx) => indx % 2 === 1);
-                const Xmin = Math.min(...Xs);
-                const Xmax = Math.max(...Xs);
-                const Ymin = Math.min(...Ys);
-                const Ymax = Math.max(...Ys);
-
-                return {
-                  x: Xmin,
-                  y: Ymin,
-                  width: Xmax - Xmin,
-                  height: Ymax - Ymin,
-                };
-              };
+              polygonRef.current[index].current!.getSelfRect = () =>
+                getTransformerRect(item.points);
               trRef.current!.nodes([polygonRef.current[index].current!]);
               trRef.current!.getLayer()!.batchDraw();
             }}
@@ -321,13 +324,20 @@ const Select = ({
                     }),
                   };
                 });
+                const finalPoints = currentPolygon.points.map((pt, idx) => {
+                  if (idx % 2 === 0) return pt + x;
+                  return pt + y;
+                });
+
+                polygonRef.current[index].current!.getSelfRect = () =>
+                  getTransformerRect(finalPoints);
+                trRef.current!.nodes([polygonRef.current[index].current!]);
+                trRef.current!.getLayer()!.batchDraw();
+
                 polygons.splice(index, 1, {
                   ...currentPolygon,
                   deductRect: finalDeducts,
-                  points: currentPolygon.points.map((pt, idx) => {
-                    if (idx % 2 === 0) return pt + x;
-                    return pt + y;
-                  }),
+                  points: finalPoints,
                 });
                 return prevCopy;
               });
@@ -385,6 +395,10 @@ const Select = ({
                   points: transformedPoints,
                   deductRect: transformedDeducts,
                 });
+                polygonRef.current[index].current!.getSelfRect = () =>
+                  getTransformerRect(transformedPoints);
+                trRef.current!.nodes([polygonRef.current[index].current!]);
+                trRef.current!.getLayer()!.batchDraw();
                 return prevCopy;
               });
               e.target._clearTransform();
@@ -415,21 +429,8 @@ const Select = ({
           }}
           draggable={true}
           onClick={() => {
-            lengthRef.current[index].current!.getSelfRect = function () {
-              const Xs = item.points.filter((num, indx) => indx % 2 === 0);
-              const Ys = item.points.filter((num, indx) => indx % 2 === 1);
-              const Xmin = Math.min(...Xs);
-              const Xmax = Math.max(...Xs);
-              const Ymin = Math.min(...Ys);
-              const Ymax = Math.max(...Ys);
-
-              return {
-                x: Xmin,
-                y: Ymin,
-                width: Xmax - Xmin,
-                height: Ymax - Ymin,
-              };
-            };
+            lengthRef.current[index].current!.getSelfRect = () =>
+              getTransformerRect(item.points);
             trRef.current!.nodes([lengthRef.current[index].current!]);
             trRef.current!.getLayer()!.batchDraw();
           }}
@@ -445,13 +446,20 @@ const Select = ({
               const temp = prevCopy[selectedPdf][selectedPage];
               const points = temp[index];
 
+              const updatedPoints = points.points.map((pt, idx) => {
+                if (idx % 2 === 0) return pt + x;
+                return pt + y;
+              });
+
               temp.splice(index, 1, {
                 ...points,
-                points: points.points.map((pt, idx) => {
-                  if (idx % 2 === 0) return pt + x;
-                  return pt + y;
-                }),
+                points: updatedPoints,
               });
+              lengthRef.current[index].current!.getSelfRect = () =>
+                getTransformerRect(updatedPoints);
+              trRef.current!.nodes([lengthRef.current[index].current!]);
+              trRef.current!.getLayer()!.batchDraw();
+
               return prevCopy;
             });
             e.target._clearTransform();
@@ -474,6 +482,12 @@ const Select = ({
             changeLength((prev) => {
               const prevCopy = _.cloneDeep(prev);
               const temp = prevCopy[selectedPdf][selectedPage];
+
+              lengthRef.current[index].current!.getSelfRect = () =>
+                getTransformerRect(transformedPoints);
+              trRef.current!.nodes([lengthRef.current[index].current!]);
+              trRef.current!.getLayer()!.batchDraw();
+
               temp.splice(index, 1, {
                 ...item,
                 points: transformedPoints,

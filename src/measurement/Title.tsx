@@ -1,5 +1,6 @@
 import { Box, styled } from "@mui/material";
 import { ReactComponent as Settings } from "../assets/icons/settingsHeight.svg";
+import { memo } from "react";
 
 const Title = (): JSX.Element => {
   return (
@@ -20,7 +21,7 @@ const Title = (): JSX.Element => {
   );
 };
 
-export default Title;
+export default memo(Title);
 
 const Container = styled(Box)({
   height: "35px",

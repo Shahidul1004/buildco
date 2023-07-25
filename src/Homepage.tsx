@@ -6,7 +6,6 @@ import {
   PdfjsDocument,
   pdfjsExtractPages,
 } from "./reusables/helpers";
-import * as pdfjsLib from "pdfjs-dist";
 import PreviewSection from "./preview/PreviewSection";
 import Playground from "./playground/Playground";
 import {
@@ -28,14 +27,15 @@ import _ from "lodash";
 import EstimateSection from "./estimate/EstimateSection";
 import { Backdrop, CircularProgress } from "@mui/material";
 import CostSection from "./cost/CostSection";
+import { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 
 const Homepage = (): JSX.Element => {
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const uploadedFiles = useRef<File[]>([]);
   const fileName = useRef<string[]>([]);
-  const pdfDocs = useRef<pdfjsLib.PDFDocumentProxy[]>([]);
-  const pdfPages = useRef<pdfjsLib.PDFPageProxy[][]>([]);
+  const pdfDocs = useRef<PDFDocumentProxy[]>([]);
+  const pdfPages = useRef<PDFPageProxy[][]>([]);
   const previewPages = useRef<HTMLImageElement[][]>([]);
   const [pdfOrder, setPdfOrder] = useState<number[]>([]);
   const [selectedPdf, setSelectedPdf] = useState<number>(-1);
@@ -83,7 +83,7 @@ const Homepage = (): JSX.Element => {
     setLoading(true);
     const names = await getFileName(files);
     const docs = await PdfjsDocument(files);
-    const newPages: pdfjsLib.PDFPageProxy[][] = [];
+    const newPages: PDFPageProxy[][] = [];
     const newPreviewPages: HTMLImageElement[][] = [];
     const newZoomLevel: number[][] = [];
     const newScaleInfo: scaleInfoType[][] = [];
@@ -176,13 +176,8 @@ const Homepage = (): JSX.Element => {
           {selectedPdf !== -1 && pdfOrder.length > 0 && (
             <>
               <Header
-                onFileUpload={fileUploadHandler}
-                fileName={fileName.current}
                 selectedPdf={selectedPdf}
-                changeSelectedPdf={setSelectedPdf}
                 selectedPage={selectedPage[selectedPdf]}
-                pdfOrder={pdfOrder}
-                changePdfOrder={setPdfOrder}
                 currentZoomLevel={
                   selectedPdf === -1
                     ? 50
@@ -199,13 +194,6 @@ const Homepage = (): JSX.Element => {
                 changeGroup={setGroup}
                 activeGroup={activeGroup}
                 changeActiveGroup={setActiveGroup}
-                scaleInfo={scaleInfo}
-                polygon={polygon}
-                changePolygon={setPolygon}
-                length={length}
-                changeLength={setLength}
-                count={count}
-                changeCount={setCount}
                 undoStack={undoStack}
                 redoStack={redoStack}
                 captureStates={captureStates}
@@ -243,7 +231,6 @@ const Homepage = (): JSX.Element => {
                   changeSelectedPage={setSelectedPage}
                   pages={pdfPages.current[selectedPdf]}
                   previewPages={previewPages.current[selectedPdf]}
-                  changeLoading={setLoading}
                   isGroupOpen={
                     activeTool === activeToolOptions.rectangle ||
                     activeTool === activeToolOptions.polygon ||

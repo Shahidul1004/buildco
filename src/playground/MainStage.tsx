@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import ScaleMeasurementModal from "../modal/ScaleMeasurementModal";
 import {
@@ -73,10 +73,11 @@ const MainStage = ({
   const enteredScale = useRef<any>();
   const [showScaleModal, setShowScaleModal] = useState<boolean>(false);
 
-  const scaleFactor =
-    zoomLevel >= 50
+  const scaleFactor = useMemo(() => {
+    return zoomLevel >= 50
       ? 0.5 * (1 + (zoomLevel - 50) / 50.0)
       : 0.5 * (1 + (0.5 * (zoomLevel - 50)) / 50.0);
+  }, [zoomLevel]);
 
   useEffect(() => {
     if (activeTool === activeToolOptions.pan) {
@@ -85,6 +86,15 @@ const MainStage = ({
       stageRef.current?.getStage().draggable(false);
     }
   }, [activeTool]);
+
+  const ImageLayer = useMemo(
+    () => (
+      <Layer name="imageLayer">
+        <Image id="image" image={blob} />
+      </Layer>
+    ),
+    [blob]
+  );
 
   return (
     <>
@@ -95,9 +105,7 @@ const MainStage = ({
         scaleY={scaleFactor}
         ref={stageRef}
       >
-        <Layer name="imageLayer">
-          <Image id="image" image={blob} />
-        </Layer>
+        {ImageLayer}
         {[activeToolOptions.scale].includes(activeTool) && (
           <Scale
             scaleFactor={scaleFactor}

@@ -26,7 +26,7 @@ const ZoomOut = ({
     setClick(true);
     const timer = setTimeout(() => {
       setClick(false);
-    }, 100);
+    }, 250);
     timerPool.current.push(timer);
 
     const newLevel = currentZoomLevel - 10;

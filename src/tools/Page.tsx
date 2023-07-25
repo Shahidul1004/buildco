@@ -10,33 +10,31 @@ type propsType = {
 
 const Page = ({ showPage, toggleShowPage }: propsType): JSX.Element => {
   return (
-    <>
-      <CustomButton
-        sx={{
-          padding: "0px 6px",
-          display: "flex",
-          flexFlow: "column nowrap",
+    <CustomButton
+      sx={{
+        padding: "0px 6px",
+        display: "flex",
+        flexFlow: "column nowrap",
+      }}
+      onClick={() => toggleShowPage((prev) => !prev)}
+    >
+      <PictureAsPdfIcon
+        fontSize="small"
+        style={{
+          width: "20px",
+          height: "20px",
+          color: `${showPage ? "#FFBC01" : "inherit"}`,
         }}
-        onClick={() => toggleShowPage((prev) => !prev)}
+      />
+      <Typography
+        fontSize={12}
+        sx={{
+          color: `${showPage ? "#FFBC01" : "inherit"}`,
+        }}
       >
-        <PictureAsPdfIcon
-          fontSize="small"
-          style={{
-            width: "20px",
-            height: "20px",
-            color: `${showPage ? "#FFBC01" : "inherit"}`,
-          }}
-        />
-        <Typography
-          fontSize={12}
-          sx={{
-            color: `${showPage ? "#FFBC01" : "inherit"}`,
-          }}
-        >
-          Page
-        </Typography>
-      </CustomButton>
-    </>
+        Page
+      </Typography>
+    </CustomButton>
   );
 };
 

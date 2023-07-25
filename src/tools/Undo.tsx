@@ -26,7 +26,7 @@ const Undo = ({
     setClick(true);
     const timer = setTimeout(() => {
       setClick(false);
-    }, 100);
+    }, 250);
     timerPool.current.push(timer);
 
     if (undoStack.current.length > 0) {

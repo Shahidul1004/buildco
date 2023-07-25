@@ -46,7 +46,7 @@ const DeleteModal = ({ onClose, onDelete, type }: propTypes): JSX.Element => {
             </CustomButton>
             <CustomButton
               variant="contained"
-              Color="white"
+              buttoncolor="white"
               hovercolor="white"
               backgroundcolor="#FFBC01"
               hoverbackgroudcolor="#ffa700"

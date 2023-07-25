@@ -56,7 +56,7 @@ const EstimateSection = ({
           <CustomButton
             backgroundcolor="#ffa700"
             hoverbackgroudcolor="#ff8700"
-            Color="white"
+            buttoncolor="white"
             hovercolor="white"
             sx={{
               marginLeft: "25px",
@@ -94,7 +94,7 @@ const EstimateSection = ({
           <CustomButton
             backgroundcolor="#ffa700"
             hoverbackgroudcolor="#ff8700"
-            Color="white"
+            buttoncolor="white"
             hovercolor="white"
             sx={{
               position: "absolute",
@@ -163,7 +163,7 @@ const EstimateSection = ({
           <CustomButton
             backgroundcolor="#ffa700"
             hoverbackgroudcolor="#ff8700"
-            Color="white"
+            buttoncolor="white"
             hovercolor="white"
             sx={{
               margin: "20px 0px",

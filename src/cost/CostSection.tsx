@@ -282,7 +282,7 @@ const CostSection = ({
           <CustomButton
             backgroundcolor="#ffa700"
             hoverbackgroudcolor="#ff8700"
-            Color="white"
+            buttoncolor="white"
             hovercolor="white"
             sx={{
               marginLeft: "25px",
@@ -320,7 +320,7 @@ const CostSection = ({
           <CustomButton
             backgroundcolor="#ffa700"
             hoverbackgroudcolor="#ff8700"
-            Color="white"
+            buttoncolor="white"
             hovercolor="white"
             sx={{
               position: "absolute",

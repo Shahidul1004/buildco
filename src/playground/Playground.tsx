@@ -69,7 +69,6 @@ const Playground = ({
   redoStack,
   captureStates,
 }: propsType): JSX.Element => {
-  const context = useContext(Context);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
   const [blob, setBlob] = useState<HTMLImageElement>();
 
@@ -114,7 +113,7 @@ const Playground = ({
   }, [page]);
   return (
     <>
-      <PlaygroundContainer navHeight={context.navHeight}>
+      <PlaygroundContainer>
         {blob && (
           <MainStage
             selectedPdf={selectedPdf}
@@ -148,16 +147,11 @@ const Playground = ({
 
 export default Playground;
 
-interface CustomBoxProps extends BoxProps {
-  navHeight: string;
-}
-const PlaygroundContainer = styled(Box)<CustomBoxProps>(
-  ({ theme, navHeight }) => ({
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "#234cbc21",
-  })
-);
+const PlaygroundContainer = styled(Box)({
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  backgroundColor: "#234cbc21",
+});

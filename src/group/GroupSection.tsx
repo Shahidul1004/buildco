@@ -3,6 +3,7 @@ import {
   MouseEventHandler,
   MutableRefObject,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -62,14 +63,18 @@ const GroupSection = ({
   );
   const openOption = Boolean(anchorElOption);
 
-  const currentGroup = filteredGroups.find(
-    (grp) =>
-      grp.id ===
-      (activeTool === activeToolOptions.count
-        ? activeGroup.count
-        : activeTool === activeToolOptions.length
-        ? activeGroup.length
-        : activeGroup.shape)
+  const currentGroup = useMemo(
+    () =>
+      filteredGroups.find(
+        (grp) =>
+          grp.id ===
+          (activeTool === activeToolOptions.count
+            ? activeGroup.count
+            : activeTool === activeToolOptions.length
+            ? activeGroup.length
+            : activeGroup.shape)
+      ),
+    [filteredGroups, activeGroup, activeTool]
   );
 
   useEffect(() => {
@@ -110,7 +115,7 @@ const GroupSection = ({
             return { ...prev, shape: 1 };
           });
     setFilteredGroups(availableGroups);
-  }, [group, activeTool]);
+  }, [group, activeTool, changeActiveGroup, activeGroup]);
 
   const handleToggleList: MouseEventHandler<HTMLDivElement> = (event) => {
     if (anchorElList) {
@@ -327,7 +332,7 @@ const GroupSection = ({
       <CustomButton
         backgroundcolor="#ffa700"
         hoverbackgroudcolor="#ff8700"
-        Color="white"
+        buttoncolor="white"
         hovercolor="white"
         sx={{
           borderRadius: "10px",

@@ -1,6 +1,11 @@
-import * as pdfjsLib from "pdfjs-dist";
+import {
+  GlobalWorkerOptions,
+  PDFDocumentProxy,
+  PDFPageProxy,
+  getDocument,
+} from "pdfjs-dist";
 import { scaleInfoType } from "../utils";
-pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.entry.js");
+GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.entry.js");
 
 const getFileName = async (
   files: File | FileList
@@ -13,29 +18,32 @@ const getFileName = async (
   return names;
 };
 
-const PdfjsDocument = async (
-  files: FileList
-): Promise<pdfjsLib.PDFDocumentProxy[]> => {
-  const docs: pdfjsLib.PDFDocumentProxy[] = [];
+const getPdfDoc = async (file: File) => {
+  const pdfDoc = await getDocument(URL.createObjectURL(file)).promise.then(
+    (pdf: PDFDocumentProxy) => pdf
+  );
+  return pdfDoc;
+};
+
+const PdfjsDocument = async (files: FileList): Promise<PDFDocumentProxy[]> => {
+  const docs: PDFDocumentProxy[] = [];
   for (const file of files) {
-    const pdfDoc = await pdfjsLib
-      .getDocument(URL.createObjectURL(file))
-      .promise.then((pdf: pdfjsLib.PDFDocumentProxy) => pdf);
+    const pdfDoc = await getPdfDoc(file);
     docs.push(pdfDoc);
   }
   return docs;
 };
 
 const pdfjsExtractPages = async (
-  pdfDoc: pdfjsLib.PDFDocumentProxy,
+  pdfDoc: PDFDocumentProxy,
   pageIndex: number[]
-): Promise<pdfjsLib.PDFPageProxy[]> => {
-  const pdfPages: pdfjsLib.PDFPageProxy[] = [];
-  const promises: Promise<pdfjsLib.PDFPageProxy>[] = [];
+): Promise<PDFPageProxy[]> => {
+  const pdfPages: PDFPageProxy[] = [];
+  const promises: Promise<PDFPageProxy>[] = [];
 
   for (const index of pageIndex) {
     await pdfDoc.getPage(index).then((page) => {
-      const promise = new Promise<pdfjsLib.PDFPageProxy>((resolve, reject) =>
+      const promise = new Promise<PDFPageProxy>((resolve, reject) =>
         resolve(page)
       );
       promises.push(promise);
@@ -174,7 +182,7 @@ const getScaledArea = (
 
 const Pdf2Image = async (
   hiddenCanvasRef: React.RefObject<HTMLCanvasElement>,
-  pages: pdfjsLib.PDFPageProxy[]
+  pages: PDFPageProxy[]
 ) => {
   const canvas = hiddenCanvasRef.current!;
   const ctx = canvas.getContext("2d")!;
