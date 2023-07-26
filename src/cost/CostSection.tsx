@@ -60,6 +60,7 @@ const CostSection = ({
   const rowIndexForTax = useRef<number>(0);
   const pdfRef = useRef<HTMLDivElement>(null);
   const hiddenText = useRef<HTMLDivElement>(null);
+  const componentToRender = useRef<HTMLDivElement>(null);
 
   const handleToggleTax: MouseEventHandler<HTMLDivElement> = (event) => {
     if (anchorElTax) {
@@ -331,12 +332,17 @@ const CostSection = ({
               fontSize: "14px",
             }}
             onClick={useReactToPrint({
-              content: () => pdfRef.current,
+              content: () => componentToRender.current!.firstElementChild,
               onBeforeGetContent: () => {
-                hiddenText.current!.style.display = "flex";
+                const pdfRefClone = pdfRef.current!.cloneNode(true);
+                const hiddenTextClone = hiddenText.current!.cloneNode(true);
+                componentToRender.current!.appendChild(pdfRefClone);
+                componentToRender.current!.firstChild!.firstChild!.before(
+                  hiddenTextClone
+                );
               },
-              onAfterPrint: () => {
-                hiddenText.current!.style.display = "none";
+              onBeforePrint: () => {
+                componentToRender.current!.firstChild!.firstChild?.remove();
               },
             })}
           >
@@ -350,33 +356,13 @@ const CostSection = ({
             sx={{
               margin: "30px 30px",
               overflow: "hidden",
+              overflowY: "auto",
               display: "flex",
               flexDirection: "column",
 
               alignItems: "flex-start",
             }}
           >
-            <Box
-              ref={hiddenText}
-              sx={{
-                marginBottom: "15px",
-                width: "1055px",
-                display: "none",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <LogoIcon style={{ width: "150px" }} />
-              <Typography
-                sx={{
-                  color: "#FFBC01",
-                  fontSize: "24px",
-                  fontWeight: "500",
-                }}
-              >
-                Estimates
-              </Typography>
-            </Box>
             <Row
               sx={{
                 color: "#666",
@@ -684,6 +670,40 @@ const CostSection = ({
               </Box>
             </Box>
           </Box>
+          <Box
+            className="hiddenText"
+            style={{
+              display: "none",
+            }}
+          >
+            <Box
+              ref={hiddenText}
+              sx={{
+                marginBottom: "15px",
+                width: "1055px",
+                justifyContent: "space-between",
+                alignItems: "center",
+                display: "flex",
+              }}
+            >
+              <LogoIcon style={{ width: "150px" }} />
+              <Typography
+                sx={{
+                  color: "#FFBC01",
+                  fontSize: "24px",
+                  fontWeight: "500",
+                }}
+              >
+                Estimates
+              </Typography>
+            </Box>
+          </Box>
+          <div
+            ref={componentToRender}
+            style={{
+              display: "none",
+            }}
+          ></div>
         </TableSection>
       </Box>
       <Menu

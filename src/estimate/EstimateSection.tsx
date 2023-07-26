@@ -38,6 +38,7 @@ const EstimateSection = ({
 }: propsType): JSX.Element => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const hiddenText = useRef<HTMLDivElement>(null);
+  const componentToRender = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -105,12 +106,19 @@ const EstimateSection = ({
               fontSize: "14px",
             }}
             onClick={useReactToPrint({
-              content: () => pdfRef.current,
-              onBeforeGetContent: () => {
-                hiddenText.current!.style.display = "flex";
+              content: () => {
+                return componentToRender.current!.firstElementChild;
               },
-              onAfterPrint: () => {
-                hiddenText.current!.style.display = "none";
+              onBeforeGetContent: () => {
+                const pdfRefClone = pdfRef.current!.cloneNode(true);
+                const hiddenTextClone = hiddenText.current!.cloneNode(true);
+                componentToRender.current!.appendChild(pdfRefClone);
+                componentToRender.current!.firstChild!.firstChild!.before(
+                  hiddenTextClone
+                );
+              },
+              onBeforePrint: () => {
+                componentToRender.current!.firstChild!.firstChild?.remove();
               },
             })}
           >
@@ -127,27 +135,6 @@ const EstimateSection = ({
               overflowY: "auto",
             }}
           >
-            <Box
-              ref={hiddenText}
-              sx={{
-                width: "1025px",
-                marginBottom: "15px",
-                justifyContent: "space-between",
-                alignItems: "center",
-                display: "none",
-              }}
-            >
-              <LogoIcon style={{ width: "150px" }} />
-              <Typography
-                sx={{
-                  color: "#FFBC01",
-                  fontSize: "24px",
-                  fontWeight: "500",
-                }}
-              >
-                All Measurements
-              </Typography>
-            </Box>
             {pdfOrder.map((order) => (
               <EstimatePerPdf
                 key={order}
@@ -178,6 +165,40 @@ const EstimateSection = ({
           >
             Calculate Cost
           </CustomButton>
+          <Box
+            className="hiddenText"
+            style={{
+              display: "none",
+            }}
+          >
+            <Box
+              ref={hiddenText}
+              sx={{
+                width: "1025px",
+                marginBottom: "15px",
+                justifyContent: "space-between",
+                alignItems: "center",
+                display: "flex",
+              }}
+            >
+              <LogoIcon style={{ width: "150px" }} />
+              <Typography
+                sx={{
+                  color: "#FFBC01",
+                  fontSize: "24px",
+                  fontWeight: "500",
+                }}
+              >
+                All Measurements
+              </Typography>
+            </Box>
+          </Box>
+          <div
+            ref={componentToRender}
+            style={{
+              display: "none",
+            }}
+          ></div>
         </EstimateModal>
       </Box>
     </>
